@@ -27,3 +27,7 @@ It borrows accessibility design patterns from the Filament Group's jQuery UI Sel
   * http://jquery.com/
   * http://jqueryui.com/
   * A live demonstration may be found at http://rayui.github.com/flyweight-jquery-custom-select/
+  
+## Disclaimer
+
+This code is currently only a functional prototype and should not be considered production ready code. Please see the unstbale branch for the latest commits
