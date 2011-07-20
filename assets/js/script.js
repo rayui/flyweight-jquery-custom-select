@@ -27,9 +27,41 @@ Number.prototype.mod = function(n) {
 	return ((this%n)+n)%n;
 };
 
-/*Initialise custom select plugin on document ready*/
+/* renderer */
+
+var render = function(e) {
+	e.stopPropagation();
+	e.preventDefault();
+	
+	var $form = $("form");
+	$form.empty();
+	
+	var numSelects = parseInt($("#render-count").val(), 10);
+	var i = numSelects;
+	
+	while (i--) {
+		var $select = $('<select id="select" name="select' + i + '" class="select' + i + '"><option value="" selected="selected">Please select...</option><option value="MR" >Mr</option><option value="MRS" >Mrs</option><option value="MS" >Ms</option><option value="MISS" >Miss</option><option value="DRM" >Dr – Male</option><option value="DRF" >Dr – Female</option></select>');
+		$form.append($select);
+	}
+	
+	var time = new Date().getTime();
+	
+	if (e.data.engine === "flyweight") {
+		$("select").each(function(index, element) {
+			customSelectManager.addCustomSelect(this);
+		});
+		customSelectManager.resetTabIndexes();
+	} else {
+		$("select").selectmenu();
+	}
+	
+	time = new Date().getTime() - time;
+	$("form").prepend("<div><span>Time to render " + numSelects + " custom selects: " + time + " ms</span><span>Average time per select: " + parseInt((time / numSelects), 10) + " ms</span></div>");
+};
+
+/*Initialise custom select plugin test on document ready*/
 
 $().ready(function() {
-        customSelectManager.addCustomSelect($("select"));
-	customSelectManager.resetTabIndexes();
+	$("#render-flyweight").bind("click", {engine:"flyweight"}, render);
+	$("#render-fnagel").bind("click", {engine:"fnagel"}, render);
 });

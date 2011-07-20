@@ -29,22 +29,22 @@
 <body> 
 
 	<h1>flyweight-jquery-custom-select</h1>
-<select id="Q_PD_TITLETYPES" name="Q_PD_TITLETYPES" class="validate:(requiredSelect) ">
-		<option value="" selected="selected">
-			Please select...
-		</option><option value="MR" >Mr</option>
-		<option value="MRS" >Mrs</option>
-		<option value="MS" >Ms</option>		
-		<option value="MISS" >Miss</option>
-		<option value="DRM" >Dr – Male</option>
-		<option value="DRF" >Dr – Female</option>
-
-
-</select>
-  <!-- scripts concatenated and minified via ant build script--> 
- 
+	
+	<div class="control">
+		<label for="render-count">Number of selects</label>
+		<input id="render-count" type="text" value="300">
+		<a id="render-flyweight" href="#">Render with flyweight</a>
+		<a id="render-fnagel" href="#">Render with fnagel</a>
+	</div>
+	
+	<form id="form" method="get" action="#">
+		
+	</form>
+	
   	<script src="assets/js/libs/jquery-1.4.2.min.js" type="text/javascript" charset="utf-8"></script>
 	<script src="assets/js/libs/jquery-ui-1.8.14.custom.min.js" type="text/javascript" charset="utf-8"></script>
+	<script src="assets/js/libs/jquery.ui.widget.js" type="text/javascript" charset="utf-8"></script>
+	<script src="assets/js/libs/jquery.ui.selectmenu.js" type="text/javascript" charset="utf-8"></script>
 	<script src="assets/js/jquery.flyweightcustomselect-0.1.js" type="text/javascript" charset="utf-8"></script> 
 	<script src="assets/js/script.js" type="text/javascript" charset="utf-8"></script> 
 

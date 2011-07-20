@@ -9,6 +9,10 @@ body select, body input{
 	color: #6c6e69;
 }
 
+a {
+	color:white;
+}
+
 /* custom dropdown */
 /* Selectmenu
 /* based on example class names and styles from 
@@ -19,7 +23,7 @@ body select, body input{
 	http://www.filamentgroup.com/lab/jquery_ui_selectmenu_an_aria_accessible_plugin_for_styling_a_html_select/
 
 ----------------------------------*/
-.ui-selectmenu { display: block; position:relative; height:2em; text-decoration: none; overflow:hidden;}
+.ui-selectmenu { display: block; position:relative; float:left; height:2em; text-decoration: none; overflow:hidden;margin:0 10px 0 0;}
 .ui-selectmenu-icon { 
 	position:absolute; right:-3px; margin-top:0; top: 0;
 	background: url(../img/custom_dropdown_bg.png) no-repeat 100% -501px;
