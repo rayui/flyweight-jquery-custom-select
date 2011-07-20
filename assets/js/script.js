@@ -47,10 +47,12 @@ var render = function(e) {
 	var time = new Date().getTime();
 	
 	if (e.data.engine === "flyweight") {
-		$("select").each(function(index, element) {
+		/*$("select").each(function(index, element) {
 			customSelectManager.addCustomSelect(this);
-		});
-		customSelectManager.resetTabIndexes();
+		});*/
+		//customSelectManager.resetTabIndexes();
+		$("select").flyweightCustomSelect();
+		
 	} else {
 		$("select").selectmenu();
 	}
