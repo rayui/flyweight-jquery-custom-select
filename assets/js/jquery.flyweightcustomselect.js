@@ -16,60 +16,73 @@
 		var searchString = ""; //must be global as needs to persist
 		var timer;
 
-		//dropdown constructor
-		var dropDown = function() {
-			var element = document.createElement('div');
+		//dropdown menu constructor
+		var flyweightMenu = function() {
+			var menu = document.createElement('div');
 			var isOpen = false;
 			
-			element.style.display = 'none';
-			element.style.position = 'absolute';
-			element.className = 'customSelect';
+			var setListToSelectedIndex = function(selectEl) {
+				var $menu = $(menu);
+				var $selectedLi = $menu.find("li:eq(" + selectEl.selectedIndex + ")");
+				$menu.find("ul").scrollTop(0);
+				$menu.find("li a").removeClass("hover");
+				if ($selectedLi.length > 0) {
+					$selectedLi.find("a").addClass("hover");
+					$menu.find("ul").scrollTop($selectedLi.position().top);
+				}
+			}
 			
-			document.getElementsByTagName('body')[0].appendChild(element);
-			// add event handler to the page, so when you click anywhere which ISN'T the custom select menu, or a placeholder
-			// for one, we close the custom select menu
-			$('body, .accordionControl').bind('click keydown focus', function(e) {
-			    if ((!$(e.target).closest('.ui-selectmenu-menu').length) && (!$(e.target).closest('a.placeholder').length)) {
-				storedInstance.close();
-			    };
-			});
+			menu.style.display = 'none';
+			menu.style.position = 'absolute';
+			menu.className = 'customSelect';
+			
+			document.getElementsByTagName('body')[0].appendChild(menu);
 			
 			return {
-				open: function(list, xy) {
-					//selectedIndex = customSelectManager._getOriginalFromFauxSelect($(fauxSelectTarget))[0].selectedIndex - 1;
+				open: function(selectEl, list, xy) {
+					selectedIndex = select.selectedIndex - 1;
 					customHTML = '</ul>';
 					var i = list[0].length;
 					while (i--) {
-					customHTML = '<li><a data-value="' + list[1][i] + '" href="#">' + list[0][i] + '</a></li>' + customHTML;
+						customHTML = '<li><a data-value="' + list[1][i] + '" href="#">' + list[0][i] + '</a></li>' + customHTML;
 					}
 					customHTML = '<ul class="ui-selectmenu-menu ui-widget ui-widget-content ui-selectmenu-menu-dropdown ui-corner-bottom" style="visibility:visible;">' + customHTML;
-					element.innerHTML = customHTML;
-					element.style.left = xy.left + 'px';
-					element.style.top = xy.top + 'px';
-					element.style.display = 'block';
-					var $list = $(element);
-					var placeholderWidth = $(fauxSelectTarget).width();
-					if (placeholderWidth > $list.width()) {
-						$list.find("ul").width(placeholderWidth);
-						if($list.find("ul").hasScrollBar()) {
-							$list.find("li").width(placeholderWidth - 17); //arbitrarily set width of scrollbar - varies from OS to OS. i picked an approximate value
+					
+					menu.innerHTML = customHTML;
+					menu.style.left = xy.left + 'px';
+					menu.style.top = xy.top + 'px';
+					menu.style.display = 'block';
+					
+					//make jQuery to get rendered width
+					var $menu = $(menu);
+					var placeholderWidth = $(selectEl).width();
+					if (placeholderWidth > $menu.width()) {
+						$menu.find("ul").width(placeholderWidth);
+						if($menu.find("ul").hasScrollBar()) {
+							$menu.find("li").width(placeholderWidth - 17); //arbitrarily set width of scrollbar - varies from OS to OS. i picked an approximate value
 						} else {
-							$list.find("li").width(placeholderWidth);
+							$menu.find("li").width(placeholderWidth);
 						}       
 					}
-					customSelectManager._setListToSelectedIndex();
+					setListToSelectedIndex(selectEl);
+					
 					//ensure fauxSelect is always visible
-					if($list.offset().top + $list.height() > $(window).height()) {
+					if($menu.offset().top + $menu.height() > $(window).height()) {
 						var scrollEl = $.browser.webkit ? document.body : "html"; 
-						$(scrollEl).animate({scrollTop: $list.offset().top - 100}, 1000);
+						$(scrollEl).animate({scrollTop: $element.offset().top - 100}, 1000);
 					}
+					
+					//set flag
 					isOpen = true;
 				},
 				close: function() {
 					selectedIndex = 0;
-					element.style.display = 'none';
+					menu.style.display = 'none';
+
+					//set flag
 					isOpen = false;
-				}
+				},
+
 			};
 		};
 		
@@ -78,11 +91,31 @@
 			return ((m%n)+n)%n;
 		};
 		
-		//instantiate single drop down
-		storedInstance = new dropDown();
+		/*create placeHolder for original submit */
+		var createPlaceholder = function(selectEl) {
+			var $selectEl = $(selectEl);
+			var text = $selectEl.find("option:eq(0)").text();
+			var $placeHolder = $('<a href="#" aria-owns="' + selectEl.id + '" class="placeholder ui-selectmenu ui-widget ui-state-default ui-selectmenu-dropdown ui-corner-all" role="button" href="#" tabindex="0" aria-haspopup="true" id="' + selectEl.id + '-button"><span class="ui-selectmenu-status">' + text + '</span><span class="ui-selectmenu-icon ui-icon ui-icon-triangle-1-s"></span></a>');
+			$selectEl.after($placeHolder);
+			$selectEl.hide();
+			return $placeHolder;
+		}
+		
+		//instantiate single drop down menu
+		storedInstance = new flyweightMenu();
+		
+		// add event handler to the page, so when you click anywhere which ISN'T the custom select menu, or a placeholder
+		// for one, we close the custom select menu
+		$('body').bind('click keydown focus', function(e) {
+		    if ((!$(e.target).closest('.ui-selectmenu-menu').length) && (!$(e.target).closest('a.placeholder').length)) {
+			storedInstance.close();
+		    };
+		});
+
 				
 		return this.each(function() {
-			console.log();
+			var $placeHolder = createPlaceholder(this);
+			return this;
 		});
 	};
 	
