@@ -15,68 +15,97 @@
 		var selectedIndex = null;
 		var searchString = ""; //must be global as needs to persist
 		var timer;
+		
+		/*Produce modulo correctly */		
+		var mod = function(m, n) {
+			return ((m%n)+n)%n;
+		};
 
 		//dropdown menuDiv constructor
 		var flyweightMenu = function() {
 			//variables to remember which element the last event was fired from
-			var lastPlaceHolder = null;
-			var lastSelectEl = null;
-			
-			var menuDiv = document.createElement('div');
-			var $menuDiv = $(menuDiv);
-			
+			var placeHolder = null;
+			var selectEl = null;
 			var isOpen = false;
+			var menuDiv, $menuDiv;
 			
-			var setListToSelectedIndex = function(selectEl) {
-				var $selectedLi = $menuDiv.find("li:eq(" + selectEl.selectedIndex + ")");
+			var setListToSelectedIndex = function(index) {
+				//update selecEl value to new index
+				var $selectEl = $(selectEl);
+				$selectEl.find("option").removeAttr("selected");
+				
+				selectEl.value = selectEl.options[index].value;
+				selectEl.options[index].selected = true;
+				
+				//scroll to selected LI in list
+				var $selectedLi = $menuDiv.find("li:eq(" + index + ")");
 				$menuDiv.find("ul").scrollTop(0);
 				$menuDiv.find("li a").removeClass("hover");
 				if ($selectedLi.length > 0) {
 					$selectedLi.find("a").addClass("hover");
 					$menuDiv.find("ul").scrollTop($selectedLi.position().top);
 				}
+				
+				//update value of anchor
+				$(placeHolder).find(".ui-selectmenu-status").text($selectedLi.text());
+
 			}
 			
-			var getOptFromSelect = function(selectEl, value) {
+			var getOptFromSelect = function(value) {
 				return $(selectEl).find("option[value='" + value + "']");
 			}
 			
-			menuDiv.style.display = 'none';
-			menuDiv.style.position = 'absolute';
-			menuDiv.className = 'customSelect';
-			
-			document.getElementsByTagName('body')[0].appendChild(menuDiv);
-			
-			$menuDiv.bind('click', function(e, selectedAnchor) {
+			var onclick = function(e) {
 				e.preventDefault();
 				e.stopPropagation();
 				
+				var selectedAnchor = e.srcElement;
+				
 				//we only set target for keyboard nav as events will be triggered on wrapper div, not anchor (as is when clicked)
 				//we need to check this because the person could theoretically click on the div which the elements are bound to, as opposed to the anchor 
-				if (e.target.nodeName.toLowerCase() !== "a" && selectedAnchor === undefined) {
+				if (selectedAnchor.nodeName.toLowerCase() !== "a") {
 					return false;
-				}
+				}				
 				
-				if (selectedAnchor === undefined) {
-					selectedAnchor = e.target;
-				}
-				
-				var text = $(selectedAnchor).text();
+				//get index of selected item in list and update the controls
 				var value = $(selectedAnchor).attr("data-value");
+				var index  = $(selectEl).find("option[value='" + value + "']").index() - 1;
+				setListToSelectedIndex(index);
 				
-				var $selectEl = $(selectEl);
-				$selectEl.value = value;
-				$selectEl.find("option").removeAttr("selected");
-				getOptFromSelect(selectEl, value).attr("selected", "selected");
-				$(placeHolder).find(".ui-selectmenu-status").text(text);
 				//kick off the change event bound to the actual select
-				$selectEl.trigger("change");
 				menu.close();
-			});
+			}
+			
+			var selectNext = function() {
+				var index = mod(parseInt(selectEl.selectedIndex + 1, 10) ,selectEl.options.length - 1);
+                    		setListToSelectedIndex(index);
+			}
+			
+			var selectPrevious = function() {
+				var index = mod(parseInt(selectEl.selectedIndex - 1, 10) ,selectEl.options.length - 1);
+                    		setListToSelectedIndex(index);
+			}
+			
+			var init = function() {
+				menuDiv = document.createElement('div');
+
+				menuDiv.style.display = 'none';
+				menuDiv.style.position = 'absolute';
+				menuDiv.className = 'customSelect';
+			
+				$('body').append(menuDiv);
+				$menuDiv = $(menuDiv);
+				
+				$menuDiv.bind('click', onclick);
+			}
+			
+			//intialise menu object
+			init();
 			
 			return {
 				open: function(triggeredPlaceHolder, triggeredSelectEl) {
 					
+					//set to remember which object triggered open
 					placeHolder = triggeredPlaceHolder;
 					selectEl = triggeredSelectEl;
 					
@@ -113,7 +142,7 @@
 						}       
 					}
 					
-					setListToSelectedIndex(selectEl);
+					setListToSelectedIndex(selectEl.selectedIndex);
 					
 					//ensure fauxSelect is always visible
 					if($menuDiv.offset().top + $menuDiv.height() > $(window).height()) {
@@ -130,13 +159,16 @@
 					//set flag
 					isOpen = false;
 				},
-
+				visible: function() {
+					return isOpen;	
+				},
+				scrollDown: function() {
+					selectNext();	
+				},
+				scrollUp: function() {
+					selectPrevious();	
+				}
 			};
-		};
-		
-		/*Produce modulo correctly */		
-		var mod = function(m, n) {
-			return ((m%n)+n)%n;
 		};
 		
 		// this utility function gets all the options out of the referenced select,
@@ -198,8 +230,8 @@
 				switch (true) {
 					case (e.which === $.ui.keyCode.LEFT):
 					case (e.which === $.ui.keyCode.UP):
-						if (menu.isOpen) {
-							$(menu).trigger("select.previous", [target]);
+						if (menu.visible()) {
+							menu.scrollUp();
 						} else {
 							$(this).trigger("click");
 						}
@@ -207,8 +239,8 @@
 						break;
 					case (e.which === $.ui.keyCode.RIGHT):
 					case (e.which === $.ui.keyCode.DOWN):
-						if (menu.isOpen) {
-							$(menu).trigger("select.next", [target]);
+						if (menu.visible()) {
+							menu.scrollDown();
 						} else {
 							$(this).trigger("click");
 						}
@@ -217,11 +249,8 @@
 					case (e.which === $.ui.keyCode.ENTER):
 					case (e.which === $.ui.keyCode.TAB):
 						//trigger click on nav
-						if (menu.isOpen) {
-							var selectedAnchor = $(menu).find("li:eq(" + selectEl.selectedIndex + ") a");
-							if (selectedAnchor.length > 0) {
-								$(menu).trigger("click", [placeHolder, selectEl, selectedAnchor]);
-							}
+						if (menu.visible()) {
+							menu.onclick();
 						} else {
 							if (e.which === $.ui.keyCode.ENTER) {
 								$(this).trigger("click");
