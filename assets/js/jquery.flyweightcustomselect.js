@@ -11,8 +11,6 @@
 		
 		//need to review the need for these variables in light of sensible model
 		var menu = null;
-		var fauxSelectTarget = null;
-		var selectedIndex = null;
 		var searchString = ""; //must be global as needs to persist
 		var timer;
 		
@@ -28,6 +26,19 @@
 			var selectEl = null;
 			var isOpen = false;
 			var menuDiv, $menuDiv;
+			
+			// this utility function gets all the options out of the referenced select,
+			// then gets their values ansd returns them in an array
+			var getSelectDataAsArray = function(selectEl) {
+				var text = $.map($('option', selectEl), function(el, index) {
+					return $(el).text();
+				});
+				var values = $.map($('option', selectEl), function(el, index) {
+					return $(el).attr("value");
+				});
+				
+				return [text, values];
+			};
 			
 			var setListToSelectedIndex = function(index) {
 				//update selecEl value to new index
@@ -49,11 +60,11 @@
 				//update value of anchor
 				$(placeHolder).find(".ui-selectmenu-status").text($selectedLi.text());
 
-			}
+			};
 			
 			var getOptFromSelect = function(value) {
 				return $(selectEl).find("option[value='" + value + "']");
-			}
+			};
 			
 			var onclick = function(e) {
 				e.preventDefault();
@@ -69,7 +80,7 @@
 				
 				//get index of selected item in list and update the controls
 				var value = $(selectedAnchor).attr("data-value");
-				var index  = $(selectEl).find("option[value='" + value + "']").index() - 1;
+				var index  = $(selectEl).find("option[value='" + value + "']").index();
 				setListToSelectedIndex(index);
 				
 				//kick off the change event bound to the actual select
@@ -77,6 +88,8 @@
 			}
 			
 			var selectNext = function() {
+				//need to think up a more intelligent way of matching elements here so we can take care of items we would like to be hidden
+				//we need to match the highlighted anchor data-value to the value of the item in the select
 				var index = mod(parseInt(selectEl.selectedIndex + 1, 10) ,selectEl.options.length - 1);
                     		setListToSelectedIndex(index);
 			}
@@ -116,11 +129,12 @@
 					
 					//get data from select
 					var list = getSelectDataAsArray(selectEl);
-					var i = list[0].length;
+					var i = list[0].length - 1;
 					var customHTML = '</ul>';
 					
-					while (i--) {
+					while (i >= 0) {
 						customHTML = '<li><a data-value="' + list[1][i] + '" href="#">' + list[0][i] + '</a></li>' + customHTML;
+						i--;
 					}
 					
 					customHTML = '<ul class="ui-selectmenu-menu ui-widget ui-widget-content ui-selectmenu-menu-dropdown ui-corner-bottom" style="visibility:visible;">' + customHTML;
@@ -169,25 +183,6 @@
 					selectPrevious();	
 				}
 			};
-		};
-		
-		// this utility function gets all the options out of the referenced select,
-		// then gets their values ansd returns them in an array
-		var getSelectDataAsArray = function(selectEl) {
-			var text = $.map($('option', selectEl), function(el, index) {
-				return $(el).text();
-			});
-			var values = $.map($('option', selectEl), function(el, index) {
-				return $(el).attr("value");
-			});
-			
-			//if value of first option element is empty, chop it out of list, which is unselected value of select
-			if (selectEl.options[0].value.length === 0) {
-				text.splice(0, 1);
-				values.splice(0, 1);
-			}
-			
-			return [text, values];
 		};
 		
 		/*create placeHolder for original submit */
@@ -250,7 +245,7 @@
 					case (e.which === $.ui.keyCode.TAB):
 						//trigger click on nav
 						if (menu.visible()) {
-							menu.onclick();
+							menu.close();
 						} else {
 							if (e.which === $.ui.keyCode.ENTER) {
 								$(this).trigger("click");
@@ -310,14 +305,8 @@
 
 				
 		return this.each(function() {
-			//hideAndReplaceOriginalSelect
-			//target === this
-			//$customSelect === $menu
-			
 			var $placeHolder = createPlaceholder(this);
 			var $menu = $(menu.menuDiv);
-			
-			
 			
 			return this;
 		});
