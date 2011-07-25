@@ -47,7 +47,7 @@ var render = function(e) {
 	var time = new Date().getTime();
 	
 	if (e.data.engine === "flyweight") {
-		$("select").flyweightCustomSelect().each(function(){console.log(this)});
+		$("select").flyweightCustomSelect();
 	} else {
 		$("select").selectmenu();
 	}
