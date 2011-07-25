@@ -15,7 +15,7 @@
 		var timer;
 		
 		/*Produce modulo correctly */		
-		var mod = function(m, n) {
+		var mod = function(n, m) {
 			return ((m%n)+n)%n;
 		};
 
@@ -87,16 +87,26 @@
 				menu.close();
 			}
 			
-			var selectNext = function() {
+			var selectItem = function(offset) {
 				//need to think up a more intelligent way of matching elements here so we can take care of items we would like to be hidden
 				//we need to match the highlighted anchor data-value to the value of the item in the select
-				var index = mod(parseInt(selectEl.selectedIndex + 1, 10) ,selectEl.options.length - 1);
-                    		setListToSelectedIndex(index);
-			}
-			
-			var selectPrevious = function() {
-				var index = mod(parseInt(selectEl.selectedIndex - 1, 10) ,selectEl.options.length - 1);
-                    		setListToSelectedIndex(index);
+				
+				/*new algorithm:
+				/* step to next while option's value is not empty and is not an optgroup or label
+				/* set index
+				/* set list to selected index
+				*/
+				
+				/* step to next while option's value is not empty and is not an optgroup or label*/
+				
+				var index = mod(selectEl.childNodes.length, parseInt(selectEl.selectedIndex + (1 * offset), 10))
+				while (selectEl[index].getAttribute("value") === undefined) {
+					index += (1 * offset);
+				}
+				
+				selectEl.selectedIndex = mod(selectEl.childNodes.length, parseInt(index, 10));
+				console.log(selectEl.selectedIndex);
+                    		setListToSelectedIndex(selectEl.selectedIndex);
 			}
 			
 			var init = function() {
@@ -177,10 +187,10 @@
 					return isOpen;	
 				},
 				scrollDown: function() {
-					selectNext();	
+					selectItem(1);	
 				},
 				scrollUp: function() {
-					selectPrevious();	
+					selectItem(-1);	
 				}
 			};
 		};
