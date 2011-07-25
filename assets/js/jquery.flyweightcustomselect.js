@@ -11,8 +11,6 @@
 		
 		//need to review the need for these variables in light of sensible model
 		var menu = null;
-		var searchString = ""; //must be global as needs to persist
-		var timer;
 		
 		/*Produce modulo correctly */		
 		var mod = function(n, m) {
@@ -26,10 +24,60 @@
 			var selectEl = null;
 			var isOpen = false;
 			var menuDiv, $menuDiv;
+			var searchString = "";
+			var timer;
+			
+			var buildMarkup = function() {
+				//get data from select
+				//build markup of control
+				var list = getSelectDataAsArray(selectEl);
+				var i = list[0].length - 1;
+				var customHTML = '</ul>';
+				
+				while (i >= 0) {
+					customHTML = '<li><a data-value="' + list[1][i] + '" href="#">' + list[0][i] + '</a></li>' + customHTML;
+					i--;
+				}
+				
+				menuDiv.innerHTML = '<ul class="ui-selectmenu-menu ui-widget ui-widget-content ui-selectmenu-menu-dropdown ui-corner-bottom" style="visibility:visible;">' + customHTML;
+			};
+			
+			var positionPlaceHolder = function() {
+				//get offset of placeholder for menu position
+				//msie7 reports offset incorrectly - VML issue?
+				var xy = $(placeHolder).offset();
+				xy.top += $(placeHolder).height();
+				
+				menuDiv.style.left = xy.left + 'px';
+				menuDiv.style.top = xy.top + 'px';
+				menuDiv.style.display = 'block';	
+			}
+			
+			var fitScrollBar = function() {
+				//make jQuery to get rendered width
+				var $menuDiv = $(menuDiv);
+				var placeholderWidth = $(selectEl).width();
+				if (placeholderWidth > $menuDiv.width()) {
+					$menuDiv.find("ul").width(placeholderWidth);
+					if($menuDiv.find("ul").hasScrollBar()) {
+						$menuDiv.find("li").width(placeholderWidth - 17); //arbitrarily set width of scrollbar - varies from OS to OS. i picked an approximate value
+					} else {
+						$menuDiv.find("li").width(placeholderWidth);
+					}       
+				}	
+			}
+			
+			var fitMenuOnScreen = function() {
+				//ensure menu is always visible
+				if($menuDiv.offset().top + $menuDiv.height() > $(window).height()) {
+					var scrollEl = $.browser.webkit ? document.body : "html"; 
+					$(scrollEl).animate({scrollTop: parseInt(menuDiv.style.top, 10) - 100}, 1000);
+				}	
+			}
 			
 			// this utility function gets all the options out of the referenced select,
 			// then gets their values ansd returns them in an array
-			var getSelectDataAsArray = function(selectEl) {
+			var getSelectDataAsArray = function() {
 				var text = $.map($('option', selectEl), function(el, index) {
 					return $(el).text();
 				});
@@ -40,14 +88,13 @@
 				return [text, values];
 			};
 			
-			var setListToSelectedIndex = function(index) {
+			var setSelectToIndex = function(index) {
 				//update selecEl value to new index
-				var $selectEl = $(selectEl);
-				$selectEl.find("option").removeAttr("selected");
-				
 				selectEl.value = selectEl.options[index].value;
 				selectEl.options[index].selected = true;
-				
+			}
+			
+			var setMenuToIndex = function(index) {
 				//scroll to selected LI in list
 				var $selectedLi = $menuDiv.find("li:eq(" + index + ")");
 				$menuDiv.find("ul").scrollTop(0);
@@ -66,7 +113,27 @@
 				return $(selectEl).find("option[value='" + value + "']");
 			};
 			
-			var onclick = function(e) {
+			var typeAhead = function(character) {
+				searchString += character;
+				var typeAheadString = searchString.replace(/[\W]/ig,"").toUpperCase();
+				console.log(typeAheadString);
+				var list = getSelectDataAsArray();
+				var found = false;
+				for (var i = 0; i < list[0].length; i++) {
+					if (list[0][i].replace(/[\W]/ig,"").substring(0, typeAheadString.length).toString().toUpperCase() === typeAheadString) {
+						setSelectToIndex(i);
+						setMenuToIndex(i);
+						i = list[0].length;
+						found = true;
+					}
+				}
+				
+				clearTimeout(timer);
+				timer = setTimeout(function() {searchString = "";}, 1000);
+
+			};
+			
+			var onClick = function(e) {
 				e.preventDefault();
 				e.stopPropagation();
 				
@@ -81,32 +148,30 @@
 				//get index of selected item in list and update the controls
 				var value = $(selectedAnchor).attr("data-value");
 				var index  = $(selectEl).find("option[value='" + value + "']").index();
-				setListToSelectedIndex(index);
+				
+				setSelectToIndex(index);
+				setMenuToIndex(index);
 				
 				//kick off the change event bound to the actual select
 				menu.close();
 			}
 			
-			var selectItem = function(offset) {
-				//need to think up a more intelligent way of matching elements here so we can take care of items we would like to be hidden
-				//we need to match the highlighted anchor data-value to the value of the item in the select
-				
-				/*new algorithm:
+			//selects the item by offset from currently selected item in original select element
+			var scrollBy = function(offset) {
 				/* step to next while option's value is not empty and is not an optgroup or label
+				/* 
 				/* set index
 				/* set list to selected index
 				*/
 				
-				/* step to next while option's value is not empty and is not an optgroup or label*/
+				var index = mod(selectEl.childNodes.length, parseInt(selectEl.selectedIndex + offset, 10));
 				
-				var index = mod(selectEl.childNodes.length, parseInt(selectEl.selectedIndex + (1 * offset), 10))
-				while (selectEl[index].getAttribute("value") === undefined) {
-					index += (1 * offset);
+				while (selectEl[index].getAttribute("value").length === 0) {
+					index = mod(selectEl.childNodes.length, parseInt(index + offset, 10));
 				}
 				
-				selectEl.selectedIndex = mod(selectEl.childNodes.length, parseInt(index, 10));
-				console.log(selectEl.selectedIndex);
-                    		setListToSelectedIndex(selectEl.selectedIndex);
+				setSelectToIndex(index);
+                    		setMenuToIndex(index);
 			}
 			
 			var init = function() {
@@ -119,7 +184,7 @@
 				$('body').append(menuDiv);
 				$menuDiv = $(menuDiv);
 				
-				$menuDiv.bind('click', onclick);
+				$menuDiv.bind('click', onClick);
 			}
 			
 			//intialise menu object
@@ -127,52 +192,15 @@
 			
 			return {
 				open: function(triggeredPlaceHolder, triggeredSelectEl) {
-					
-					//set to remember which object triggered open
+					//set closure wide variable to remember which object triggered open
 					placeHolder = triggeredPlaceHolder;
 					selectEl = triggeredSelectEl;
 					
-					//get offset of placeholder for menu position
-					//msie7 reports offset incorrectly - VML issue?
-					var xy = $(placeHolder).offset();
-					xy.top += $(placeHolder).height();
-					
-					//get data from select
-					var list = getSelectDataAsArray(selectEl);
-					var i = list[0].length - 1;
-					var customHTML = '</ul>';
-					
-					while (i >= 0) {
-						customHTML = '<li><a data-value="' + list[1][i] + '" href="#">' + list[0][i] + '</a></li>' + customHTML;
-						i--;
-					}
-					
-					customHTML = '<ul class="ui-selectmenu-menu ui-widget ui-widget-content ui-selectmenu-menu-dropdown ui-corner-bottom" style="visibility:visible;">' + customHTML;
-					
-					menuDiv.innerHTML = customHTML;
-					menuDiv.style.left = xy.left + 'px';
-					menuDiv.style.top = xy.top + 'px';
-					menuDiv.style.display = 'block';
-					
-					//make jQuery to get rendered width
-					var $menuDiv = $(menuDiv);
-					var placeholderWidth = $(selectEl).width();
-					if (placeholderWidth > $menuDiv.width()) {
-						$menuDiv.find("ul").width(placeholderWidth);
-						if($menuDiv.find("ul").hasScrollBar()) {
-							$menuDiv.find("li").width(placeholderWidth - 17); //arbitrarily set width of scrollbar - varies from OS to OS. i picked an approximate value
-						} else {
-							$menuDiv.find("li").width(placeholderWidth);
-						}       
-					}
-					
-					setListToSelectedIndex(selectEl.selectedIndex);
-					
-					//ensure fauxSelect is always visible
-					if($menuDiv.offset().top + $menuDiv.height() > $(window).height()) {
-						var scrollEl = $.browser.webkit ? document.body : "html"; 
-						$(scrollEl).animate({scrollTop: xy.top - 100}, 1000);
-					}
+					buildMarkup();
+					positionPlaceHolder();
+					fitScrollBar();
+					fitMenuOnScreen();
+					setMenuToIndex(selectEl.selectedIndex);
 					
 					//set flag
 					isOpen = true;
@@ -187,10 +215,13 @@
 					return isOpen;	
 				},
 				scrollDown: function() {
-					selectItem(1);	
+					scrollBy(1);	
 				},
 				scrollUp: function() {
-					selectItem(-1);	
+					scrollBy(-1);	
+				},
+				search: function(character) {
+					typeAhead(character);
 				}
 			};
 		};
@@ -275,20 +306,21 @@
 					case (e.which >= 65 && e.which <= 90):
 					case (e.which >= 97 && e.which <= 122):
 						/* this bit is for scrolling to a particular item in the list */
-						searchString += String.fromCharCode(e.which);
+						//searchString += String.fromCharCode(e.which);
 						if (!menu.isOpen) {
 							$(this).trigger("click");
 						}
-						$(menu).trigger("select.item", [selectEl]);
+						//pass string to typeahead function
+						menu.search(String.fromCharCode(e.which));
 						//now we build a timeout to clear search string after 1 seconds of no input and set upa  new timer in its place
-						clearTimeout(timer);
-						timer = setTimeout(function() {searchString = "";}, 1000);
-						break;
+						//clearTimeout(timer);
+						//timer = setTimeout(function() {searchString = "";}, 1000);
+						//break;
 				}
 			});
 			
 			$placeHolder.bind('focus mouseover', function(e) {
-				clearTimeout(timer);
+				//clearTimeout(timer);
 				searchString = "";
 				$(this).addClass("ui-selectmenu-focus ui-state-hover");
 			});
