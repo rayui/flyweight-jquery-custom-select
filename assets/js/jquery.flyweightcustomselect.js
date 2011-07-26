@@ -8,8 +8,6 @@
 (function($){
 	$.fn.flyweightCustomSelect = function(options) {
 		var opts = $.extend({}, $.fn.flyweightCustomSelect.defaults, options);
-		
-		//need to review the need for these variables in light of sensible model
 		var menu = null;
 		
 		/*Produce modulo correctly */		
@@ -24,13 +22,14 @@
 			var selectEl = null;
 			var isOpen = false;
 			var menuDiv, $menuDiv;
+			var initialSelectedIndex = -1;
 			var searchString = "";
 			var timer;
 			
 			var buildMarkup = function() {
 				//get data from select
 				//build markup of control
-				var list = getSelectDataAsArray(selectEl);
+				var list = mapOptionsToArray(selectEl);
 				var i = list[0].length - 1;
 				var customHTML = '</ul>';
 				
@@ -75,9 +74,9 @@
 				}	
 			}
 			
-			// this utility function gets all the options out of the referenced select,
-			// then gets their values ansd returns them in an array
-			var getSelectDataAsArray = function() {
+			// this utility function gets all the options out of the select element,
+			// then gets their values and returns them in an array
+			var mapOptionsToArray = function() {
 				var text = $.map($('option', selectEl), function(el, index) {
 					return $(el).text();
 				});
@@ -87,14 +86,19 @@
 				
 				return [text, values];
 			};
-			
+
+			//update selecEl value to new index			
 			var setSelectToIndex = function(index) {
-				//update selecEl value to new index
 				selectEl.value = selectEl.options[index].value;
 				selectEl.options[index].selected = true;
 			}
-			
+
+			//update menu to show new select info
 			var setMenuToIndex = function(index) {
+				//first ensure select is kept in sync
+				//necessary for data integrity
+				setSelectToIndex(index);
+				
 				//scroll to selected LI in list
 				var $selectedLi = $menuDiv.find("li:eq(" + index + ")");
 				$menuDiv.find("ul").scrollTop(0);
@@ -117,11 +121,10 @@
 				searchString += character;
 				var typeAheadString = searchString.replace(/[\W]/ig,"").toUpperCase();
 				console.log(typeAheadString);
-				var list = getSelectDataAsArray();
+				var list = mapOptionsToArray();
 				var found = false;
 				for (var i = 0; i < list[0].length; i++) {
 					if (list[0][i].replace(/[\W]/ig,"").substring(0, typeAheadString.length).toString().toUpperCase() === typeAheadString) {
-						setSelectToIndex(i);
 						setMenuToIndex(i);
 						i = list[0].length;
 						found = true;
@@ -149,7 +152,6 @@
 				var value = $(selectedAnchor).attr("data-value");
 				var index  = $(selectEl).find("option[value='" + value + "']").index();
 				
-				setSelectToIndex(index);
 				setMenuToIndex(index);
 				
 				//kick off the change event bound to the actual select
@@ -170,7 +172,6 @@
 					index = mod(selectEl.childNodes.length, parseInt(index + offset, 10));
 				}
 				
-				setSelectToIndex(index);
                     		setMenuToIndex(index);
 			}
 			
@@ -202,14 +203,22 @@
 					fitMenuOnScreen();
 					setMenuToIndex(selectEl.selectedIndex);
 					
-					//set flag
+					//set flags
+					initialSelectedIndex = selectEl.selectedIndex; 
 					isOpen = true;
+					searchString = "";
+					clearTimeout(timer);
+
 				},
 				close: function() {
 					menuDiv.style.display = 'none';
 
 					//set flag
 					isOpen = false;
+				},
+				reset: function() {
+					setMenuToIndex(initialSelectedIndex);
+					this.close();
 				},
 				visible: function() {
 					return isOpen;	
@@ -226,7 +235,7 @@
 			};
 		};
 		
-		/*create placeHolder for original submit */
+		/*create placeHolder for a submit*/
 		var createPlaceholder = function(selectEl) {
 			var text = "";
 			
@@ -295,33 +304,25 @@
 								menu.close();
 							}
 						}
-									
 						break;
 					case (e.which === $.ui.keyCode.ESCAPE):
-						//close dropdown 
-						menu.close();
+						//close dropdown
+						menu.reset();
 						return false;
 						break;
 					case (e.which >= 48 && e.which <= 59):
 					case (e.which >= 65 && e.which <= 90):
 					case (e.which >= 97 && e.which <= 122):
-						/* this bit is for scrolling to a particular item in the list */
-						//searchString += String.fromCharCode(e.which);
-						if (!menu.isOpen) {
+						//open menu if not already
+						if (!menu.visible()) {
 							$(this).trigger("click");
 						}
 						//pass string to typeahead function
 						menu.search(String.fromCharCode(e.which));
-						//now we build a timeout to clear search string after 1 seconds of no input and set upa  new timer in its place
-						//clearTimeout(timer);
-						//timer = setTimeout(function() {searchString = "";}, 1000);
-						//break;
 				}
 			});
 			
 			$placeHolder.bind('focus mouseover', function(e) {
-				//clearTimeout(timer);
-				searchString = "";
 				$(this).addClass("ui-selectmenu-focus ui-state-hover");
 			});
 			
