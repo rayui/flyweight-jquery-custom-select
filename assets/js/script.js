@@ -46,22 +46,15 @@ var render = function(e) {
 	
 	var time = new Date().getTime();
 	
-	if (e.data.engine === "flyweight") {
-		$("select").each(function(index, element) {
-			customSelectManager.addCustomSelect(this);
-		});
-		customSelectManager.resetTabIndexes();
-	} else {
-		$("select").selectmenu();
-	}
+	$("select").flyweightCustomSelect();
 	
 	time = new Date().getTime() - time;
+	
 	$("form").prepend("<div><span>Time to render " + numSelects + " custom selects: " + time + " ms</span><span>Average time per select: " + parseInt((time / numSelects), 10) + " ms</span></div>");
 };
 
 /*Initialise custom select plugin test on document ready*/
 
 $().ready(function() {
-	$("#render-flyweight").bind("click", {engine:"flyweight"}, render);
-	$("#render-fnagel").bind("click", {engine:"fnagel"}, render);
+	$("#render-flyweight").bind("click", render);
 });
