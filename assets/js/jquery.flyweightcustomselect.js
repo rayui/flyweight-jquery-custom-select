@@ -120,7 +120,6 @@
 			var typeAhead = function(character) {
 				searchString += character;
 				var typeAheadString = searchString.replace(/[\W]/ig,"").toUpperCase();
-				console.log(typeAheadString);
 				var list = mapOptionsToArray();
 				var found = false;
 				for (var i = 0; i < list[0].length; i++) {
