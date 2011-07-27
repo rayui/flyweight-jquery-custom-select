@@ -23,7 +23,9 @@ a {
 	http://www.filamentgroup.com/lab/jquery_ui_selectmenu_an_aria_accessible_plugin_for_styling_a_html_select/
 
 ----------------------------------*/
-.ui-selectmenu { display: block; position:relative; float:left; height:2em; text-decoration: none; overflow:hidden;margin:0 10px 0 0;}
+
+
+/*.ui-selectmenu { display: block; position:relative; float:left; height:2em; text-decoration: none; overflow:hidden;margin:0 10px 0 0;}
 .ui-selectmenu-icon { 
 	position:absolute; right:-3px; margin-top:0; top: 0;
 	background: url(../img/custom_dropdown_bg.png) no-repeat 100% -501px;
@@ -50,7 +52,7 @@ a {
 .ui-selectmenu-menu li .ui-selectmenu-item-content {  }
 .ui-selectmenu-menu li .ui-selectmenu-item-footer { opacity: .8; }
 /*for optgroups*/
-.ui-selectmenu-menu .ui-selectmenu-group { font-size: 1em; }
+/*.ui-selectmenu-menu .ui-selectmenu-group { font-size: 1em; }
 .ui-selectmenu-menu .ui-selectmenu-group .ui-selectmenu-group-label { line-height: 1.4em; display:block; padding:.6em .5em 0; font-weight: bold; }
 .ui-selectmenu-menu .ui-selectmenu-group ul { margin: 0; padding: 0; }
 .ui-selectmenu-status{
@@ -83,7 +85,7 @@ a.ui-selectmenu{
 /*a.ui-selectmenu.disabled {
 	background-position: 0 -501px;
 }*/
-a.ui-selectmenu-focus, a.ui-state-active, .valid .ui-selectmenu-focus, .valid a.ui-selectmenu, .forceValid .ui-selectmenu-focus, .forceValid a.ui-selectmenu{
+/*a.ui-selectmenu-focus, a.ui-state-active, .valid .ui-selectmenu-focus, .valid a.ui-selectmenu, .forceValid .ui-selectmenu-focus, .forceValid a.ui-selectmenu{
 	color: #329724;
 }
 ul.ui-selectmenu-menu, .ui-state-active, .ui-widget-content .ui-state-active{
