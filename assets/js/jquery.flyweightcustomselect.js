@@ -234,24 +234,12 @@
 			};
 		};
 		
-		/*create placeHolder for a submit*/
-		var createPlaceholder = function(selectEl) {
+		var PlaceHolder = function(selectEl) {
 			var text = "";
+			var $placeHolder;
 			
-			//set initial text of placeholder
-			if (selectEl.selectedIndex >= 0) {
-				text = selectEl.options[selectEl.selectedIndex].text;
-			} else {
-				text = selectEl.options[0].text
-			}
-			
-			var $placeHolder = $('<a href="#" aria-owns="' + selectEl.id + '" class="placeholder ui-selectmenu ui-widget ui-state-default ui-selectmenu-dropdown ui-corner-all" role="button" href="#" tabindex="0" aria-haspopup="true" id="' + selectEl.id + '-button"><span class="ui-selectmenu-status">' + text + '</span><span class="ui-selectmenu-icon ui-icon ui-icon-triangle-1-s"></span></a>');
-			
-			$(selectEl).after($placeHolder);
-			$(selectEl).hide();
-			
-			//bind behaviour
-			$placeHolder.bind('click', function(e) {
+			//click behaviour
+			var onClick = function(e) {
 				e.stopPropagation();
 				e.preventDefault();
 
@@ -263,10 +251,11 @@
 						menu.close();
 					}       
 				}
-			});
+			};
 			
-			$placeHolder.bind('keydown', function(e){
-                                if (e.which === $.ui.keyCode.LEFT || e.keyCode === $.ui.keyCode.RIGHT || e.keyCode === $.ui.keyCode.UP || e.keyCode === $.ui.keyCode.DOWN || e.keyCode === $.ui.keyCode.ENTER) {
+			//keydown behaviour
+			var onKeydown = function(e) {
+                if (e.which === $.ui.keyCode.LEFT || e.keyCode === $.ui.keyCode.RIGHT || e.keyCode === $.ui.keyCode.UP || e.keyCode === $.ui.keyCode.DOWN || e.keyCode === $.ui.keyCode.ENTER) {
 					e.stopPropagation();
 					e.preventDefault();
 				}
@@ -319,17 +308,42 @@
 						//pass string to typeahead function
 						menu.search(String.fromCharCode(e.which));
 				}
-			});
+			};
 			
-			$placeHolder.bind('focus mouseover', function(e) {
+			var onFocus = function(e) {
 				$(this).addClass("ui-selectmenu-focus ui-state-hover");
-			});
+			};
 			
-			$placeHolder.bind('blur mouseout', function(e) {
+			var onBlur = function(e) {
 				$(this).removeClass("ui-selectmenu-focus ui-state-hover");
-			});
+			};
 			
+			var init = function() {
+				//set initial text of placeholder
+				if (selectEl.selectedIndex >= 0) {
+					text = selectEl.options[selectEl.selectedIndex].text;
+				} else {
+					text = selectEl.options[0].text
+				}
+				
+				$placeHolder = $('<a href="#" aria-owns="' + selectEl.id + '" class="placeholder ui-selectmenu ui-widget ui-state-default ui-selectmenu-dropdown ui-corner-all" role="button" href="#" tabindex="0" aria-haspopup="true" id="' + selectEl.id + '-button"><span class="ui-selectmenu-status">' + text + '</span><span class="ui-selectmenu-icon ui-icon ui-icon-triangle-1-s"></span></a>');
+				
+				$(selectEl).after($placeHolder);
+				$(selectEl).hide();
+				
+				$placeHolder.bind('click', onClick);
+				$placeHolder.bind('keydown', onKeydown);
+				$placeHolder.bind('focus mouseover', onFocus);
+				$placeHolder.bind('blur mouseout', onBlur);
+			};
+			
+			init();
 			return $placeHolder;
+			
+		}
+		
+		/*create placeHolder for a submit*/
+		var createPlaceholder = function(selectEl) {
 		}
 		
 		//instantiate single drop down menuDiv on run
@@ -347,9 +361,7 @@
 
 				
 		return this.each(function() {
-			var $placeHolder = createPlaceholder(this);
-			var $menu = $(menu.menuDiv);
-			
+			var $placeHolder = new PlaceHolder(this);			
 			return this;
 		});
 	};
