@@ -1,5 +1,3 @@
-var jQuery = jQuery || {} ;
-
 /*!
 * jQuery Custom Select Manager function
 * Copyright 2011, Ray Brooks
@@ -9,8 +7,8 @@ var jQuery = jQuery || {} ;
 
 (function($){
 	$.fn.flyweightCustomSelect = function(options) {
-		var opts = $.extend({}, $.fn.flyweightCustomSelect.defaults, options),
-			menu = null;
+		var opts = $.extend({}, $.fn.flyweightCustomSelect.defaults, options);
+		var menu = null;
 		
 		/*Produce modulo correctly */		
 		var mod = function(n, m) {
@@ -18,42 +16,26 @@ var jQuery = jQuery || {} ;
 		};
 
 		//dropdown menuDiv constructor
-		var FlyweightMenu = function() {
+		var flyweightMenu = function() {
 			//variables to remember which element the last event was fired from
-			var placeHolder = null,
-				selectEl = null,
-				isOpen = false,
-				menuDiv,
-				initialSelectedIndex = -1,
-				searchString = "",
-				timer;
+			var placeHolder = null;
+			var selectEl = null;
+			var isOpen = false;
+			var menuDiv, $menuDiv;
+			var initialSelectedIndex = -1;
+			var searchString = "";
+			var timer;
 			
-			// this utility function gets all the options out of the select element,
-			// then gets their values and returns them in an array
-			var mapOptionsToArray = function() {
-				var text,
-					values;
-					
-				text = $.map($('option', selectEl), function(el, index) {
-					return $(el).text();
-				});
-				values = $.map($('option', selectEl), function(el, index) {
-					return $(el).attr("value");
-				});
-				
-				return [text, values];
-			};
-				
 			var buildMarkup = function() {
 				//get data from select
 				//build markup of control
-				var list = mapOptionsToArray(selectEl),
-					i = list[0].length - 1,
-					customHTML = '</ul>';
+				var list = mapOptionsToArray(selectEl);
+				var i = list[0].length - 1;
+				var customHTML = '</ul>';
 				
 				while (i >= 0) {
 					customHTML = '<li><a data-value="' + list[1][i] + '" href="#">' + list[0][i] + '</a></li>' + customHTML;
-					i-=1;
+					i--;
 				}
 				
 				menuDiv.innerHTML = '<ul class="ui-selectmenu-menu ui-widget ui-widget-content ui-selectmenu-menu-dropdown ui-corner-bottom" style="visibility:visible;">' + customHTML;
@@ -68,13 +50,12 @@ var jQuery = jQuery || {} ;
 				menuDiv.style.left = xy.left + 'px';
 				menuDiv.style.top = xy.top + 'px';
 				menuDiv.style.display = 'block';	
-			};
+			}
 			
 			var fitScrollBar = function() {
 				//make jQuery to get rendered width
-				var $menuDiv = $(menuDiv),
-					placeholderWidth = $(selectEl).width();
-					
+				var $menuDiv = $(menuDiv);
+				var placeholderWidth = $(selectEl).width();
 				if (placeholderWidth > $menuDiv.width()) {
 					$menuDiv.find("ul").width(placeholderWidth);
 					if($menuDiv.find("ul").hasScrollBar()) {
@@ -83,28 +64,37 @@ var jQuery = jQuery || {} ;
 						$menuDiv.find("li").width(placeholderWidth);
 					}       
 				}	
-			};
+			}
 			
 			var fitMenuOnScreen = function() {
-				var $menuDiv = $(menuDiv);
-				
 				//ensure menu is always visible
 				if($menuDiv.offset().top + $menuDiv.height() > $(window).height()) {
 					var scrollEl = $.browser.webkit ? document.body : "html"; 
 					$(scrollEl).animate({scrollTop: parseInt(menuDiv.style.top, 10) - 100}, 1000);
 				}	
+			}
+			
+			// this utility function gets all the options out of the select element,
+			// then gets their values and returns them in an array
+			var mapOptionsToArray = function() {
+				var text = $.map($('option', selectEl), function(el, index) {
+					return $(el).text();
+				});
+				var values = $.map($('option', selectEl), function(el, index) {
+					return $(el).attr("value");
+				});
+				
+				return [text, values];
 			};
 
 			//update selecEl value to new index			
 			var setSelectToIndex = function(index) {
 				selectEl.value = selectEl.options[index].value;
 				selectEl.options[index].selected = true;
-			};
+			}
 
 			//update menu to show new select info
 			var setMenuToIndex = function(index) {
-				var $menuDiv = $(menuDiv);
-				
 				//first ensure select is kept in sync
 				//necessary for data integrity
 				setSelectToIndex(index);
@@ -128,17 +118,12 @@ var jQuery = jQuery || {} ;
 			};
 			
 			var typeAhead = function(character) {
-				var typeAheadString,
-					list,
-					found = false,
-					i = 0;
-					
 				searchString += character;
-				typeAheadString = searchString.replace(/[\W]/ig,"").toUpperCase();
-				list = mapOptionsToArray();
-
-				for (i = 0; i < list[0].length; i+=1) {
-					if (list[0][i].replace(/[\W]/ig,"").substring(0, typeAheadString.length).toUpperCase() === typeAheadString) {
+				var typeAheadString = searchString.replace(/[\W]/ig,"").toUpperCase();
+				var list = mapOptionsToArray();
+				var found = false;
+				for (var i = 0; i < list[0].length; i++) {
+					if (list[0][i].replace(/[\W]/ig,"").substring(0, typeAheadString.length).toString().toUpperCase() === typeAheadString) {
 						setMenuToIndex(i);
 						i = list[0].length;
 						found = true;
@@ -151,46 +136,43 @@ var jQuery = jQuery || {} ;
 			};
 			
 			var onClick = function(e) {
-				var index,
-					selectedAnchor;
-					
 				e.preventDefault();
 				e.stopPropagation();
 				
-				selectedAnchor = e.srcElement;
+				var selectedAnchor = e.srcElement;
 				
+				//we only set target for keyboard nav as events will be triggered on wrapper div, not anchor (as is when clicked)
 				//we need to check this because the person could theoretically click on the div which the elements are bound to, as opposed to the anchor 
 				if (selectedAnchor.nodeName.toLowerCase() !== "a") {
 					return false;
 				}				
 				
 				//get index of selected item in list and update the controls
-				index  = $(selectEl).find("option[value='" + $(selectedAnchor).attr("data-value") + "']").index();
+				var value = $(selectedAnchor).attr("data-value");
+				var index  = $(selectEl).find("option[value='" + value + "']").index();
 				
 				setMenuToIndex(index);
 				
 				//kick off the change event bound to the actual select
 				menu.close();
-			};
+			}
 			
 			//selects the item by offset from currently selected item in original select element
 			var scrollBy = function(offset) {
 				/* step to next while option's value is not empty and is not an optgroup or label
-				* 
-				* set index
-				* set list to selected index
+				/* 
+				/* set index
+				/* set list to selected index
 				*/
 				
-				var index;
-				
-				index = mod(selectEl.childNodes.length, parseInt(selectEl.selectedIndex + offset, 10));
+				var index = mod(selectEl.childNodes.length, parseInt(selectEl.selectedIndex + offset, 10));
 				
 				while (selectEl[index].getAttribute("value").length === 0) {
 					index = mod(selectEl.childNodes.length, parseInt(index + offset, 10));
 				}
 				
-				setMenuToIndex(index);
-			};
+                    		setMenuToIndex(index);
+			}
 			
 			var init = function() {
 				menuDiv = document.createElement('div');
@@ -200,9 +182,10 @@ var jQuery = jQuery || {} ;
 				menuDiv.className = 'customSelect';
 			
 				$('body').append(menuDiv);
+				$menuDiv = $(menuDiv);
 				
-				$(menuDiv).bind('click', onClick);
-			};
+				$menuDiv.bind('click', onClick);
+			}
 			
 			//intialise menu object
 			init();
@@ -251,25 +234,12 @@ var jQuery = jQuery || {} ;
 			};
 		};
 		
-		/*create placeHolder for a submit*/
-		var createPlaceholder = function(selectEl) {
-			var text = "",
-				$placeHolder;
+		var PlaceHolder = function(selectEl) {
+			var text = "";
+			var $placeHolder;
 			
-			//set initial text of placeholder
-			if (selectEl.selectedIndex >= 0) {
-				text = selectEl.options[selectEl.selectedIndex].text;
-			} else {
-				text = selectEl.options[0].text;
-			}
-			
-			$placeHolder = $('<a href="#" aria-owns="' + selectEl.id + '" class="placeholder ui-selectmenu ui-widget ui-state-default ui-selectmenu-dropdown ui-corner-all" role="button" href="#" tabindex="0" aria-haspopup="true" id="' + selectEl.id + '-button"><span class="ui-selectmenu-status">' + text + '</span><span class="ui-selectmenu-icon ui-icon ui-icon-triangle-1-s"></span></a>');
-			
-			$(selectEl).after($placeHolder);
-			$(selectEl).hide();
-			
-			//bind behaviour
-			$placeHolder.bind('click', function(e) {
+			//click behaviour
+			var onClick = function(e) {
 				e.stopPropagation();
 				e.preventDefault();
 
@@ -281,75 +251,104 @@ var jQuery = jQuery || {} ;
 						menu.close();
 					}       
 				}
-			});
+			};
 			
-			$placeHolder.bind('keydown', function(e){
-                                if (e.which === $.ui.keyCode.LEFT || e.keyCode === $.ui.keyCode.RIGHT || e.keyCode === $.ui.keyCode.UP || e.keyCode === $.ui.keyCode.DOWN || e.keyCode === $.ui.keyCode.ENTER) {
+			//keydown behaviour
+			var onKeydown = function(e) {
+                if (e.which === $.ui.keyCode.LEFT || e.keyCode === $.ui.keyCode.RIGHT || e.keyCode === $.ui.keyCode.UP || e.keyCode === $.ui.keyCode.DOWN || e.keyCode === $.ui.keyCode.ENTER) {
 					e.stopPropagation();
 					e.preventDefault();
 				}
 				/* switch(true) to enable use of expanded conditional statements */
 				switch (true) {
-					case (e.which === $.ui.keyCode.UP || e.which === $.ui.keyCode.LEFT):
+					case (e.which === $.ui.keyCode.LEFT):
+					case (e.which === $.ui.keyCode.UP):
 						if (menu.visible()) {
 							menu.scrollUp();
 						} else {
 							$(this).trigger("click");
 						}
 						return false;
-					case (e.which === $.ui.keyCode.DOWN || e.which === $.ui.keyCode.RIGHT):
+						break;
+					case (e.which === $.ui.keyCode.RIGHT):
+					case (e.which === $.ui.keyCode.DOWN):
 						if (menu.visible()) {
 							menu.scrollDown();
 						} else {
 							$(this).trigger("click");
 						}
 						return false;
-					case (e.which === $.ui.keyCode.ENTER || e.which === $.ui.keyCode.TAB):
-						if (e.which === $.ui.keyCode.ENTER && !menu.visible()) {
-							$(this).trigger("click");
-							return false;
-						} else {
+						break;
+					case (e.which === $.ui.keyCode.ENTER):
+					case (e.which === $.ui.keyCode.TAB):
+						//trigger click on nav
+						if (menu.visible()) {
 							menu.close();
+						} else {
+							if (e.which === $.ui.keyCode.ENTER) {
+								$(this).trigger("click");
+								return false;
+							} else {
+								menu.close();
+							}
 						}
 						break;
 					case (e.which === $.ui.keyCode.ESCAPE):
-						//reset placeholder and select to original values
-						//close menu
+						//close dropdown
 						menu.reset();
 						return false;
-					case ((e.which >= 48 && e.which <= 59) || (e.which >= 65 && e.which <= 90) || (e.which >= 97 && e.which <= 122)):
+						break;
+					case (e.which >= 48 && e.which <= 59):
+					case (e.which >= 65 && e.which <= 90):
+					case (e.which >= 97 && e.which <= 122):
 						//open menu if not already
 						if (!menu.visible()) {
 							$(this).trigger("click");
 						}
 						//pass string to typeahead function
 						menu.search(String.fromCharCode(e.which));
-						break;
 				}
-			});
+			};
 			
-			$placeHolder.bind('focus', function(e) {
-				$(this).addClass("ui-selectmenu-focus");
-			});
+			var onFocus = function(e) {
+				$(this).addClass("ui-selectmenu-focus ui-state-hover");
+			};
 			
-			$placeHolder.bind('mouseover', function(e) {
-				$(this).addClass("ui-state-hover");
-			});
+			var onBlur = function(e) {
+				$(this).removeClass("ui-selectmenu-focus ui-state-hover");
+			};
 			
-			$placeHolder.bind('blur', function(e) {
-				$(this).removeClass("ui-selectmenu-focus");
-			});
+			var init = function() {
+				//set initial text of placeholder
+				if (selectEl.selectedIndex >= 0) {
+					text = selectEl.options[selectEl.selectedIndex].text;
+				} else {
+					text = selectEl.options[0].text
+				}
+				
+				$placeHolder = $('<a href="#" aria-owns="' + selectEl.id + '" class="placeholder ui-selectmenu ui-widget ui-state-default ui-selectmenu-dropdown ui-corner-all" role="button" href="#" tabindex="0" aria-haspopup="true" id="' + selectEl.id + '-button"><span class="ui-selectmenu-status">' + text + '</span><span class="ui-selectmenu-icon ui-icon ui-icon-triangle-1-s"></span></a>');
+				
+				$(selectEl).after($placeHolder);
+				$(selectEl).hide();
+				
+				$placeHolder.bind('click', onClick);
+				$placeHolder.bind('keydown', onKeydown);
+				$placeHolder.bind('focus mouseover', onFocus);
+				$placeHolder.bind('blur mouseout', onBlur);
+			};
 			
-			$placeHolder.bind('mouseout', function(e) {
-				$(this).removeClass("ui-state-hover");
-			});
-			
+			init();
 			return $placeHolder;
-		};
+			
+		}
+		
+		/*create placeHolder for a submit*/
+		var createPlaceholder = function(selectEl) {
+		}
 		
 		//instantiate single drop down menuDiv on run
 		if (menu === null) {
-			menu = new FlyweightMenu();
+			menu = new flyweightMenu();
 		}
 		
 		// add event handler to the page, so when you click anywhere which ISN'T the custom select menuDiv, or a placeholder
@@ -357,12 +356,12 @@ var jQuery = jQuery || {} ;
 		$('body').bind('click keydown focus', function(e) {
 		    if ((!$(e.target).closest('.ui-selectmenu-menu').length) && (!$(e.target).closest('a.placeholder').length)) {
 			menu.close();
-		    }
+		    };
 		});
 
 				
 		return this.each(function() {
-			var $placeHolder = createPlaceholder(this);			
+			var $placeHolder = new PlaceHolder(this);			
 			return this;
 		});
 	};
@@ -370,4 +369,4 @@ var jQuery = jQuery || {} ;
 	$.fn.flyweightCustomSelect.defaults = {
 	
 	};
-}(jQuery));
+})(jQuery);
