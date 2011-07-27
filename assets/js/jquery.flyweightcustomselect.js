@@ -51,7 +51,7 @@
 					i--;
 				}
 				
-				menuDiv.innerHTML = '<ul class="ui-selectmenu-menu ui-widget ui-widget-content ui-selectmenu-menu-dropdown ui-corner-bottom" style="visibility:visible;">' + customHTML;
+				menuDiv.innerHTML = '<ul class="ui-selectmenu-menu ui-widget ui-widget-content ui-selectmenu-menu-dropdown ui-corner-bottom">' + customHTML;
 			};
 			
 			var positionPlaceHolder = function() {
@@ -62,7 +62,6 @@
 				
 				menuDiv.style.left = xy.left + 'px';
 				menuDiv.style.top = xy.top + 'px';
-				menuDiv.style.display = 'block';	
 			};
 			
 			var fitScrollBar = function() {
@@ -176,11 +175,8 @@
 			
 			var init = function() {
 				menuDiv = window.document.createElement('div');
-
-				menuDiv.style.display = 'none';
-				menuDiv.style.position = 'absolute';
-				menuDiv.className = 'customSelect';
-			
+				menuDiv.className = "ui-selectmenu-menu ui-widget ui-widget-content ui-corner-bottom ui-selectmenu-menu-dropdown";
+				
 				$('body').append(menuDiv);
 				$menuDiv = $(menuDiv);
 				
@@ -202,6 +198,8 @@
 					fitMenuOnScreen();
 					setMenuToIndex(selectEl.selectedIndex);
 					
+					$menuDiv.addClass("ui-selectmenu-open");
+					
 					//set flags
 					initialSelectedIndex = selectEl.selectedIndex; 
 					isOpen = true;
@@ -210,8 +208,8 @@
 
 				},
 				close: function() {
-					menuDiv.style.display = 'none';
-
+					$menuDiv.removeClass("ui-selectmenu-open");
+					
 					//set flag
 					isOpen = false;
 				},
@@ -331,16 +329,16 @@
 					text = selectEl.options[0].text;
 				}
 				
-				$placeHolder = $('<a href="#" aria-owns="' + selectEl.id + '" class="placeholder ui-selectmenu ui-widget ui-state-default ui-selectmenu-dropdown ui-corner-all" role="button" href="#" tabindex="0" aria-haspopup="true" id="' + selectEl.id + '-button"><span class="ui-selectmenu-status">' + text + '</span><span class="ui-selectmenu-icon ui-icon ui-icon-triangle-1-s"></span></a>');
-				
-				$(selectEl).after($placeHolder);
-				$(selectEl).hide();
+				$placeHolder = $('<a href="#" aria-owns="' + selectEl.id + '" class="ui-selectmenu ui-widget ui-state-default ui-selectmenu-dropdown ui-corner-all" role="button" href="#" tabindex="0" aria-haspopup="true" id="' + selectEl.id + '-button"><span class="ui-selectmenu-status">' + text + '</span><span class="ui-selectmenu-icon ui-icon ui-icon-triangle-1-s"></span></a>');
 				
 				$placeHolder.click(onClick);
 				$placeHolder.keydown(onKeydown);
 				$placeHolder.focus(onFocus);
 				$placeHolder.blur(onBlur);
 				$placeHolder.hover(onMouseOver, onMouseOut);
+				
+				$(selectEl).after($placeHolder);
+				$(selectEl).hide();
 			};
 			
 			init();
