@@ -236,6 +236,10 @@
 				visible: function() {
 					return isOpen;	
 				},
+				enabled: function() {
+					//stub
+					return true;	
+				},
 				scrollDown: function() {
 					scrollBy(1);	
 				},
@@ -244,6 +248,9 @@
 				},
 				search: function() {
 					typeAhead();
+				},
+				getSelect: function() {
+					return selectEl;
 				}
 			};
 		};
@@ -251,6 +258,7 @@
 		var PlaceHolder = function(selectEl) {
 			var text = "";
 			var $placeHolder;
+			var isEnabled = true;
 			
 			//click behaviour
 			var onClick = function(e) {
@@ -258,11 +266,14 @@
 				e.preventDefault();
 
 				// toggle the custom select menu if enabled
-				if (!$(this).hasClass(settings.menu.classes.container.disabled)) {
-					if (!menu.isOpen) {                             
+				if (isEnabled) {
+					if (!menu.visible()) {
 						menu.open(this, selectEl);
 					} else {
 						menu.close();
+						if (menu.getSelect() !== selectEl) {
+							menu.open(this, selectEl);
+						}
 					}       
 				}
 			};
@@ -342,6 +353,23 @@
 				$(this).removeClass(settings.placeholder.classes.container.hover);
 			};
 			
+			var enable = function() {
+				$placeHolder.click(onClick);
+				$placeHolder.keydown(onKeydown);
+				$placeHolder.focus(onFocus);
+				$placeHolder.blur(onBlur);
+				$placeHolder.hover(onMouseOver, onMouseOut);
+			};
+			
+			var disable = function() {
+				$placeHolder.unbind("click");
+				$placeHolder.unbind("keydown");
+				$placeHolder.unbind("focus");
+				$placeHolder.unbind("blur");
+				$placeHolder.unbind("mouseover");
+				$placeHolder.unbind("mouseout");
+			};
+			
 			var init = function() {
 				//set initial text of placeholder
 				if (selectEl.selectedIndex >= 0) {
@@ -352,11 +380,7 @@
 				
 				$placeHolder = $('<a href="#" aria-owns="' + selectEl.id + '" class="' + settings.placeholder.classes.container.default + '" role="button" href="#" tabindex="0" aria-haspopup="true" id="' + selectEl.id + '-button"><span class="' + settings.placeholder.classes.text.default + '">' + text + '</span><span class="' + settings.placeholder.classes.arrow.default + '"></span></a>');
 				
-				$placeHolder.click(onClick);
-				$placeHolder.keydown(onKeydown);
-				$placeHolder.focus(onFocus);
-				$placeHolder.blur(onBlur);
-				$placeHolder.hover(onMouseOver, onMouseOut);
+				enable();
 				
 				$(selectEl).after($placeHolder);
 				$(selectEl).hide();

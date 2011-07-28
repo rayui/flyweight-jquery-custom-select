@@ -11,13 +11,14 @@ It borrows accessibility design patterns from the Filament Group's jQuery UI Sel
   * Full keyboard navigation
   * Typeahead
   * WAI-ARIA roles
-  * Infinite scroll  
+  * Infinite scroll
+  * Customisable class names
 
 ## Todo
 
   * Lint code
   * Opt groups
-  * Improve typeahead algorithm 
+  * Improve infinite scroll
   * Label association
   * Refactor to jQuery UI plugin model
 

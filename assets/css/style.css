@@ -14,6 +14,7 @@ a {
 	width:200px;
 	padding:5px;
 	margin:0 10px 10px 0;
+	background-color:#e0e0e0;
 	background-image: -webkit-gradient(
 	    linear,
 	    left bottom,
@@ -50,6 +51,7 @@ a {
 .jquery-flyweight-select:hover {
 	outline:0;
 	color:#ffffff;
+	background-color:#FF8B17;
 	background-image: -webkit-gradient(
 	    linear,
 	    left bottom,
@@ -72,12 +74,29 @@ a {
 		
 }
 
+.jquery-flyweight-select-arrow {
+	float:right;
+	margin-top:5px;
+	border-color: #606060 transparent transparent transparent;
+	border-style:solid;
+	border-width:5px;
+	width:0;
+	height:0;
+}
+
+.jquery-flyweight-select-focus .jquery-flyweight-select-arrow,
+.jquery-flyweight-select-hover .jquery-flyweight-select-arrow,
+.jquery-flyweight-select:hover .jquery-flyweight-select-arrow {
+	border-color: #ffffff transparent transparent transparent;
+}
+
 .jquery-flyweight-selectmenu {
 	visibility:hidden;
 	position:absolute;
 	padding:0;
 	margin:12px 0 0 0;
 	min-width:210px;
+	background-color:#e0e0e0;
 	background-image: -webkit-gradient(
 	    linear,
 	    left bottom,
@@ -126,7 +145,7 @@ a {
 
 .jquery-flyweight-selectmenu-listitem a {
 	display:block;
-	padding:2px 5px;
+	padding:5px;
 	text-decoration:none;
 }
 
@@ -135,6 +154,7 @@ a {
 .jquery-flyweight-selectmenu-listitem-hover a {
 	outline:0;
 	color:#ffffff;
+	background-color:#FF8B17;
 	background-image: -webkit-gradient(
 	    linear,
 	    left bottom,
