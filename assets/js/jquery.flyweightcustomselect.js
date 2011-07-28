@@ -1,5 +1,3 @@
-var jQuery = jQuery || {} ;
-
 /*!
 * jQuery Custom Select Manager function
 * Copyright 2011, Ray Brooks
@@ -9,54 +7,51 @@ var jQuery = jQuery || {} ;
 
 (function($){
 	$.fn.flyweightCustomSelect = function(options) {
-		var opts = $.extend({}, $.fn.flyweightCustomSelect.defaults, options),
+		var settings = $.extend({}, $.fn.flyweightCustomSelect.settings, options),
 			menu = null;
 		
 		/*Produce modulo correctly */		
 		var mod = function(n, m) {
 			return ((m%n)+n)%n;
 		};
-
+			
 		//dropdown menuDiv constructor
 		var FlyweightMenu = function() {
 			//variables to remember which element the last event was fired from
-			var placeHolder = null,
+			var placeHolder = null
 				selectEl = null,
 				isOpen = false,
-				menuDiv,
+				menuDiv = null,
 				initialSelectedIndex = -1,
 				searchString = "",
-				timer;
-			
+				timer = null;
+
 			// this utility function gets all the options out of the select element,
 			// then gets their values and returns them in an array
 			var mapOptionsToArray = function() {
-				var text,
-					values;
-					
-				text = $.map($('option', selectEl), function(el, index) {
+				var text = $.map($('option', selectEl), function(el, index) {
 					return $(el).text();
 				});
-				values = $.map($('option', selectEl), function(el, index) {
+				var values = $.map($('option', selectEl), function(el, index) {
 					return $(el).attr("value");
 				});
 				
 				return [text, values];
 			};
-				
+			
 			var buildMarkup = function() {
 				//get data from select
 				//build markup of control
-				var list = mapOptionsToArray(selectEl),
+				var list = mapOptionsToArray(),
 					i = list[0].length - 1,
 					customHTML = '</ul>';
 				
 				while (i >= 0) {
-					customHTML = '<li><a data-value="' + list[1][i] + '" href="#">' + list[0][i] + '</a></li>' + customHTML;
-					i-=1;
+					customHTML = '<li class="' + settings.menu.classes.listitem.default + '"><a data-value="' + list[1][i] + '" href="#">' + list[0][i] + '</a></li>' + customHTML;
+					i--;
 				}
 				
-				menuDiv.innerHTML = '<ul class="ui-selectmenu-menu ui-widget ui-widget-content ui-selectmenu-menu-dropdown ui-corner-bottom" style="visibility:visible;">' + customHTML;
+				menuDiv.innerHTML = '<ul class="' + settings.menu.classes.list.default + '">' + customHTML;
 			};
 			
 			var positionPlaceHolder = function() {
@@ -67,7 +62,6 @@ var jQuery = jQuery || {} ;
 				
 				menuDiv.style.left = xy.left + 'px';
 				menuDiv.style.top = xy.top + 'px';
-				menuDiv.style.display = 'block';	
 			};
 			
 			var fitScrollBar = function() {
@@ -86,11 +80,10 @@ var jQuery = jQuery || {} ;
 			};
 			
 			var fitMenuOnScreen = function() {
-				var $menuDiv = $(menuDiv);
-				
 				//ensure menu is always visible
+				var $menuDiv = $(menuDiv);
 				if($menuDiv.offset().top + $menuDiv.height() > $(window).height()) {
-					var scrollEl = $.browser.webkit ? document.body : "html"; 
+					var scrollEl = $.browser.webkit ? window.document.body : "html"; 
 					$(scrollEl).animate({scrollTop: parseInt(menuDiv.style.top, 10) - 100}, 1000);
 				}	
 			};
@@ -103,23 +96,25 @@ var jQuery = jQuery || {} ;
 
 			//update menu to show new select info
 			var setMenuToIndex = function(index) {
-				var $menuDiv = $(menuDiv);
-				
+				var $menuDiv = $(menuDiv),
+					$selectedLi;
+					
 				//first ensure select is kept in sync
 				//necessary for data integrity
 				setSelectToIndex(index);
 				
 				//scroll to selected LI in list
-				var $selectedLi = $menuDiv.find("li:eq(" + index + ")");
+				$selectedLi = $menuDiv.find("li:eq(" + index + ")");
+					
 				$menuDiv.find("ul").scrollTop(0);
-				$menuDiv.find("li a").removeClass("hover");
+				$menuDiv.find("li").removeClass(settings.menu.classes.listitem.focus);
 				if ($selectedLi.length > 0) {
-					$selectedLi.find("a").addClass("hover");
+					$selectedLi.addClass(settings.menu.classes.listitem.focus);
 					$menuDiv.find("ul").scrollTop($selectedLi.position().top);
 				}
 				
 				//update value of anchor
-				$(placeHolder).find(".ui-selectmenu-status").text($selectedLi.text());
+				$(placeHolder).find("span." + settings.placeholder.classes.text.default).text($selectedLi.text());
 
 			};
 			
@@ -127,46 +122,42 @@ var jQuery = jQuery || {} ;
 				return $(selectEl).find("option[value='" + value + "']");
 			};
 			
-			var typeAhead = function(character) {
-				var typeAheadString,
-					list,
-					found = false,
-					i = 0;
+			var typeAhead = function() {
+				var typeAheadString = searchString.replace(/[\W]/ig,"").toUpperCase(),
+					list = mapOptionsToArray(),
+					found = false;
 					
-				searchString += character;
-
-				typeAheadString = searchString.replace(/[\W]/ig,"").toUpperCase();
-				list = mapOptionsToArray();
-
-				for (i = 0; i < list[0].length; i+=1) {
-					if (list[0][i].replace(/[\W]/ig,"").substring(0, typeAheadString.length).toUpperCase() === typeAheadString) {
+				for (var i = 0; i < list[0].length; i++) {
+					if (list[0][i].replace(/[\W]/ig,"").substring(0, typeAheadString.length).toString().toUpperCase() === typeAheadString) {
 						setMenuToIndex(i);
 						i = list[0].length;
 						found = true;
 					}
 				}
 				
-				clearTimeout(timer);
-				timer = setTimeout(function() {searchString = "";}, 1000);
+				window.clearTimeout(timer);
+				timer = window.setTimeout(function() {searchString = "";}, 1000);
 
 			};
 			
 			var onClick = function(e) {
-				var index,
-					selectedAnchor;
+				var selectedAnchor = e.target,
+					value,
+					index;
 					
 				e.preventDefault();
 				e.stopPropagation();
 				
-				selectedAnchor = e.srcElement;
 				
+				//we only set target for keyboard nav as events will be triggered on wrapper div, not anchor (as is when clicked)
 				//we need to check this because the person could theoretically click on the div which the elements are bound to, as opposed to the anchor 
 				if (selectedAnchor.nodeName.toLowerCase() !== "a") {
 					return false;
 				}				
 				
 				//get index of selected item in list and update the controls
-				index  = $(selectEl).find("option[value='" + $(selectedAnchor).attr("data-value") + "']").index();
+				value = $(selectedAnchor).attr("data-value");
+				index  = $(selectEl).find("option[value='" + value + "']").index();
 				
 				setMenuToIndex(index);
 				
@@ -182,9 +173,7 @@ var jQuery = jQuery || {} ;
 				* set list to selected index
 				*/
 				
-				var index;
-				
-				index = mod(selectEl.childNodes.length, parseInt(selectEl.selectedIndex + offset, 10));
+				var index = mod(selectEl.childNodes.length, parseInt(selectEl.selectedIndex + offset, 10));
 				
 				while (selectEl[index].getAttribute("value").length === 0) {
 					index = mod(selectEl.childNodes.length, parseInt(index + offset, 10));
@@ -194,15 +183,15 @@ var jQuery = jQuery || {} ;
 			};
 			
 			var init = function() {
-				menuDiv = document.createElement('div');
-
-				menuDiv.style.display = 'none';
-				menuDiv.style.position = 'absolute';
-				menuDiv.className = 'customSelect';
-			
+				var $menuDiv;
+				
+				menuDiv = window.document.createElement('div');
+				menuDiv.className = settings.menu.classes.container.default;
+				
 				$('body').append(menuDiv);
 				
-				$(menuDiv).bind('click', onClick);
+				$menuDiv = $(menuDiv);
+				$menuDiv.bind('click', onClick);
 			};
 			
 			//intialise menu object
@@ -210,6 +199,8 @@ var jQuery = jQuery || {} ;
 			
 			return {
 				open: function(triggeredPlaceHolder, triggeredSelectEl) {
+					var $menuDiv;
+					
 					//set closure wide variable to remember which object triggered open
 					placeHolder = triggeredPlaceHolder;
 					selectEl = triggeredSelectEl;
@@ -220,16 +211,21 @@ var jQuery = jQuery || {} ;
 					fitMenuOnScreen();
 					setMenuToIndex(selectEl.selectedIndex);
 					
+					$(menuDiv).addClass(settings.menu.classes.container.open);
+					$(placeHolder).addClass(settings.placeholder.classes.container.open);
+					
 					//set flags
 					initialSelectedIndex = selectEl.selectedIndex; 
 					isOpen = true;
 					searchString = "";
-					clearTimeout(timer);
+					window.clearTimeout(timer);
 
 				},
 				close: function() {
-					menuDiv.style.display = 'none';
-
+					$(menuDiv).removeClass(settings.menu.classes.container.open);
+					$(placeHolder).removeClass(settings.placeholder.classes.container.open);
+					//$placeHolder.removeClass(settings.placeholder.classes.container.hover);
+					
 					//set flag
 					isOpen = false;
 				},
@@ -246,129 +242,183 @@ var jQuery = jQuery || {} ;
 				scrollUp: function() {
 					scrollBy(-1);	
 				},
-				search: function(character) {
-					typeAhead(character);
+				search: function() {
+					typeAhead();
 				}
 			};
 		};
 		
-		/*create placeHolder for a submit*/
-		var createPlaceholder = function(selectEl) {
-			var text = "",
-				$placeHolder;
+		var PlaceHolder = function(selectEl) {
+			var text = "";
+			var $placeHolder;
 			
-			//set initial text of placeholder
-			if (selectEl.selectedIndex >= 0) {
-				text = selectEl.options[selectEl.selectedIndex].text;
-			} else {
-				text = selectEl.options[0].text;
-			}
-			
-			$placeHolder = $('<a href="#" aria-owns="' + selectEl.id + '" class="placeholder ui-selectmenu ui-widget ui-state-default ui-selectmenu-dropdown ui-corner-all" role="button" href="#" tabindex="0" aria-haspopup="true" id="' + selectEl.id + '-button"><span class="ui-selectmenu-status">' + text + '</span><span class="ui-selectmenu-icon ui-icon ui-icon-triangle-1-s"></span></a>');
-			
-			$(selectEl).after($placeHolder);
-			$(selectEl).hide();
-			
-			//bind behaviour
-			$placeHolder.bind('click', function(e) {
+			//click behaviour
+			var onClick = function(e) {
 				e.stopPropagation();
 				e.preventDefault();
 
 				// toggle the custom select menu if enabled
-				if (!$(this).hasClass("disabled")) {
+				if (!$(this).hasClass(settings.menu.classes.container.disabled)) {
 					if (!menu.isOpen) {                             
 						menu.open(this, selectEl);
 					} else {
 						menu.close();
 					}       
 				}
-			});
+			};
 			
-			$placeHolder.bind('keydown', function(e){
-                                if (e.which === $.ui.keyCode.LEFT || e.keyCode === $.ui.keyCode.RIGHT || e.keyCode === $.ui.keyCode.UP || e.keyCode === $.ui.keyCode.DOWN || e.keyCode === $.ui.keyCode.ENTER) {
+			//keydown behaviour
+			var onKeydown = function(e) {
+				if (e.which === settings.keymap.left || e.keyCode === settings.keymap.right || e.keyCode === settings.keymap.up || e.keyCode === settings.keymap.down || e.keyCode === settings.keymap.enter) {
 					e.stopPropagation();
 					e.preventDefault();
 				}
+				
 				/* switch(true) to enable use of expanded conditional statements */
 				switch (true) {
-					case (e.which === $.ui.keyCode.UP || e.which === $.ui.keyCode.LEFT):
+					case (e.which === settings.keymap.left):
+					case (e.which === settings.keymap.up):
 						if (menu.visible()) {
 							menu.scrollUp();
 						} else {
 							$(this).trigger("click");
 						}
 						return false;
-					case (e.which === $.ui.keyCode.DOWN || e.which === $.ui.keyCode.RIGHT):
+					case (e.which === settings.keymap.right):
+					case (e.which === settings.keymap.down):
 						if (menu.visible()) {
 							menu.scrollDown();
 						} else {
 							$(this).trigger("click");
 						}
 						return false;
-					case (e.which === $.ui.keyCode.ENTER || e.which === $.ui.keyCode.TAB):
-						if (e.which === $.ui.keyCode.ENTER && !menu.visible()) {
-							$(this).trigger("click");
-							return false;
-						} else {
+					case (e.which === settings.keymap.enter):
+					case (e.which === settings.keymap.tab):
+					case (e.which === settings.keymap.space):
+						//trigger click on nav
+						if (menu.visible()) {
 							menu.close();
+						} else {
+							if (e.which === settings.keymap.enter || e.which === settings.keymap.space) {
+								$(this).trigger("click");
+								return false;
+							} else {
+								menu.close();
+							}
 						}
 						break;
-					case (e.which === $.ui.keyCode.ESCAPE):
-						//reset placeholder and select to original values
-						//close menu
+					case (e.which === settings.keymap.escape):
+						//close dropdown
 						menu.reset();
 						return false;
-					case ((e.which >= 48 && e.which <= 59) || (e.which >= 65 && e.which <= 90) || (e.which >= 97 && e.which <= 122)):
+					case (e.which >= 48 && e.which <= 59):
+					case (e.which >= 65 && e.which <= 90):
+					case (e.which >= 97 && e.which <= 122):
 						//open menu if not already
 						if (!menu.visible()) {
 							$(this).trigger("click");
 						}
+						//first, add character to search string
+						searchString += String.fromCharCode(e.which);
+				
 						//pass string to typeahead function
-						menu.search(String.fromCharCode(e.which));
-						break;
+						menu.search();
 				}
-			});
+			};
 			
-			$placeHolder.bind('focus', function(e) {
-				$(this).addClass("ui-selectmenu-focus");
-			});
+			var onFocus = function(e) {
+				$(this).addClass(settings.placeholder.classes.container.focus);
+			};
 			
-			$placeHolder.bind('mouseover', function(e) {
-				$(this).addClass("ui-state-hover");
-			});
+			var onBlur = function(e) {
+				$(this).removeClass(settings.placeholder.classes.container.focus);
+			};
 			
-			$placeHolder.bind('blur', function(e) {
-				$(this).removeClass("ui-selectmenu-focus");
-			});
+			var onMouseOver = function(e) {
+				$(this).addClass(settings.placeholder.classes.container.hover);
+			};
 			
-			$placeHolder.bind('mouseout', function(e) {
-				$(this).removeClass("ui-state-hover");
-			});
+			var onMouseOut = function(e) {
+				$(this).removeClass(settings.placeholder.classes.container.hover);
+			};
 			
-			return $placeHolder;
+			var init = function() {
+				//set initial text of placeholder
+				if (selectEl.selectedIndex >= 0) {
+					text = selectEl.options[selectEl.selectedIndex].text;
+				} else {
+					text = selectEl.options[0].text;
+				}
+				
+				$placeHolder = $('<a href="#" aria-owns="' + selectEl.id + '" class="' + settings.placeholder.classes.container.default + '" role="button" href="#" tabindex="0" aria-haspopup="true" id="' + selectEl.id + '-button"><span class="' + settings.placeholder.classes.text.default + '">' + text + '</span><span class="' + settings.placeholder.classes.arrow.default + '"></span></a>');
+				
+				$placeHolder.click(onClick);
+				$placeHolder.keydown(onKeydown);
+				$placeHolder.focus(onFocus);
+				$placeHolder.blur(onBlur);
+				$placeHolder.hover(onMouseOver, onMouseOut);
+				
+				$(selectEl).after($placeHolder);
+				$(selectEl).hide();
+			};
+			
+			init();
+			
+			return $placeHolder[0];
+			
 		};
 		
 		//instantiate single drop down menuDiv on run
 		if (menu === null) {
 			menu = new FlyweightMenu();
 		}
-		
-		// add event handler to the page, so when you click anywhere which ISN'T the custom select menuDiv, or a placeholder
-		// for one, we close the custom select menuDiv
-		$('body').bind('click keydown focus', function(e) {
-		    if ((!$(e.target).closest('.ui-selectmenu-menu').length) && (!$(e.target).closest('a.placeholder').length)) {
-			menu.close();
-		    }
-		});
-
 				
 		return this.each(function() {
-			var $placeHolder = createPlaceholder(this);			
-			return this;
+			return new PlaceHolder(this);
 		});
 	};
-	
-	$.fn.flyweightCustomSelect.defaults = {
-	
+	$.fn.flyweightCustomSelect.settings = {
+		menu:{
+			classes:{
+				container:{
+					default:"jquery-flyweight-selectmenu",
+					open:"jquery-flyweight-selectmenu-open"
+				},
+				list:{
+					default:"jquery-flyweight-selectmenu-list"
+				},
+				listitem:{
+					default:"jquery-flyweight-selectmenu-listitem",
+					focus:"jquery-flyweight-selectmenu-listitem-focus"
+				}
+			}
+		},
+		placeholder:{
+			classes:{
+				container:{
+					default:"jquery-flyweight-select",
+					open:"jquery-flyweight-select-open",
+					hover:"jquery-flyweight-select-hover",
+					focus:"jquery-flyweight-select-focus",
+					disabled:"jquery-flyweight-select-disabled"
+				},
+				text:{
+					default:"jquery-flyweight-select-text"
+				},
+				arrow:{
+					default:"jquery-flyweight-select-arrow"
+				}
+			}			
+		},
+		keymap:{
+			left:$.ui.keyCode.LEFT,
+			right:$.ui.keyCode.RIGHT,
+			up:$.ui.keyCode.UP,
+			down:$.ui.keyCode.DOWN,
+			enter:$.ui.keyCode.ENTER,
+			space:$.ui.keyCode.SPACE,
+			tab:$.ui.keyCode.TAB,
+			escape:$.ui.keyCode.ESCAPE
+		}
 	};
-}(jQuery));
+})(jQuery);
