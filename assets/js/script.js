@@ -47,6 +47,7 @@ var render = function(e) {
 	var time = new Date().getTime();
 	
 	$("select").flyweightCustomSelect();
+	//$("select").selectmenu();
 	
 	time = new Date().getTime() - time;
 	
