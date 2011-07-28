@@ -257,35 +257,37 @@
 			
 			//keydown behaviour
 			var onKeydown = function(e) {
-				if (e.which === $.ui.keyCode.LEFT || e.keyCode === $.ui.keyCode.RIGHT || e.keyCode === $.ui.keyCode.UP || e.keyCode === $.ui.keyCode.DOWN || e.keyCode === $.ui.keyCode.ENTER) {
+				if (e.which === settings.keymap.left || e.keyCode === settings.keymap.right || e.keyCode === settings.keymap.up || e.keyCode === settings.keymap.down || e.keyCode === settings.keymap.enter) {
 					e.stopPropagation();
 					e.preventDefault();
 				}
+				
 				/* switch(true) to enable use of expanded conditional statements */
 				switch (true) {
-					case (e.which === $.ui.keyCode.LEFT):
-					case (e.which === $.ui.keyCode.UP):
+					case (e.which === settings.keymap.left):
+					case (e.which === settings.keymap.up):
 						if (menu.visible()) {
 							menu.scrollUp();
 						} else {
 							$(this).trigger("click");
 						}
 						return false;
-					case (e.which === $.ui.keyCode.RIGHT):
-					case (e.which === $.ui.keyCode.DOWN):
+					case (e.which === settings.keymap.right):
+					case (e.which === settings.keymap.down):
 						if (menu.visible()) {
 							menu.scrollDown();
 						} else {
 							$(this).trigger("click");
 						}
 						return false;
-					case (e.which === $.ui.keyCode.ENTER):
-					case (e.which === $.ui.keyCode.TAB):
+					case (e.which === settings.keymap.enter):
+					case (e.which === settings.keymap.left):
+					case (e.which === settings.keymap.space):
 						//trigger click on nav
 						if (menu.visible()) {
 							menu.close();
 						} else {
-							if (e.which === $.ui.keyCode.ENTER) {
+							if (e.which === settings.keymap.enter || e.which === settings.keymap.space) {
 								$(this).trigger("click");
 								return false;
 							} else {
@@ -293,7 +295,7 @@
 							}
 						}
 						break;
-					case (e.which === $.ui.keyCode.ESCAPE):
+					case (e.which === settings.keymap.escape):
 						//close dropdown
 						menu.reset();
 						return false;
@@ -364,37 +366,47 @@
 		menu:{
 			classes:{
 				container:{
-					default:"",
-					open:""
+					default:"jquery-flyweight-selectmenu",
+					open:"jquery-flyweight-selectmenu-open"
 				},
 				list:{
-					default:"",
-					open:""
+					default:"jquery-flyweight-selectmenu-list"
 				},
 				listitem:{
-					default:"",
-					hover:""
+					default:"jquery-flyweight-selectmenu-listitem",
+					hover:"jquery-flyweight-selectmenu-listitem-hover",
+					focus:"jquery-flyweight-selectmenu-listitem-focus"
 				}
 			}
 		},
 		placeholder:{
 			classes:{
 				container:{
-					default:"",
-					open:"",
-					hover:"",
-					focus:"",
-					disabled:""
+					default:"jquery-flyweight-select",
+					open:"jquery-flyweight-select-open",
+					hover:"jquery-flyweight-select-hover",
+					focus:"jquery-flyweight-select-focus",
+					disabled:"jquery-flyweight-select-disabled"
 				},
 				text:{
-					default:"",
-					hover:""
+					default:"jquery-flyweight-select-text",
+					hover:"jquery-flyweight-select-text-hover"
 				},
 				arrow:{
-					default:"",
-					hover:""
+					default:"jquery-flyweight-select-arrow",
+					hover:"jquery-flyweight-select-arrow-hover"
 				}
 			}			
+		},
+		keymap:{
+			left:$.ui.keyCode.LEFT,
+			right:$.ui.keyCode.RIGHT,
+			up:$.ui.keyCode.UP,
+			down:$.ui.keyCode.DOWN,
+			enter:$.ui.keyCode.ENTER,
+			space:$.ui.keyCode.SPACE,
+			tab:$.ui.keyCode.TAB,
+			escape:$.ui.keyCode.ESCAPE
 		}
 	};
 })(jQuery);
