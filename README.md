@@ -17,9 +17,7 @@ It borrows accessibility design patterns from the Filament Group's jQuery UI Sel
 
   * Lint code
   * Opt groups
-  * Improve typahead algorithm 
-  * Label association
-  * Refactor to jQuery/jQuery UI plugin model
+  * Refactor to jQuery UI plugin model
 
 ## Useful links
 
