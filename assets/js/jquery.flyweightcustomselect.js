@@ -7,7 +7,7 @@
 
 (function($){
 	$.fn.flyweightCustomSelect = function(options) {
-		var opts = $.extend({}, $.fn.flyweightCustomSelect.defaults, options);
+		var settings = $.extend({}, $.fn.flyweightCustomSelect.settings, options);
 		var menu = null;
 		
 		/*Produce modulo correctly */		
@@ -21,7 +21,7 @@
 			var placeHolder = null;
 			var selectEl = null;
 			var isOpen = false;
-			var menuDiv, $menuDiv;
+			var menuDiv;
 			var initialSelectedIndex = -1;
 			var searchString = "";
 			var timer;
@@ -51,7 +51,7 @@
 					i--;
 				}
 				
-				menuDiv.innerHTML = '<ul class="ui-selectmenu-menu ui-widget ui-widget-content ui-selectmenu-menu-dropdown ui-corner-bottom">' + customHTML;
+				menuDiv.innerHTML = '<ul class="' + settings.menu.classes.list.default + '">' + customHTML;
 			};
 			
 			var positionPlaceHolder = function() {
@@ -80,6 +80,7 @@
 			
 			var fitMenuOnScreen = function() {
 				//ensure menu is always visible
+				var $menuDiv = $(menuDiv);
 				if($menuDiv.offset().top + $menuDiv.height() > $(window).height()) {
 					var scrollEl = $.browser.webkit ? window.document.body : "html"; 
 					$(scrollEl).animate({scrollTop: parseInt(menuDiv.style.top, 10) - 100}, 1000);
@@ -99,16 +100,17 @@
 				setSelectToIndex(index);
 				
 				//scroll to selected LI in list
+				var $menuDiv = $(menuDiv);
 				var $selectedLi = $menuDiv.find("li:eq(" + index + ")");
 				$menuDiv.find("ul").scrollTop(0);
-				$menuDiv.find("li a").removeClass("hover");
+				$menuDiv.find("li a").removeClass(settings.menu.classes.listitem.hover);
 				if ($selectedLi.length > 0) {
-					$selectedLi.find("a").addClass("hover");
+					$selectedLi.find("a").addClass(settings.menu.classes.listitem.hover);
 					$menuDiv.find("ul").scrollTop($selectedLi.position().top);
 				}
 				
 				//update value of anchor
-				$(placeHolder).find(".ui-selectmenu-status").text($selectedLi.text());
+				$(placeHolder).find("a").text($selectedLi.text());
 
 			};
 			
@@ -170,16 +172,16 @@
 					index = mod(selectEl.childNodes.length, parseInt(index + offset, 10));
 				}
 				
-                setMenuToIndex(index);
+				setMenuToIndex(index);
 			};
 			
 			var init = function() {
 				menuDiv = window.document.createElement('div');
-				menuDiv.className = "ui-selectmenu-menu ui-widget ui-widget-content ui-corner-bottom ui-selectmenu-menu-dropdown";
+				menuDiv.className = settings.menu.classes.container.default;
 				
 				$('body').append(menuDiv);
-				$menuDiv = $(menuDiv);
 				
+				var $menuDiv = $(menuDiv);
 				$menuDiv.bind('click', onClick);
 			};
 			
@@ -198,7 +200,8 @@
 					fitMenuOnScreen();
 					setMenuToIndex(selectEl.selectedIndex);
 					
-					$menuDiv.addClass("ui-selectmenu-open");
+					var $menuDiv = $(menuDiv);
+					$menuDiv.addClass(settings.menu.classes.container.visible);
 					
 					//set flags
 					initialSelectedIndex = selectEl.selectedIndex; 
@@ -208,7 +211,8 @@
 
 				},
 				close: function() {
-					$menuDiv.removeClass("ui-selectmenu-open");
+					var $menuDiv = $(menuDiv);
+					$menuDiv.removeClass(settings.menu.classes.container.visible);
 					
 					//set flag
 					isOpen = false;
@@ -242,7 +246,7 @@
 				e.preventDefault();
 
 				// toggle the custom select menu if enabled
-				if (!$(this).hasClass("disabled")) {
+				if (!$(this).hasClass(settings.menu.classes.container.disabled)) {
 					if (!menu.isOpen) {                             
 						menu.open(this, selectEl);
 					} else {
@@ -253,7 +257,7 @@
 			
 			//keydown behaviour
 			var onKeydown = function(e) {
-                if (e.which === $.ui.keyCode.LEFT || e.keyCode === $.ui.keyCode.RIGHT || e.keyCode === $.ui.keyCode.UP || e.keyCode === $.ui.keyCode.DOWN || e.keyCode === $.ui.keyCode.ENTER) {
+				if (e.which === $.ui.keyCode.LEFT || e.keyCode === $.ui.keyCode.RIGHT || e.keyCode === $.ui.keyCode.UP || e.keyCode === $.ui.keyCode.DOWN || e.keyCode === $.ui.keyCode.ENTER) {
 					e.stopPropagation();
 					e.preventDefault();
 				}
@@ -306,19 +310,19 @@
 			};
 			
 			var onFocus = function(e) {
-				$(this).addClass("ui-selectmenu-focus");
+				$(this).addClass(settings.placeholder.classes.container.focus);
 			};
 			
 			var onBlur = function(e) {
-				$(this).removeClass("ui-selectmenu-focus");
+				$(this).removeClass(settings.placeholder.classes.container.focus);
 			};
 			
 			var onMouseOver = function(e) {
-				$(this).addClass("ui-state-hover");
+				$(this).addClass(settings.placeholder.classes.container.hover);
 			};
 			
 			var onMouseOut = function(e) {
-				$(this).removeClass("ui-state-hover");
+				$(this).removeClass(settings.placeholder.classes.container.hover);
 			};
 			
 			var init = function() {
@@ -329,7 +333,7 @@
 					text = selectEl.options[0].text;
 				}
 				
-				$placeHolder = $('<a href="#" aria-owns="' + selectEl.id + '" class="ui-selectmenu ui-widget ui-state-default ui-selectmenu-dropdown ui-corner-all" role="button" href="#" tabindex="0" aria-haspopup="true" id="' + selectEl.id + '-button"><span class="ui-selectmenu-status">' + text + '</span><span class="ui-selectmenu-icon ui-icon ui-icon-triangle-1-s"></span></a>');
+				$placeHolder = $('<a href="#" aria-owns="' + selectEl.id + '" class="' + settings.placeholder.classes.container.default + '" role="button" href="#" tabindex="0" aria-haspopup="true" id="' + selectEl.id + '-button"><span class="' + settings.placeholder.classes.text.default + '">' + text + '</span><span class="' + settings.placeholder.classes.arrow.default + '"></span></a>');
 				
 				$placeHolder.click(onClick);
 				$placeHolder.keydown(onKeydown);
@@ -356,8 +360,41 @@
 			return new PlaceHolder(this);
 		});
 	};
-	
-	$.fn.flyweightCustomSelect.defaults = {
-	
+	$.fn.flyweightCustomSelect.settings = {
+		menu:{
+			classes:{
+				container:{
+					default:"",
+					open:""
+				},
+				list:{
+					default:"",
+					open:""
+				},
+				listitem:{
+					default:"",
+					hover:""
+				}
+			}
+		},
+		placeholder:{
+			classes:{
+				container:{
+					default:"",
+					open:"",
+					hover:"",
+					focus:"",
+					disabled:""
+				},
+				text:{
+					default:"",
+					hover:""
+				},
+				arrow:{
+					default:"",
+					hover:""
+				}
+			}			
+		}
 	};
 })(jQuery);
