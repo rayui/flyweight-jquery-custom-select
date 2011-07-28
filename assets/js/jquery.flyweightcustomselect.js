@@ -122,19 +122,11 @@
 				return $(selectEl).find("option[value='" + value + "']");
 			};
 			
-<<<<<<< Temporary merge branch 1
-			var typeAhead = function(character) {
-				searchString += character;
-				var typeAheadString = searchString.replace(/[\W]/ig,"").toUpperCase();
-				var list = mapOptionsToArray();
-				var found = false;
-=======
 			var typeAhead = function() {
 				var typeAheadString = searchString.replace(/[\W]/ig,"").toUpperCase(),
 					list = mapOptionsToArray(),
 					found = false;
 					
->>>>>>> Temporary merge branch 2
 				for (var i = 0; i < list[0].length; i++) {
 					if (list[0][i].replace(/[\W]/ig,"").substring(0, typeAheadString.length).toString().toUpperCase() === typeAheadString) {
 						setMenuToIndex(i);
