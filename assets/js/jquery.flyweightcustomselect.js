@@ -14,7 +14,7 @@
 		var mod = function(n, m) {
 			return ((m%n)+n)%n;
 		};
-			
+
 		//dropdown menuDiv constructor
 		var FlyweightMenu = function() {
 			//variables to remember which element the last event was fired from
@@ -68,10 +68,10 @@
 				//make jQuery to get rendered width
 				var $menuDiv = $(menuDiv),
 					placeholderWidth = $(selectEl).width();
-					
+									
 				if (placeholderWidth > $menuDiv.width()) {
 					$menuDiv.find("ul").width(placeholderWidth);
-					if($menuDiv.find("ul").hasScrollBar()) {
+					if($menuDiv.find("ul").flyweightCustomSelect.hasScrollBar()) {
 						$menuDiv.find("li").width(placeholderWidth - 17); //arbitrarily set width of scrollbar - varies from OS to OS. i picked an approximate value
 					} else {
 						$menuDiv.find("li").width(placeholderWidth);
@@ -445,4 +445,14 @@
 			escape:$.ui.keyCode.ESCAPE
 		}
 	};
+	$.fn.flyweightCustomSelect.hasScrollBar = function() {
+	    //note: clientHeight= height of holder
+	    //scrollHeight= we have content till this height
+	    var _elm = this;
+	    var _hasScrollBar = false;
+	    if ((_elm.clientHeight < _elm.scrollHeight) || (_elm.clientWidth < _elm.scrollWidth)) {
+		_hasScrollBar = true;
+	    }
+	    return _hasScrollBar;
+	}
 })(jQuery);
