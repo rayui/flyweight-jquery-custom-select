@@ -24,30 +24,48 @@
 				menuDiv = null,
 				initialSelectedIndex = -1,
 				searchString = "",
+				lookupHash = [],
 				timer = null;
 
-			// this utility function gets all the options out of the select element,
+			// this utility function gets a hash of text and value of each filtered element out of the select,
 			// then gets their values and returns them in an array
 			var mapOptionsToHash = function() {
-				var hash = $.map($(settings.optionfilter, selectEl), function(el, index) {
-					return {text:$(el).text(), value:$(el).attr("value")};
+				lookupHash = $.map($(settings.optionfilter, selectEl), function(el, index) {
+					var $el = $(el);
+					return {type:el.nodeName, index:$el.attr("index"), text:$el.attr("text"), value:$el.attr("value"), group:$el.attr("label")};
 				});
-				return hash;
 			};
 			
-			var buildMarkup = function() {
+			var buildPlaceholder = function() {
 				//get data from select
 				//build markup of control
-				var hash = mapOptionsToHash(),
-					i = hash.length - 1,
-					customHTML = '</ul>';
+				var i = 0,
+					customHTML = '<ul class="' + settings.classes.menu.list.base + '">';
 				
-				while (i >= 0) {
-					customHTML = '<li class="' + settings.classes.menu.listitem.base + '"><a data-value="' + hash[i].value + '" href="#">' + hash[i].text + '</a></li>' + customHTML;
-					i--;
+				while (i < lookupHash.length) {
+					var hashEl = lookupHash[i];
+					if (hashEl.type === "OPTGROUP") {
+						customHTML += '<li class="' + settings.classes.menu.group.base + '"><span>' + hashEl.group + '</span><ul>';
+						i++;
+						hashEl = lookupHash[i];
+						while (i < lookupHash.length && hashEl.type !== "OPTGROUP") {
+							customHTML += buildItem(hashEl.value, hashEl.text);
+							i++;
+							hashEl = lookupHash[i];
+						}
+						customHTML += '</ul></li>';
+					} else {
+						customHTML += buildItem(hashEl.value, hashEl.text) + customHTML;
+						i++;
+					}
 				}
 				
-				$(menuDiv).html('<ul class="' + settings.classes.menu.list.base + '">' + customHTML);
+				$(menuDiv).html(customHTML + '</ul>');
+				
+			};
+			
+			var buildItem = function(value, text) {
+				return '<li class="' + settings.classes.menu.listitem.base + '"><a data-value="' + value + '" href="#">' + text + '</a></li>'
 			};
 			
 			var positionPlaceHolder = function() {
@@ -67,7 +85,7 @@
 					
 				if (placeholderWidth > $menuDiv.width()) {
 					$menuDiv.find("ul").width(placeholderWidth);
-					if($menuDiv.find("ul").hasScrollBar()) {
+					if($menuDiv.find("ul").flyweightCustomSelect.hasScrollBar()) {
 						$menuDiv.find("li").width(placeholderWidth - 17); //arbitrarily set width of scrollbar - varies from OS to OS. i picked an approximate value
 					} else {
 						$menuDiv.find("li").width(placeholderWidth);
@@ -85,25 +103,29 @@
 			};
 
 			//update selecEl value to new index			
-			var setSelectToIndex = function(index) {
-				selectEl.value = selectEl.options[index].value;
-				selectEl.options[index].selected = true;
+			var setSelectToIndex = function(lookupIndex) {
+				selectEl.value = lookupHash[lookupIndex].value;
+				selectEl.options[lookupHash[lookupIndex].index].selected = true;
+				selectEl.selectedIndex = lookupHash[lookupIndex].index;
+				
+				//trigger any change events bound to select element
+				$(selectEl).trigger("change");
 			};
 
 			//update menu to show new select info
-			var setMenuToIndex = function(index) {
+			var setMenuToIndex = function(lookupIndex) {
 				var $menuDiv = $(menuDiv),
 					$selectedLi;
 					
 				//first ensure select is kept in sync
 				//necessary for data integrity
-				setSelectToIndex(index);
+				setSelectToIndex(lookupIndex);
 				
 				//scroll to selected LI in list
-				$selectedLi = $menuDiv.find("li:eq(" + index + ")");
+				$selectedLi = $menuDiv.find('a[data-value="' + lookupHash[lookupIndex].value + '"]');
 					
 				$menuDiv.find("ul").scrollTop(0);
-				$menuDiv.find("li").removeClass(settings.classes.menu.listitem.focus);
+				$menuDiv.find("li a").removeClass(settings.classes.menu.listitem.focus);
 				if ($selectedLi.length > 0) {
 					$selectedLi.addClass(settings.classes.menu.listitem.focus);
 					$menuDiv.find("ul").scrollTop($selectedLi.position().top);
@@ -111,23 +133,31 @@
 				
 				//update value of anchor
 				$(placeHolder).find("span." + settings.classes.placeholder.text.base).text($selectedLi.text());
-
 			};
 			
-			var getOptFromSelect = function(value) {
-				return $(selectEl).find("option[value='" + value + "']");
+			//update menu to to match psecific attribute in lookupHash 
+			var setMenuByAttr = function(attr, data) {
+				var i = lookupHash.length - 1;
+				
+				while(i--) {
+					if(lookupHash[i][attr] === data) {
+						setMenuToIndex(i);
+						i = 0;
+					}
+				}
 			};
 			
 			var typeAhead = function() {
 				var typeAheadString = searchString.replace(/[\W]/ig,"").toUpperCase(),
-					hash = mapOptionsToHash(),
 					found = false;
 
-				for (var i = 0; i < hash.length; i++) {
-					if (hash[i].text.replace(/[\W]/ig,"").substring(0, typeAheadString.length).toString().toUpperCase() === typeAheadString) {
-						setMenuToIndex(i);
-						i = hash.length;
-						found = true;
+				for (var i = 0; i < lookupHash.length; i++) {
+					if(lookupHash[i].text) {
+						if (lookupHash[i].text.replace(/[\W]/ig,"").substring(0, typeAheadString.length).toString().toUpperCase() === typeAheadString) {
+							setMenuByAttr("value", lookupHash[i].value);
+							i = lookupHash.length;
+							found = true;
+						}
 					}
 				}
 				
@@ -151,11 +181,7 @@
 					return false;
 				}				
 				
-				//get index of selected item in list and update the controls
-				value = $(selectedAnchor).attr("data-value");
-				index  = $(selectEl).find("option[value='" + value + "']").index();
-				
-				setMenuToIndex(index);
+				setMenuByAttr("value", $(selectedAnchor).attr("data-value"));
 				
 				//kick off the change event bound to the actual select
 				menu.close();
@@ -169,13 +195,15 @@
 				* set list to selected index
 				*/
 				
-				var index = mod(selectEl.childNodes.length, parseInt(selectEl.selectedIndex + offset, 10));
+				var lookupIndex = lookupHash.length;
+					
+				while (lookupIndex--) {                                     
+					if (lookupHash[lookupIndex].index === selectEl.selectedIndex + offset) {
+						setMenuToIndex(lookupIndex);	
+						lookupIndex = 0;
+					}
+				}			
 				
-				while (selectEl[index].getAttribute("value").length === 0) {
-					index = mod(selectEl.childNodes.length, parseInt(index + offset, 10));
-				}
-				
-				setMenuToIndex(index);
 			};
 			
 			var init = function() {
@@ -201,11 +229,13 @@
 					placeHolder = triggeredPlaceHolder;
 					selectEl = triggeredSelectEl;
 					
-					buildMarkup();
+					//cache the values & text for performance
+					mapOptionsToHash();
+					buildPlaceholder();
 					positionPlaceHolder();
 					fitScrollBar();
 					fitMenuOnScreen();
-					setMenuToIndex(selectEl.selectedIndex);
+					setMenuByAttr("index", selectEl.selectedIndex);
 					
 					$(menuDiv).addClass(settings.classes.menu.container.open);
 					$(placeHolder).addClass(settings.classes.placeholder.container.open);
@@ -443,10 +473,13 @@
 				listitem:{
 					base:"jquery-flyweight-selectmenu-listitem",
 					focus:"jquery-flyweight-selectmenu-listitem-focus"
+				},
+				group:{
+					base:"jquery-flyweight-selectmenu-group",
 				}
 			}			
 		},
-		optionfilter:'option[value!=""]',
+		optionfilter:'option[value!=""],optgroup',
 		keymap:{
 			left:$.ui.keyCode.LEFT,
 			right:$.ui.keyCode.RIGHT,

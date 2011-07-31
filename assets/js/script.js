@@ -39,10 +39,22 @@ var render = function(e) {
 	
 	for(i = numSelects - 1; i >= 0; i--) {
 		selectHTML = '<select id="select" name="select' + i + '" class="select' + i + '"><option value="" selected="selected">Please select...</option>';
+		selectHTML += '<optgroup label="' + makeid() + '">';
+		
 		for (j = 0; j <= 10; j++) {
 			randomString = makeid();
 			selectHTML += '<option value="' + randomString.toUpperCase() + '">' + randomString + '</option>';
 		}
+		
+		selectHTML += '</optgroup><optgroup label="' + makeid() + '">';
+		
+		for (j = 0; j <= 10; j++) {
+			randomString = makeid();
+			selectHTML += '<option value="' + randomString.toUpperCase() + '">' + randomString + '</option>';
+		}
+		
+		selectHTML += '</optgroup>';
+		
 		$form.append(selectHTML + '</select>');
 	}
 	

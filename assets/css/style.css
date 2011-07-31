@@ -149,9 +149,9 @@ a {
 	text-decoration:none;
 }
 
-.jquery-flyweight-selectmenu-listitem-focus a,
-.jquery-flyweight-selectmenu-listitem:hover a,
-.jquery-flyweight-selectmenu-listitem-hover a {
+a.jquery-flyweight-selectmenu-listitem-focus,
+a.jquery-flyweight-selectmenu-listitem:hover,
+a.jquery-flyweight-selectmenu-listitem-hover {
 	outline:0;
 	color:#ffffff;
 	background-color:#FF8B17;
