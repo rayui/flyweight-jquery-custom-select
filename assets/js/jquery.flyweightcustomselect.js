@@ -28,30 +28,26 @@
 
 			// this utility function gets all the options out of the select element,
 			// then gets their values and returns them in an array
-			var mapOptionsToArray = function() {
-				var text = $.map($('option', selectEl), function(el, index) {
-					return $(el).text();
+			var mapOptionsToHash = function() {
+				var hash = $.map($(settings.optionfilter, selectEl), function(el, index) {
+					return {text:$(el).text(), value:$(el).attr("value")};
 				});
-				var values = $.map($('option', selectEl), function(el, index) {
-					return $(el).attr("value");
-				});
-				
-				return [text, values];
+				return hash;
 			};
 			
 			var buildMarkup = function() {
 				//get data from select
 				//build markup of control
-				var list = mapOptionsToArray(),
-					i = list[0].length - 1,
+				var hash = mapOptionsToHash(),
+					i = hash.length - 1,
 					customHTML = '</ul>';
 				
 				while (i >= 0) {
-					customHTML = '<li class="' + settings.menu.classes.listitem.default + '"><a data-value="' + list[1][i] + '" href="#">' + list[0][i] + '</a></li>' + customHTML;
+					customHTML = '<li class="' + settings.classes.menu.listitem.base + '"><a data-value="' + hash[i].value + '" href="#">' + hash[i].text + '</a></li>' + customHTML;
 					i--;
 				}
 				
-				menuDiv.innerHTML = '<ul class="' + settings.menu.classes.list.default + '">' + customHTML;
+				$(menuDiv).html('<ul class="' + settings.classes.menu.list.base + '">' + customHTML);
 			};
 			
 			var positionPlaceHolder = function() {
@@ -107,14 +103,14 @@
 				$selectedLi = $menuDiv.find("li:eq(" + index + ")");
 					
 				$menuDiv.find("ul").scrollTop(0);
-				$menuDiv.find("li").removeClass(settings.menu.classes.listitem.focus);
+				$menuDiv.find("li").removeClass(settings.classes.menu.listitem.focus);
 				if ($selectedLi.length > 0) {
-					$selectedLi.addClass(settings.menu.classes.listitem.focus);
+					$selectedLi.addClass(settings.classes.menu.listitem.focus);
 					$menuDiv.find("ul").scrollTop($selectedLi.position().top);
 				}
 				
 				//update value of anchor
-				$(placeHolder).find("span." + settings.placeholder.classes.text.default).text($selectedLi.text());
+				$(placeHolder).find("span." + settings.classes.placeholder.text.base).text($selectedLi.text());
 
 			};
 			
@@ -124,13 +120,13 @@
 			
 			var typeAhead = function() {
 				var typeAheadString = searchString.replace(/[\W]/ig,"").toUpperCase(),
-					list = mapOptionsToArray(),
+					hash = mapOptionsToHash(),
 					found = false;
 
-				for (var i = 0; i < list[0].length; i++) {
-					if (list[0][i].replace(/[\W]/ig,"").substring(0, typeAheadString.length).toString().toUpperCase() === typeAheadString) {
+				for (var i = 0; i < hash.length; i++) {
+					if (hash[i].text.replace(/[\W]/ig,"").substring(0, typeAheadString.length).toString().toUpperCase() === typeAheadString) {
 						setMenuToIndex(i);
-						i = list[0].length;
+						i = hash.length;
 						found = true;
 					}
 				}
@@ -186,7 +182,7 @@
 				var $menuDiv;
 				
 				menuDiv = window.document.createElement('div');
-				menuDiv.className = settings.menu.classes.container.default;
+				menuDiv.className = settings.classes.menu.container.base;
 				
 				$('body').append(menuDiv);
 				
@@ -211,8 +207,8 @@
 					fitMenuOnScreen();
 					setMenuToIndex(selectEl.selectedIndex);
 					
-					$(menuDiv).addClass(settings.menu.classes.container.open);
-					$(placeHolder).addClass(settings.placeholder.classes.container.open);
+					$(menuDiv).addClass(settings.classes.menu.container.open);
+					$(placeHolder).addClass(settings.classes.placeholder.container.open);
 					
 					//set flags
 					initialSelectedIndex = selectEl.selectedIndex; 
@@ -222,9 +218,8 @@
 
 				},
 				close: function() {
-					$(menuDiv).removeClass(settings.menu.classes.container.open);
-					$(placeHolder).removeClass(settings.placeholder.classes.container.open);
-					//$placeHolder.removeClass(settings.placeholder.classes.container.hover);
+					$(menuDiv).removeClass(settings.classes.menu.container.open);
+					$(placeHolder).removeClass(settings.classes.placeholder.container.open);
 					
 					//set flag
 					isOpen = false;
@@ -338,19 +333,19 @@
 			};
 			
 			var onFocus = function(e) {
-				$(this).addClass(settings.placeholder.classes.container.focus);
+				$(this).addClass(settings.classes.placeholder.container.focus);
 			};
 			
 			var onBlur = function(e) {
-				$(this).removeClass(settings.placeholder.classes.container.focus);
+				$(this).removeClass(settings.classes.placeholder.container.focus);
 			};
 			
 			var onMouseOver = function(e) {
-				$(this).addClass(settings.placeholder.classes.container.hover);
+				$(this).addClass(settings.classes.placeholder.container.hover);
 			};
 			
 			var onMouseOut = function(e) {
-				$(this).removeClass(settings.placeholder.classes.container.hover);
+				$(this).removeClass(settings.classes.placeholder.container.hover);
 			};
 			
 			var enable = function() {
@@ -378,7 +373,7 @@
 					text = selectEl.options[0].text;
 				}
 				
-				$placeHolder = $('<a href="#" aria-owns="' + selectEl.id + '" class="' + settings.placeholder.classes.container.default + '" role="button" href="#" tabindex="0" aria-haspopup="true" id="' + selectEl.id + '-button"><span class="' + settings.placeholder.classes.text.default + '">' + text + '</span><span class="' + settings.placeholder.classes.arrow.default + '"></span></a>');
+				$placeHolder = $('<a href="#" aria-owns="' + selectEl.id + '" class="' + settings.classes.placeholder.container.base + '" role="button" href="#" tabindex="0" aria-haspopup="true" id="' + selectEl.id + '-button"><span class="' + settings.classes.placeholder.text.base + '">' + text + '</span><span class="' + settings.classes.placeholder.arrow.base + '"></span></a>');
 				
 				enable();
 				
@@ -421,38 +416,37 @@
 	};
 	
 	$.fn.flyweightCustomSelect.settings = {
-		menu:{
-			classes:{
+		classes:{
+			placeholder:{
 				container:{
-					default:"jquery-flyweight-selectmenu",
-					open:"jquery-flyweight-selectmenu-open"
-				},
-				list:{
-					default:"jquery-flyweight-selectmenu-list"
-				},
-				listitem:{
-					default:"jquery-flyweight-selectmenu-listitem",
-					focus:"jquery-flyweight-selectmenu-listitem-focus"
-				}
-			}
-		},
-		placeholder:{
-			classes:{
-				container:{
-					default:"jquery-flyweight-select",
+					base:"jquery-flyweight-select",
 					open:"jquery-flyweight-select-open",
 					hover:"jquery-flyweight-select-hover",
 					focus:"jquery-flyweight-select-focus",
 					disabled:"jquery-flyweight-select-disabled"
 				},
 				text:{
-					default:"jquery-flyweight-select-text"
+					base:"jquery-flyweight-select-text"
 				},
 				arrow:{
-					default:"jquery-flyweight-select-arrow"
+					base:"jquery-flyweight-select-arrow"
+				}
+			},
+			menu:{
+				container:{
+					base:"jquery-flyweight-selectmenu",
+					open:"jquery-flyweight-selectmenu-open"
+				},
+				list:{
+					base:"jquery-flyweight-selectmenu-list"
+				},
+				listitem:{
+					base:"jquery-flyweight-selectmenu-listitem",
+					focus:"jquery-flyweight-selectmenu-listitem-focus"
 				}
 			}			
 		},
+		optionfilter:'option[value!=""]',
 		keymap:{
 			left:$.ui.keyCode.LEFT,
 			right:$.ui.keyCode.RIGHT,
