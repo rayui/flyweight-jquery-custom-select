@@ -143,10 +143,21 @@ a {
 	padding:0;
 }
 
+.jquery-flyweight-selectmenu .jquery-flyweight-selectmenu-group span {
+	display:block;
+	background-color:#c0c0c0;
+	padding:5px;
+	color:#ffffff;
+}
+
 .jquery-flyweight-selectmenu ul li a.jquery-flyweight-selectmenu-listitem {
 	display:block;
 	padding:5px;
 	text-decoration:none;
+}
+
+.jquery-flyweight-selectmenu .jquery-flyweight-selectmenu-group a.jquery-flyweight-selectmenu-listitem {
+	padding:5px 5px 5px 10px;	
 }
 
 .jquery-flyweight-selectmenu ul li a.jquery-flyweight-selectmenu-listitem-focus,
