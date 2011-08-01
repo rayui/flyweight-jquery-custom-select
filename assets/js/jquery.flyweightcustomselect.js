@@ -38,7 +38,7 @@
 			
 			//builds markup for li and anchor of list item
 			var buildItem = function(value, text) {
-				return '<li class="' + settings.classes.menu.listitem.base + '"><a data-value="' + value + '" href="#">' + text + '</a></li>';
+				return '<li><a  class="' + settings.classes.menu.listitem.base + '"data-value="' + value + '" href="#">' + text + '</a></li>';
 			};
 			
 			//builds placeholder markup
@@ -120,17 +120,17 @@
 				setSelectToIndex(lookupIndex);
 				
 				//scroll to selected LI in list
-				$selectedLi = $menuDiv.find('a[data-value="' + lookupHash[lookupIndex].value + '"]');
+				$selectedAnchor = $menuDiv.find('a[data-value="' + lookupHash[lookupIndex].value + '"]');
 					
 				$menuDiv.find("ul").scrollTop(0);
-				$menuDiv.find("li a").removeClass(settings.classes.menu.listitem.focus);
-				if ($selectedLi.length > 0) {
-					$selectedLi.addClass(settings.classes.menu.listitem.focus);
-					$menuDiv.find("ul").scrollTop($selectedLi.position().top);
+				$menuDiv.find("a").removeClass(settings.classes.menu.listitem.focus);
+				if ($selectedAnchor.length > 0) {
+					$selectedAnchor.addClass(settings.classes.menu.listitem.focus);
+					$menuDiv.find("ul").scrollTop($selectedAnchor.position().top);
 				}
 				
 				//update value of anchor
-				$(placeHolder).find("span." + settings.classes.placeholder.text.base).text($selectedLi.text());
+				$(placeHolder).find("span." + settings.classes.placeholder.text.base).text($selectedAnchor.text());
 			};
 			
 			//update menu to to match psecific attribute in lookupHash 
@@ -474,7 +474,8 @@
 				},
 				listitem:{
 					base:"jquery-flyweight-selectmenu-listitem",
-					focus:"jquery-flyweight-selectmenu-listitem-focus"
+					focus:"jquery-flyweight-selectmenu-listitem-focus",
+					hover:"jquery-flyweight-selectmenu-listitem-hover"
 				},
 				group:{
 					base:"jquery-flyweight-selectmenu-group",
