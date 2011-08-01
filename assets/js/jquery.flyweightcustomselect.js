@@ -1,3 +1,5 @@
+var jQuery = window.jQuery || {};
+
 /*!
 * jQuery Custom Select Manager function
 * Copyright 2011, Ray Brooks
@@ -23,7 +25,7 @@
 				isOpen = false,
 				menuDiv = null,
 				initialSelectedIndex = -1,
-				searchString = "",
+				searchString = '',
 				lookupHash = [],
 				timer = null;
 
@@ -41,8 +43,8 @@
 				return '<li><a  class="' + settings.classes.menu.listitem.base + '"data-value="' + value + '" href="#">' + text + '</a></li>';
 			};
 			
-			//builds placeholder markup
-			var buildPlaceholder = function() {
+			//builds menu markup
+			var buildMenu = function() {
 				//get data from select
 				//build markup of control
 				var i = 0,
@@ -67,7 +69,7 @@
 				
 			};
 			
-			var positionPlaceHolder = function() {
+			var positionMenu = function() {
 				//get offset of placeholder for menu position
 				//msie7 reports offset incorrectly - VML issue?
 				var xy = $(placeHolder).offset();
@@ -146,13 +148,13 @@
 			
 			//typeahead functionality
 			var typeAhead = function() {
-				var typeAheadString = searchString.replace(/[\W]/ig,"").toUpperCase(),
+				var typeAheadString = searchString.replace(/[\W]/ig,'').toUpperCase(),
 					found = false,
 					i = 0;
 
 				for (i = 0; i < lookupHash.length; i+=1) {
 					if(lookupHash[i].text) {
-						if (lookupHash[i].text.replace(/[\W]/ig,"").substring(0, typeAheadString.length).toString().toUpperCase() === typeAheadString) {
+						if (lookupHash[i].text.replace(/[\W]/ig,'').substring(0, typeAheadString.length).toString().toUpperCase() === typeAheadString) {
 							setMenuByAttr("value", lookupHash[i].value);
 							i = lookupHash.length;
 							found = true;
@@ -161,7 +163,7 @@
 				}
 				
 				window.clearTimeout(timer);
-				timer = window.setTimeout(function() {searchString = "";}, 1000);
+				timer = window.setTimeout(function() {searchString = '';}, 1000);
 
 			};
 			
@@ -194,34 +196,29 @@
 				
 				var lookupIndex = lookupHash.length;
 					
-				while (lookupIndex--) {                                     
+				while (lookupIndex) {
+					lookupIndex -= 1;
 					if (lookupHash[lookupIndex].index === selectEl.selectedIndex + offset) {
 						setMenuToIndex(lookupIndex);	
 						lookupIndex = 0;
 					}
-				}			
-				
+				}
 			};
 			
 			var init = function() {
-				var $menuDiv;
-				
 				menuDiv = window.document.createElement('div');
 				menuDiv.className = settings.classes.menu.container.base;
 				
 				$('body').append(menuDiv);
 				
-				$menuDiv = $(menuDiv);
-				$menuDiv.bind('click', onClick);
+				$(menuDiv).bind('click', onClick);
 			};
 			
 			//intialise menu object
 			init();
 			
 			return {
-				open: function(triggeredPlaceHolder, triggeredSelectEl) {
-					var $menuDiv;
-					
+				open: function(triggeredPlaceHolder, triggeredSelectEl) {			
 					//set closure wide variable to remember which object triggered open
 					placeHolder = triggeredPlaceHolder;
 					selectEl = triggeredSelectEl;
@@ -229,8 +226,8 @@
 					
 					//cache the values & text for performance
 					mapOptionsToHash();
-					buildPlaceholder();
-					positionPlaceHolder();
+					buildMenu();
+					positionMenu();
 					fitScrollBar();
 					fitMenuOnScreen();
 					setMenuByAttr("index", initialSelectedIndex);
@@ -240,7 +237,7 @@
 					
 					//set flags
 					isOpen = true;
-					searchString = "";
+					searchString = '';
 					window.clearTimeout(timer);
 
 				},
@@ -256,7 +253,7 @@
 					this.close();
 				},
 				visible: function() {
-					return isOpen;	
+					return isOpen;
 				},
 				enabled: function() {
 					//stub
@@ -279,7 +276,7 @@
 		};
 		
 		var PlaceHolder = function(selectEl) {
-			var text = "";
+			var text = '';
 			var $placeHolder;
 			var isEnabled = true;
 			
@@ -318,7 +315,7 @@
 						} else {
 							$(this).trigger("click");
 						}
-						return false;
+						break;
 					case (e.which === settings.keymap.right):
 					case (e.which === settings.keymap.down):
 						if (menu.visible()) {
@@ -326,7 +323,7 @@
 						} else {
 							$(this).trigger("click");
 						}
-						return false;
+						break;
 					case (e.which === settings.keymap.enter):
 					case (e.which === settings.keymap.tab):
 					case (e.which === settings.keymap.space):
@@ -336,7 +333,6 @@
 						} else {
 							if (e.which === settings.keymap.enter || e.which === settings.keymap.space) {
 								$(this).trigger("click");
-								return false;
 							} else {
 								menu.close();
 							}
@@ -345,7 +341,7 @@
 					case (e.which === settings.keymap.escape):
 						//close dropdown
 						menu.reset();
-						return false;
+						break;
 					case (e.which >= 48 && e.which <= 59):
 					case (e.which >= 65 && e.which <= 90):
 					case (e.which >= 97 && e.which <= 122):
