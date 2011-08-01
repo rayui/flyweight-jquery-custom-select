@@ -251,7 +251,7 @@
 					isOpen = false;
 				},
 				reset: function() {
-					setMenuToIndex(initialSelectedIndex);
+					setMenuByAttr("index", initialSelectedIndex);
 					this.close();
 				},
 				visible: function() {
