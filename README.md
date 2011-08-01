@@ -15,6 +15,7 @@ It borrows accessibility design patterns from the Filament Group's jQuery UI Sel
   * Semantic markup
   * Binds to original select change event
   * Auto scroll
+  * Javascript under 7KB compressed
   * Works in all major browsers
 
 ## Todo
