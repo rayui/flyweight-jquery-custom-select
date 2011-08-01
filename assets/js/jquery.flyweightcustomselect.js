@@ -478,7 +478,7 @@
 					hover:"jquery-flyweight-selectmenu-listitem-hover"
 				},
 				group:{
-					base:"jquery-flyweight-selectmenu-group",
+					base:"jquery-flyweight-selectmenu-group"
 				}
 			}			
 		},
