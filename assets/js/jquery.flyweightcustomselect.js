@@ -147,6 +147,8 @@
 			//typeahead functionality
 			var typeAhead = function() {
 				var typeAheadString = searchString.replace(/[\W]/ig,"").toUpperCase(),
+					found = false,
+					i = 0;
 
 				for (i = 0; i < lookupHash.length; i+=1) {
 					if(lookupHash[i].text) {
@@ -493,5 +495,4 @@
 			escape:$.ui.keyCode.ESCAPE
 		}
 	};
-=======
 }(jQuery));
