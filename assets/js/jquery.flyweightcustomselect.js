@@ -224,6 +224,7 @@
 					//set closure wide variable to remember which object triggered open
 					placeHolder = triggeredPlaceHolder;
 					selectEl = triggeredSelectEl;
+					initialSelectedIndex = selectEl.selectedIndex; 
 					
 					//cache the values & text for performance
 					mapOptionsToHash();
@@ -231,13 +232,12 @@
 					positionPlaceHolder();
 					fitScrollBar();
 					fitMenuOnScreen();
-					setMenuByAttr("index", selectEl.selectedIndex);
+					setMenuByAttr("index", initialSelectedIndex);
 					
 					$(menuDiv).addClass(settings.classes.menu.container.open);
 					$(placeHolder).addClass(settings.classes.placeholder.container.open);
 					
 					//set flags
-					initialSelectedIndex = selectEl.selectedIndex; 
 					isOpen = true;
 					searchString = "";
 					window.clearTimeout(timer);
@@ -292,6 +292,7 @@
 						menu.open(this, selectEl);
 					} else {
 						menu.close();
+						//if it's a different target select, open the menu (or we must click twice, boring)
 						if (menu.getSelect() !== selectEl) {
 							menu.open(this, selectEl);
 						}
