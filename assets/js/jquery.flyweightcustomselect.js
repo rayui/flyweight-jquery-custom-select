@@ -8,7 +8,7 @@
 (function($){
 	$.fn.flyweightCustomSelect = function(options) {
 		var settings = $.extend({}, $.fn.flyweightCustomSelect.settings, options),
-			menu = null;
+		menu = $.fn.flyweightCustomSelect.menu ? $.fn.flyweightCustomSelect.menu : null;
 		
 		/*Produce modulo correctly */		
 		var mod = function(n, m) {
@@ -36,13 +36,17 @@
 				});
 			};
 			
+			//builds markup for li and anchor of list item
+			var buildItem = function(value, text) {
+				return '<li class="' + settings.classes.menu.listitem.base + '"><a data-value="' + value + '" href="#">' + text + '</a></li>';
+			};
+			
+			//builds placeholder markup
 			var buildPlaceholder = function() {
 				//get data from select
 				//build markup of control
 				var i = 0,
 					customHTML = '<ul class="' + settings.classes.menu.list.base + '">';
-				
-				console.log(lookupHash);
 					
 				while (i < lookupHash.length) {
 					if (lookupHash[i].type === "OPTGROUP") {
@@ -61,12 +65,6 @@
 				
 				$(menuDiv).html(customHTML + '</ul>');
 				
-				console.log(customHTML);
-				
-			};
-			
-			var buildItem = function(value, text) {
-				return '<li class="' + settings.classes.menu.listitem.base + '"><a data-value="' + value + '" href="#">' + text + '</a></li>';
 			};
 			
 			var positionPlaceHolder = function() {
@@ -415,9 +413,15 @@
 			
 		};
 		
-		//instantiate single drop down menuDiv on run
+		//instantiate single drop down menuDiv on first run
+		//store instance on prototype. menu is local var for better compression & performance!
 		if (menu === null) {
-			menu = new FlyweightMenu();
+			$.fn.flyweightCustomSelect.menu = new FlyweightMenu();
+			menu = $.fn.flyweightCustomSelect.menu;
+			
+			//close existing instance, looks cleaner
+			//do this here as opposed to on each new PlaceHolder as interferes with user if used on dynamic load
+			menu.close();
 		}
 				
 		return this.each(function() {
