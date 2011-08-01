@@ -8,7 +8,7 @@
 (function($){
 	$.fn.flyweightCustomSelect = function(options) {
 		var settings = $.extend({}, $.fn.flyweightCustomSelect.settings, options),
-		menu = $.fn.flyweightCustomSelect.menu ? $.fn.flyweightCustomSelect.menu : null;
+		menu = $.fn.flyweightCustomSelect.menu || null;
 		
 		/*Produce modulo correctly */		
 		var mod = function(n, m) {
@@ -18,7 +18,7 @@
 		//dropdown menuDiv constructor
 		var FlyweightMenu = function() {
 			//variables to remember which element the last event was fired from
-			var placeHolder = null
+			var placeHolder = null,
 				selectEl = null,
 				isOpen = false,
 				menuDiv = null,
@@ -51,15 +51,15 @@
 				while (i < lookupHash.length) {
 					if (lookupHash[i].type === "OPTGROUP") {
 						customHTML += '<li class="' + settings.classes.menu.group.base + '"><span>' + lookupHash[i].group + '</span><ul>';
-						i++;
+						i+=1;
 						while (i < lookupHash.length && lookupHash[i].type !== "OPTGROUP") {
 							customHTML += buildItem(lookupHash[i].value, lookupHash[i].text);
-							i++;
+							i+=1;
 						}
 						customHTML += '</ul></li>';
 					} else {
 						customHTML += buildItem(lookupHash[i].value, lookupHash[i].text);
-						i++;
+						i+=1;
 					}
 				}
 				
@@ -113,7 +113,7 @@
 			//update menu to show new select info
 			var setMenuToIndex = function(lookupIndex) {
 				var $menuDiv = $(menuDiv),
-					$selectedLi;
+					$selectedAnchor;
 					
 				//first ensure select is kept in sync
 				//necessary for data integrity
@@ -138,7 +138,7 @@
 				var i = lookupHash.length - 1;
 				
 				while(i > 0 && lookupHash[i][attr] !== data) {
-					i--;
+					i-=1;
 				}
 				
 				setMenuToIndex(i);
@@ -147,9 +147,10 @@
 			//typeahead functionality
 			var typeAhead = function() {
 				var typeAheadString = searchString.replace(/[\W]/ig,"").toUpperCase(),
-					found = false;
+					found = false,
+					i = 0;
 
-				for (var i = 0; i < lookupHash.length; i++) {
+				for (i = 0; i < lookupHash.length; i+=1) {
 					if(lookupHash[i].text) {
 						if (lookupHash[i].text.replace(/[\W]/ig,"").substring(0, typeAheadString.length).toString().toUpperCase() === typeAheadString) {
 							setMenuByAttr("value", lookupHash[i].value);
@@ -267,7 +268,8 @@
 				scrollUp: function() {
 					scrollBy(-1);	
 				},
-				search: function() {
+				search: function(charCode) {
+					searchString += charCode;
 					typeAhead();
 				},
 				getSelect: function() {
@@ -351,11 +353,9 @@
 						if (!menu.visible()) {
 							$(this).trigger("click");
 						}
-						//first, add character to search string
-						searchString += String.fromCharCode(e.which);
-				
 						//pass string to typeahead function
-						menu.search();
+						menu.search(String.fromCharCode(e.which));
+						break;
 				}
 			};
 			
@@ -440,12 +440,12 @@
 	$.fn.flyweightCustomSelect.hasScrollBar = function() {
 	    //note: clientHeight= height of holder
 	    //scrollHeight= we have content till this height
-	    var _elm = this;
-	    var _hasScrollBar = false;
-	    if ((_elm.clientHeight < _elm.scrollHeight) || (_elm.clientWidth < _elm.scrollWidth)) {
-		_hasScrollBar = true;
+	    var elm = this;
+	    var hasScrollBar = false;
+	    if ((elm.clientHeight < elm.scrollHeight) || (elm.clientWidth < elm.scrollWidth)) {
+		hasScrollBar = true;
 	    }
-	    return _hasScrollBar;
+	    return hasScrollBar;
 	};
 	
 	$.fn.flyweightCustomSelect.settings = {
@@ -495,4 +495,4 @@
 			escape:$.ui.keyCode.ESCAPE
 		}
 	};
-})(jQuery);
+}(jQuery));
