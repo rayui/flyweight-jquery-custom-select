@@ -137,21 +137,20 @@ a {
 	list-style-type:none;
 }
 
-.jquery-flyweight-selectmenu-listitem {
+.jquery-flyweight-selectmenu ul li {
 	display:block;
 	margin:0;
 	padding:0;
 }
 
-.jquery-flyweight-selectmenu-listitem a {
+.jquery-flyweight-selectmenu ul li a.jquery-flyweight-selectmenu-listitem {
 	display:block;
 	padding:5px;
 	text-decoration:none;
 }
 
-.jquery-flyweight-selectmenu-listitem-focus a,
-.jquery-flyweight-selectmenu-listitem:hover a,
-.jquery-flyweight-selectmenu-listitem-hover a {
+.jquery-flyweight-selectmenu ul li a.jquery-flyweight-selectmenu-listitem-focus,
+.jquery-flyweight-selectmenu ul li a.jquery-flyweight-selectmenu-listitem:hover {
 	outline:0;
 	color:#ffffff;
 	background-color:#FF8B17;
