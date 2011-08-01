@@ -42,30 +42,31 @@
 				var i = 0,
 					customHTML = '<ul class="' + settings.classes.menu.list.base + '">';
 				
+				console.log(lookupHash);
+					
 				while (i < lookupHash.length) {
-					var hashEl = lookupHash[i];
-					if (hashEl.type === "OPTGROUP") {
-						customHTML += '<li class="' + settings.classes.menu.group.base + '"><span>' + hashEl.group + '</span><ul>';
+					if (lookupHash[i].type === "OPTGROUP") {
+						customHTML += '<li class="' + settings.classes.menu.group.base + '"><span>' + lookupHash[i].group + '</span><ul>';
 						i++;
-						hashEl = lookupHash[i];
-						while (i < lookupHash.length && hashEl.type !== "OPTGROUP") {
-							customHTML += buildItem(hashEl.value, hashEl.text);
+						while (i < lookupHash.length && lookupHash[i].type !== "OPTGROUP") {
+							customHTML += buildItem(lookupHash[i].value, lookupHash[i].text);
 							i++;
-							hashEl = lookupHash[i];
 						}
 						customHTML += '</ul></li>';
 					} else {
-						customHTML += buildItem(hashEl.value, hashEl.text) + customHTML;
+						customHTML += buildItem(lookupHash[i].value, lookupHash[i].text);
 						i++;
 					}
 				}
 				
 				$(menuDiv).html(customHTML + '</ul>');
 				
+				console.log(customHTML);
+				
 			};
 			
 			var buildItem = function(value, text) {
-				return '<li class="' + settings.classes.menu.listitem.base + '"><a data-value="' + value + '" href="#">' + text + '</a></li>'
+				return '<li class="' + settings.classes.menu.listitem.base + '"><a data-value="' + value + '" href="#">' + text + '</a></li>';
 			};
 			
 			var positionPlaceHolder = function() {
@@ -105,7 +106,6 @@
 			//update selecEl value to new index			
 			var setSelectToIndex = function(lookupIndex) {
 				selectEl.value = lookupHash[lookupIndex].value;
-				selectEl.options[lookupHash[lookupIndex].index].selected = true;
 				selectEl.selectedIndex = lookupHash[lookupIndex].index;
 				
 				//trigger any change events bound to select element
@@ -139,14 +139,14 @@
 			var setMenuByAttr = function(attr, data) {
 				var i = lookupHash.length - 1;
 				
-				while(i--) {
-					if(lookupHash[i][attr] === data) {
-						setMenuToIndex(i);
-						i = 0;
-					}
+				while(i > 0 && lookupHash[i][attr] !== data) {
+					i--;
 				}
+				
+				setMenuToIndex(i);
 			};
 			
+			//typeahead functionality
 			var typeAhead = function() {
 				var typeAheadString = searchString.replace(/[\W]/ig,"").toUpperCase(),
 					found = false;
@@ -182,8 +182,6 @@
 				}				
 				
 				setMenuByAttr("value", $(selectedAnchor).attr("data-value"));
-				
-				//kick off the change event bound to the actual select
 				menu.close();
 			};
 			
