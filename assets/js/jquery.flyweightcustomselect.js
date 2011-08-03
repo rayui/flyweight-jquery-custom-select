@@ -1,3 +1,5 @@
+var jQuery = window.jQuery || {};
+
 /*!
 * jQuery Custom Select Manager function
 * Copyright 2011, Ray Brooks
@@ -23,26 +25,31 @@
 				isOpen = false,
 				menuDiv = null,
 				initialSelectedIndex = -1,
-				searchString = "",
+				searchString = '',
 				lookupHash = [],
 				timer = null;
 
 			// this utility function gets a hash of text and value of each filtered element out of the select,
 			// then gets their values and returns them in an array
 			var mapOptionsToHash = function() {
+				//get all filtered elements and cache them
 				lookupHash = $.map($(settings.optionfilter, selectEl), function(el, index) {
 					var $el = $(el);
 					return {type:el.nodeName, index:$el.attr("index"), text:$el.attr("text"), value:$el.attr("value"), group:$el.attr("label")};
 				});
+				//flag first option as "plesae select"
+				if (lookupHash[0].type === "OPTION" && settings.pleaseselect) {
+					lookupHash[0]['pleaseselect'] = true; 	
+				}
 			};
 			
 			//builds markup for li and anchor of list item
-			var buildItem = function(value, text) {
-				return '<li><a  class="' + settings.classes.menu.listitem.base + '"data-value="' + value + '" href="#">' + text + '</a></li>';
+			var buildItem = function(dataIndex, text) {
+				return '<li><a  class="' + settings.classes.menu.listitem.base + '"data-index="' + dataIndex + '" href="#">' + text + '</a></li>';
 			};
 			
-			//builds placeholder markup
-			var buildPlaceholder = function() {
+			//builds menu markup
+			var buildMenu = function() {
 				//get data from select
 				//build markup of control
 				var i = 0,
@@ -53,12 +60,14 @@
 						customHTML += '<li class="' + settings.classes.menu.group.base + '"><span>' + lookupHash[i].group + '</span><ul>';
 						i+=1;
 						while (i < lookupHash.length && lookupHash[i].type !== "OPTGROUP") {
-							customHTML += buildItem(lookupHash[i].value, lookupHash[i].text);
+							customHTML += buildItem(lookupHash[i].index, lookupHash[i].text);
 							i+=1;
 						}
 						customHTML += '</ul></li>';
 					} else {
-						customHTML += buildItem(lookupHash[i].value, lookupHash[i].text);
+						if (!lookupHash[i].pleaseselect) {
+							customHTML += buildItem(lookupHash[i].index, lookupHash[i].text);
+						}
 						i+=1;
 					}
 				}
@@ -67,7 +76,7 @@
 				
 			};
 			
-			var positionPlaceHolder = function() {
+			var positionMenu = function() {
 				//get offset of placeholder for menu position
 				//msie7 reports offset incorrectly - VML issue?
 				var xy = $(placeHolder).offset();
@@ -114,13 +123,13 @@
 			var setMenuToIndex = function(lookupIndex) {
 				var $menuDiv = $(menuDiv),
 					$selectedAnchor;
-					
+				
 				//first ensure select is kept in sync
 				//necessary for data integrity
 				setSelectToIndex(lookupIndex);
 				
 				//scroll to selected LI in list
-				$selectedAnchor = $menuDiv.find('a[data-value="' + lookupHash[lookupIndex].value + '"]');
+				$selectedAnchor = $menuDiv.find('a[data-index="' + lookupHash[lookupIndex].index + '"]');
 					
 				$menuDiv.find("ul").scrollTop(0);
 				$menuDiv.find("a").removeClass(settings.classes.menu.listitem.focus);
@@ -130,29 +139,34 @@
 				}
 				
 				//update value of anchor
-				$(placeHolder).find("span." + settings.classes.placeholder.text.base).text($selectedAnchor.text());
+				$(placeHolder).find("span." + settings.classes.placeholder.text.base).text(lookupHash[lookupIndex].text);
 			};
 			
-			//update menu to to match psecific attribute in lookupHash 
-			var setMenuByAttr = function(attr, data) {
+			//get index of attribute 
+			var getIndexByAttr = function(attr, data) {
 				var i = lookupHash.length - 1;
 				
 				while(i > 0 && lookupHash[i][attr] !== data) {
 					i-=1;
 				}
 				
-				setMenuToIndex(i);
+				return i;
+			};
+			
+			//update menu to to match psecific attribute in lookupHash 
+			var setMenuByAttr = function(attr, data) {
+				setMenuToIndex(getIndexByAttr(attr, data));
 			};
 			
 			//typeahead functionality
 			var typeAhead = function() {
-				var typeAheadString = searchString.replace(/[\W]/ig,"").toUpperCase(),
+				var typeAheadString = searchString.replace(/[\W]/ig,'').toUpperCase(),
 					found = false,
 					i = 0;
 
 				for (i = 0; i < lookupHash.length; i+=1) {
 					if(lookupHash[i].text) {
-						if (lookupHash[i].text.replace(/[\W]/ig,"").substring(0, typeAheadString.length).toString().toUpperCase() === typeAheadString) {
+						if (lookupHash[i].text.replace(/[\W]/ig,'').substring(0, typeAheadString.length).toString().toUpperCase() === typeAheadString) {
 							setMenuByAttr("value", lookupHash[i].value);
 							i = lookupHash.length;
 							found = true;
@@ -161,7 +175,7 @@
 				}
 				
 				window.clearTimeout(timer);
-				timer = window.setTimeout(function() {searchString = "";}, 1000);
+				timer = window.setTimeout(function() {searchString = '';}, 1000);
 
 			};
 			
@@ -194,43 +208,42 @@
 				
 				var lookupIndex = lookupHash.length;
 					
-				while (lookupIndex--) {                                     
+				while (lookupIndex) {
+					lookupIndex -= 1;
 					if (lookupHash[lookupIndex].index === selectEl.selectedIndex + offset) {
+						console.log(lookupHash[lookupIndex]);
+						if (lookupHash[lookupIndex].pleaseselect) {
+							lookupIndex+=1;	
+						}
 						setMenuToIndex(lookupIndex);	
 						lookupIndex = 0;
 					}
-				}			
-				
+				}
 			};
 			
 			var init = function() {
-				var $menuDiv;
-				
 				menuDiv = window.document.createElement('div');
 				menuDiv.className = settings.classes.menu.container.base;
 				
 				$('body').append(menuDiv);
 				
-				$menuDiv = $(menuDiv);
-				$menuDiv.bind('click', onClick);
+				$(menuDiv).bind('click', onClick);
 			};
 			
 			//intialise menu object
 			init();
 			
 			return {
-				open: function(triggeredPlaceHolder, triggeredSelectEl) {
-					var $menuDiv;
-					
+				open: function(triggeredPlaceHolder, triggeredSelectEl) {			
 					//set closure wide variable to remember which object triggered open
 					placeHolder = triggeredPlaceHolder;
 					selectEl = triggeredSelectEl;
-					initialSelectedIndex = selectEl.selectedIndex; 
+					initialSelectedIndex = selectEl.selectedIndex;	
 					
 					//cache the values & text for performance
 					mapOptionsToHash();
-					buildPlaceholder();
-					positionPlaceHolder();
+					buildMenu();
+					positionMenu();
 					fitScrollBar();
 					fitMenuOnScreen();
 					setMenuByAttr("index", initialSelectedIndex);
@@ -240,7 +253,7 @@
 					
 					//set flags
 					isOpen = true;
-					searchString = "";
+					searchString = '';
 					window.clearTimeout(timer);
 
 				},
@@ -256,7 +269,7 @@
 					this.close();
 				},
 				visible: function() {
-					return isOpen;	
+					return isOpen;
 				},
 				enabled: function() {
 					//stub
@@ -279,9 +292,9 @@
 		};
 		
 		var PlaceHolder = function(selectEl) {
-			var text = "";
-			var $placeHolder;
-			var isEnabled = true;
+			var text = '',
+				$placeHolder,
+				isEnabled = true;
 			
 			//click behaviour
 			var onClick = function(e) {
@@ -291,6 +304,7 @@
 				// toggle the custom select menu if enabled
 				if (isEnabled) {
 					if (!menu.visible()) {
+						initialSelectedIndex = selectEl.selectedIndex;
 						menu.open(this, selectEl);
 					} else {
 						menu.close();
@@ -304,7 +318,7 @@
 			
 			//keydown behaviour
 			var onKeydown = function(e) {
-				if (e.which === settings.keymap.left || e.keyCode === settings.keymap.right || e.keyCode === settings.keymap.up || e.keyCode === settings.keymap.down || e.keyCode === settings.keymap.enter) {
+				if (e.which === settings.keymap.left || e.keyCode === settings.keymap.right || e.keyCode === settings.keymap.up || e.keyCode === settings.keymap.down || e.keyCode === settings.keymap.enter || e.keyCode === settings.keymap.space) {
 					e.stopPropagation();
 					e.preventDefault();
 				}
@@ -318,7 +332,7 @@
 						} else {
 							$(this).trigger("click");
 						}
-						return false;
+						break;
 					case (e.which === settings.keymap.right):
 					case (e.which === settings.keymap.down):
 						if (menu.visible()) {
@@ -326,26 +340,21 @@
 						} else {
 							$(this).trigger("click");
 						}
-						return false;
+						break;
 					case (e.which === settings.keymap.enter):
 					case (e.which === settings.keymap.tab):
 					case (e.which === settings.keymap.space):
 						//trigger click on nav
-						if (menu.visible()) {
-							menu.close();
+						if (e.which === settings.keymap.enter || e.which === settings.keymap.space) {
+							$(this).trigger("click");
 						} else {
-							if (e.which === settings.keymap.enter || e.which === settings.keymap.space) {
-								$(this).trigger("click");
-								return false;
-							} else {
-								menu.close();
-							}
+							menu.close();
 						}
 						break;
 					case (e.which === settings.keymap.escape):
 						//close dropdown
 						menu.reset();
-						return false;
+						break;
 					case (e.which >= 48 && e.which <= 59):
 					case (e.which >= 65 && e.which <= 90):
 					case (e.which >= 97 && e.which <= 122):
@@ -394,13 +403,9 @@
 			
 			var init = function() {
 				//set initial text of placeholder
-				if (selectEl.selectedIndex >= 0) {
-					text = selectEl.options[selectEl.selectedIndex].text;
-				} else {
-					text = selectEl.options[0].text;
-				}
+				var selectedItem = $(settings.optionfilter, selectEl)[0];
 				
-				$placeHolder = $('<a href="#" aria-owns="' + selectEl.id + '" class="' + settings.classes.placeholder.container.base + '" role="button" href="#" tabindex="0" aria-haspopup="true" id="' + selectEl.id + '-button"><span class="' + settings.classes.placeholder.text.base + '">' + text + '</span><span class="' + settings.classes.placeholder.arrow.base + '"></span></a>');
+				$placeHolder = $('<a href="#" aria-owns="' + selectEl.id + '" class="' + settings.classes.placeholder.container.base + '" role="button" href="#" tabindex="0" aria-haspopup="true" id="' + selectEl.id + '-button"><span class="' + settings.classes.placeholder.text.base + '">' + (selectedItem.label || selectedItem.text) + '</span><span class="' + settings.classes.placeholder.arrow.base + '"></span></a>');
 				
 				enable();
 				
@@ -483,7 +488,8 @@
 				}
 			}			
 		},
-		optionfilter:'option[value!=""],optgroup',
+		optionfilter:'option,optgroup',
+		pleaseselect:true,
 		keymap:{
 			left:$.ui.keyCode.LEFT,
 			right:$.ui.keyCode.RIGHT,
