@@ -16,7 +16,7 @@ var jQuery = window.jQuery || {};
 		var mod = function(n, m) {
 			return ((m%n)+n)%n;
 		};
-			
+
 		//dropdown menuDiv constructor
 		var FlyweightMenu = function() {
 			//variables to remember which element the last event was fired from
@@ -90,7 +90,7 @@ var jQuery = window.jQuery || {};
 				//make jQuery to get rendered width
 				var $menuDiv = $(menuDiv),
 					placeholderWidth = $(selectEl).width();
-					
+									
 				if (placeholderWidth > $menuDiv.width()) {
 					$menuDiv.find("ul").width(placeholderWidth);
 					if($menuDiv.find("ul").flyweightCustomSelect.hasScrollBar()) {
