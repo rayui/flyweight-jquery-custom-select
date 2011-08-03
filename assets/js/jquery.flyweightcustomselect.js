@@ -24,7 +24,7 @@ var jQuery = window.jQuery || {};
 				selectEl = null,
 				isOpen = false,
 				menuDiv = null,
-				initialSelectedIndex = -1,
+				initialSelectedIndex = 0,
 				searchString = '',
 				lookupHash = [],
 				timer = null;
@@ -167,7 +167,7 @@ var jQuery = window.jQuery || {};
 				for (i = 0; i < lookupHash.length; i+=1) {
 					if(lookupHash[i].text) {
 						if (lookupHash[i].text.replace(/[\W]/ig,'').substring(0, typeAheadString.length).toString().toUpperCase() === typeAheadString) {
-							setMenuByAttr("value", lookupHash[i].value);
+							setMenuByAttr("text", lookupHash[i].text);
 							i = lookupHash.length;
 							found = true;
 						}
@@ -235,7 +235,6 @@ var jQuery = window.jQuery || {};
 					//set closure wide variable to remember which object triggered open
 					placeHolder = triggeredPlaceHolder;
 					selectEl = triggeredSelectEl;
-					initialSelectedIndex = selectEl.selectedIndex; 	
 					
 					//cache the values & text for performance
 					mapOptionsToHash();
@@ -243,7 +242,10 @@ var jQuery = window.jQuery || {};
 					positionMenu();
 					fitScrollBar();
 					fitMenuOnScreen();
-					setMenuByAttr("index", initialSelectedIndex);
+					
+					//now set intial state of menu
+					initialSelectedIndex = getIndexByAttr("index", selectEl.selectedIndex);
+					setMenuToIndex(initialSelectedIndex);
 					
 					$(menuDiv).addClass(settings.classes.menu.container.open);
 					$(placeHolder).addClass(settings.classes.placeholder.container.open);
@@ -262,7 +264,7 @@ var jQuery = window.jQuery || {};
 					isOpen = false;
 				},
 				reset: function() {
-					setMenuByAttr("index", initialSelectedIndex);
+					setMenuToIndex(initialSelectedIndex);
 					this.close();
 				},
 				visible: function() {
@@ -301,7 +303,6 @@ var jQuery = window.jQuery || {};
 				// toggle the custom select menu if enabled
 				if (isEnabled) {
 					if (!menu.visible()) {
-						initialSelectedIndex = selectEl.selectedIndex;
 						menu.open(this, selectEl);
 					} else {
 						menu.close();
