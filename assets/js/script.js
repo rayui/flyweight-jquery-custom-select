@@ -1,50 +1,64 @@
 /*!
- * hasScrollBar function
- * Copyright 2011, Pravee Prasad
- * See http://stackoverflow.com/users/183200/praveen-prasad http://stackoverflow.com/questions/2059743/detect-elements-overflow-using-jquery/2060003#2060003 
+ * Flyweight jQuery Custom Select plugin 
+ * Copyright 2009 csharptest.net
+ * http://stackoverflow.com/questions/1349404/generate-a-string-of-5-random-characters-in-javascript
  */
 
-$.fn.hasScrollBar = function() {
-    //note: clientHeight= height of holder
-    //scrollHeight= we have content till this height
-    var _elm = this;
-    var _hasScrollBar = false;
-    if ((_elm.clientHeight < _elm.scrollHeight) || (_elm.clientWidth < _elm.scrollWidth)) {
-        _hasScrollBar = true;
+function makeid()
+{
+    var text = "";
+    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+    for( var i=0; i < 5; i++ ) {
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
     }
-    return _hasScrollBar;
+
+    return text;
 }
- 
- /*!
+
+/*!
  * Flyweight jQuery Custom Select plugin 
  * Copyright 2011, Raymond Brooks
  * Dual licensed under the MIT or GPL Version 2 licenses.
  */
- 
-/*Produce modulo correctly */
-
-Number.prototype.mod = function(n) {
-	return ((this%n)+n)%n;
-};
 
 /* renderer */
 
 var render = function(e) {
+	var numSelects = parseInt($("#render-count").val(), 10),
+		$form = $("form"),
+		time,
+		i, j,
+		selectHTML,
+		randomString;
+	
 	e.stopPropagation();
 	e.preventDefault();
 	
-	var $form = $("form");
 	$form.empty();
 	
-	var numSelects = parseInt($("#render-count").val(), 10);
-	var i = numSelects;
-	
-	while (i--) {
-		var $select = $('<select id="select" name="select' + i + '" class="select' + i + '"><option value="" selected="selected">Please select...</option><option value="MR" >Mr</option><option value="MRS" >Mrs</option><option value="MS" >Ms</option><option value="MISS" >Miss</option><option value="DRM" >Dr – Male</option><option value="DRF" >Dr – Female</option></select>');
-		$form.append($select);
+	for(i = numSelects - 1; i >= 0; i--) {
+		selectHTML = '<select id="select" name="select' + i + '" class="select' + i + '"><option value="" selected="selected">Please select...</option>';
+		selectHTML += '<optgroup label="' + makeid() + '">';
+		
+		for (j = 0; j <= 10; j++) {
+			randomString = makeid();
+			selectHTML += '<option value="' + randomString.toUpperCase() + '">' + randomString + '</option>';
+		}
+		
+		selectHTML += '</optgroup><optgroup label="' + makeid() + '">';
+		
+		for (j = 0; j <= 10; j++) {
+			randomString = makeid();
+			selectHTML += '<option value="' + randomString.toUpperCase() + '">' + randomString + '</option>';
+		}
+		
+		selectHTML += '</optgroup>';
+		
+		$form.append(selectHTML + '</select>');
 	}
 	
-	var time = new Date().getTime();
+	time = new Date().getTime();
 	
 	$("select").flyweightCustomSelect();
 	

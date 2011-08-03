@@ -7,19 +7,26 @@ It borrows accessibility design patterns from the Filament Group's jQuery UI Sel
 ## Features
 
   * Lightweight
-  * Fast
-  * Full keyboard navigation
-  * Typeahead
-  * WAI-ARIA roles
-  * Infinite scroll  
+  * Extremely fast
+  * Semantic markup
+  * Fully customisable keyboard navigation
+  * Fully customisable class names
+  * Intelligent typeahead
+  * Option group support
+  * Hide first option element (for Please Select, etc)
+  * Binds to original select change event
+  * Auto scroll
+  * Javascript under 7KB compressed
+  * Works in all major browsers
 
 ## Todo
 
   * Lint code
-  * Opt groups
-  * Improve typeahead algorithm 
   * Label association
-  * Refactor to jQuery/jQuery UI plugin pattern
+  * Refactor to jQuery UI plugin model/remove minor dependencies
+  * Infinite scroll
+  * Rationalise WAI-ARIA roles
+  * Event binding
 
 ## Useful links
 
