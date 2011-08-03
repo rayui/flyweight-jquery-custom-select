@@ -1,5 +1,3 @@
-var jQuery = window.jQuery || {};
-
 /*!
 * jQuery Custom Select Manager function
 * Copyright 2011, Ray Brooks
