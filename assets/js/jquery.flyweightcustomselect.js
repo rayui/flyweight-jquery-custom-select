@@ -35,7 +35,7 @@ var jQuery = window.jQuery || {};
 				//get all filtered elements and cache them
 				lookupHash = $.map($(settings.optionfilter, selectEl), function(el, index) {
 					var $el = $(el);
-					return {type:el.nodeName, index:$el.attr("index"), text:$el.attr("text"), value:$el.attr("value"), group:$el.attr("label")};
+					return {type:el.nodeName.toUpperCase(), index:$el.attr("index"), text:$el.attr("text"), value:$el.attr("value"), group:$el.attr("label"), hidden:false};
 				});
 				//flag first option as "please select"
 				if (lookupHash[0].type === "OPTION" && settings.pleaseselect) {
@@ -115,6 +115,9 @@ var jQuery = window.jQuery || {};
 				selectEl.value = lookupHash[lookupIndex].value;
 				selectEl.selectedIndex = lookupHash[lookupIndex].index;
 				
+				//update value of anchor
+				$(placeHolder).find("span." + settings.classes.placeholder.text.base).text(lookupHash[lookupIndex].text);
+				
 				//trigger any change events bound to select element
 				$(selectEl).trigger("change");
 			};
@@ -137,9 +140,6 @@ var jQuery = window.jQuery || {};
 					$selectedAnchor.addClass(settings.classes.menu.listitem.focus);
 					$menuDiv.find("ul").scrollTop($selectedAnchor.position().top);
 				}
-				
-				//update value of anchor
-				$(placeHolder).find("span." + settings.classes.placeholder.text.base).text(lookupHash[lookupIndex].text);
 			};
 			
 			//get index of attribute 
@@ -190,11 +190,10 @@ var jQuery = window.jQuery || {};
 				
 				//we only set target for keyboard nav as events will be triggered on wrapper div, not anchor (as is when clicked)
 				//we need to check this because the person could theoretically click on the div which the elements are bound to, as opposed to the anchor 
-				if (selectedAnchor.nodeName.toLowerCase() !== "a") {
+				if (selectedAnchor.nodeName.toUpperCase() !== "A") {
 					return false;
-				}				
-				
-				setMenuByAttr("value", $(selectedAnchor).attr("data-value"));
+				}
+				setSelectToIndex(getIndexByAttr("index", parseInt(selectedAnchor.getAttribute("data-index"), 10)));
 				menu.close();
 			};
 			
