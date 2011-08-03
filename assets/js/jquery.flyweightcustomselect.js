@@ -37,9 +37,9 @@ var jQuery = window.jQuery || {};
 					var $el = $(el);
 					return {type:el.nodeName, index:$el.attr("index"), text:$el.attr("text"), value:$el.attr("value"), group:$el.attr("label")};
 				});
-				//flag first option as "plesae select"
+				//flag first option as "please select"
 				if (lookupHash[0].type === "OPTION" && settings.pleaseselect) {
-					lookupHash[0]['pleaseselect'] = true; 	
+					lookupHash[0].hidden = true; 	
 				}
 			};
 			
@@ -65,7 +65,7 @@ var jQuery = window.jQuery || {};
 						}
 						customHTML += '</ul></li>';
 					} else {
-						if (!lookupHash[i].pleaseselect) {
+						if (!lookupHash[i].hidden) {
 							customHTML += buildItem(lookupHash[i].index, lookupHash[i].text);
 						}
 						i+=1;
@@ -211,11 +211,9 @@ var jQuery = window.jQuery || {};
 				while (lookupIndex) {
 					lookupIndex -= 1;
 					if (lookupHash[lookupIndex].index === selectEl.selectedIndex + offset) {
-						console.log(lookupHash[lookupIndex]);
-						if (lookupHash[lookupIndex].pleaseselect) {
-							lookupIndex+=1;	
+						if (!lookupHash[lookupIndex].hidden) {
+							setMenuToIndex(lookupIndex);
 						}
-						setMenuToIndex(lookupIndex);	
 						lookupIndex = 0;
 					}
 				}
@@ -238,7 +236,7 @@ var jQuery = window.jQuery || {};
 					//set closure wide variable to remember which object triggered open
 					placeHolder = triggeredPlaceHolder;
 					selectEl = triggeredSelectEl;
-					initialSelectedIndex = selectEl.selectedIndex;	
+					initialSelectedIndex = selectEl.selectedIndex; 	
 					
 					//cache the values & text for performance
 					mapOptionsToHash();

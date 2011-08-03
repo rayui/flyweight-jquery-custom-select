@@ -8,11 +8,12 @@ It borrows accessibility design patterns from the Filament Group's jQuery UI Sel
 
   * Lightweight
   * Extremely fast
+  * Semantic markup
   * Fully customisable keyboard navigation
   * Fully customisable class names
   * Intelligent typeahead
   * Option group support
-  * Semantic markup
+  * Hide first option element (for Please Select, etc)
   * Binds to original select change event
   * Auto scroll
   * Javascript under 7KB compressed
