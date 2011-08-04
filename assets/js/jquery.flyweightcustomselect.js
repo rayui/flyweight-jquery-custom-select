@@ -8,9 +8,9 @@ var jQuery = window.jQuery || {};
 */
 
 (function($){
-	$.fn.flyweightCustomSelect = function(options) {
-		var settings = $.extend({}, $.fn.flyweightCustomSelect.settings, options),
-		menu = $.fn.flyweightCustomSelect.menu || null;
+	$.fn.flyweightCustomSelect = function(method) {
+		var settings = {},
+			menu = $.fn.flyweightCustomSelect.menu || null;
 		
 		/*Produce modulo correctly */		
 		var mod = function(n, m) {
@@ -35,7 +35,7 @@ var jQuery = window.jQuery || {};
 				//get all filtered elements and cache them
 				lookupHash = $.map($(settings.optionfilter, selectEl), function(el, index) {
 					var $el = $(el);
-					return {type:el.nodeName.toUpperCase(), index:$el.attr("index"), text:$el.attr("text"), value:$el.attr("value"), group:$el.attr("label"), hidden:false};
+					return {type:el.nodeName.toUpperCase(), selectIndex:$el.attr("index"), text:$el.attr("text"), value:$el.attr("value"), group:$el.attr("label"), hidden:false};
 				});
 				//flag first option as "please select"
 				if (lookupHash[0].type === "OPTION" && settings.pleaseselect) {
@@ -60,13 +60,13 @@ var jQuery = window.jQuery || {};
 						customHTML += '<li class="' + settings.classes.menu.group.base + '"><span>' + lookupHash[i].group + '</span><ul>';
 						i+=1;
 						while (i < lookupHash.length && lookupHash[i].type !== "OPTGROUP") {
-							customHTML += buildItem(lookupHash[i].index, lookupHash[i].text);
+							customHTML += buildItem(lookupHash[i].selectIndex, lookupHash[i].text);
 							i+=1;
 						}
 						customHTML += '</ul></li>';
 					} else {
 						if (!lookupHash[i].hidden) {
-							customHTML += buildItem(lookupHash[i].index, lookupHash[i].text);
+							customHTML += buildItem(lookupHash[i].selectIndex, lookupHash[i].text);
 						}
 						i+=1;
 					}
@@ -113,7 +113,7 @@ var jQuery = window.jQuery || {};
 			//update selecEl value to new index			
 			var setSelectToIndex = function(lookupIndex) {
 				selectEl.value = lookupHash[lookupIndex].value;
-				selectEl.selectedIndex = lookupHash[lookupIndex].index;
+				selectEl.selectedIndex = lookupHash[lookupIndex].selectIndex;
 				
 				//update value of anchor
 				$(placeHolder).find("span." + settings.classes.placeholder.text.base).text(lookupHash[lookupIndex].text);
@@ -132,7 +132,7 @@ var jQuery = window.jQuery || {};
 				setSelectToIndex(lookupIndex);
 				
 				//scroll to selected LI in list
-				$selectedAnchor = $menuDiv.find('a[data-index="' + lookupHash[lookupIndex].index + '"]');
+				$selectedAnchor = $menuDiv.find('a[data-index="' + lookupHash[lookupIndex].selectIndex + '"]');
 					
 				$menuDiv.find("ul").scrollTop(0);
 				$menuDiv.find("a").removeClass(settings.classes.menu.listitem.focus);
@@ -209,7 +209,7 @@ var jQuery = window.jQuery || {};
 					
 				while (lookupIndex) {
 					lookupIndex -= 1;
-					if (lookupHash[lookupIndex].index === selectEl.selectedIndex + offset) {
+					if (lookupHash[lookupIndex].selectIndex === selectEl.selectedIndex + offset) {
 						if (!lookupHash[lookupIndex].hidden) {
 							setMenuToIndex(lookupIndex);
 						}
@@ -218,19 +218,18 @@ var jQuery = window.jQuery || {};
 				}
 			};
 			
-			var init = function() {
-				menuDiv = window.document.createElement('div');
-				menuDiv.className = settings.classes.menu.container.base;
-				
-				$('body').append(menuDiv);
-				
-				$(menuDiv).bind('click', onClick);
-			};
-			
-			//intialise menu object
-			init();
-			
 			return {
+				init: function() {
+					menuDiv = window.document.createElement('div');
+					menuDiv.className = settings.classes.menu.container.base;
+					
+					$('body').append(menuDiv);
+					
+					$(menuDiv).bind('click', onClick);
+					
+					this.close();
+					return this;
+				},
 				open: function(triggeredPlaceHolder, triggeredSelectEl) {			
 					//set closure wide variable to remember which object triggered open
 					placeHolder = triggeredPlaceHolder;
@@ -297,7 +296,7 @@ var jQuery = window.jQuery || {};
 			var onClick = function(e) {
 				e.stopPropagation();
 				e.preventDefault();
-
+				
 				// toggle the custom select menu if enabled
 				if (isEnabled) {
 					if (!menu.visible()) {
@@ -324,19 +323,17 @@ var jQuery = window.jQuery || {};
 				switch (true) {
 					case (e.which === settings.keymap.left):
 					case (e.which === settings.keymap.up):
-						if (menu.visible()) {
-							menu.scrollUp();
-						} else {
+						if (!menu.visible()) {
 							$(this).trigger("click");
 						}
+						menu.scrollUp();
 						break;
 					case (e.which === settings.keymap.right):
 					case (e.which === settings.keymap.down):
-						if (menu.visible()) {
-							menu.scrollDown();
-						} else {
+						if (!menu.visible()) {
 							$(this).trigger("click");
 						}
+						menu.scrollDown();
 						break;
 					case (e.which === settings.keymap.enter):
 					case (e.which === settings.keymap.tab):
@@ -398,38 +395,63 @@ var jQuery = window.jQuery || {};
 				$placeHolder.unbind("mouseout");
 			};
 			
-			var init = function() {
-				//set initial text of placeholder
-				var selectedItem = $(settings.optionfilter, selectEl)[0];
-				
-				$placeHolder = $('<a href="#" aria-owns="' + selectEl.id + '" class="' + settings.classes.placeholder.container.base + '" role="button" href="#" tabindex="0" aria-haspopup="true" id="' + selectEl.id + '-button"><span class="' + settings.classes.placeholder.text.base + '">' + (selectedItem.label || selectedItem.text) + '</span><span class="' + settings.classes.placeholder.arrow.base + '"></span></a>');
-				
-				enable();
-				
-				$(selectEl).after($placeHolder);
-				$(selectEl).hide();
+			return {
+				init: function() {
+					//set initial text of placeholder
+					var selectedItem = $(settings.optionfilter, selectEl)[0];
+					
+					$placeHolder = $('<a href="#" aria-owns="' + selectEl.id + '" class="' + settings.classes.placeholder.container.base + '" role="button" href="#" tabindex="0" aria-haspopup="true" id="' + selectEl.id + '-button"><span class="' + settings.classes.placeholder.text.base + '">' + (selectedItem.label || selectedItem.text) + '</span><span class="' + settings.classes.placeholder.arrow.base + '"></span></a>');
+					
+					enable();
+					
+					$(selectEl).after($placeHolder);
+					$(selectEl).hide();
+					
+					return $placeHolder[0];
+				},
+				enable:function() {
+					
+				},
+				disable:function() {
+					
+				}
 			};
-			
-			init();
-			
-			return $placeHolder[0];
 			
 		};
 		
-		//instantiate single drop down menuDiv on first run
-		//store instance on prototype. menu is local var for better compression & performance!
-		if (menu === null) {
-			$.fn.flyweightCustomSelect.menu = new FlyweightMenu();
-			menu = $.fn.flyweightCustomSelect.menu;
-			
-			//close existing instance, looks cleaner
-			//do this here as opposed to on each new PlaceHolder as interferes with user if used on dynamic load
-			menu.close();
-		}
+		var methods = {
+			init:function(options) {
+				settings = $.extend({}, $.fn.flyweightCustomSelect.settings, options);
 				
-		return this.each(function() {
-			return new PlaceHolder(this);
-		});
+				//instantiate single drop down menuDiv on first run
+				//store instance on prototype. menu is local var for better compression & performance!
+				if (menu === null) {
+					menu = $.fn.flyweightCustomSelect.menu = new FlyweightMenu().init();
+				}
+				
+				return this.each(function() {
+					return new PlaceHolder(this).init();
+				});
+			},
+			destroy:function() {
+				
+			},
+			enable:function() {
+				
+			},
+			disable:function() {
+				
+			}
+		};
+		
+		if ( methods[method] ) {
+			return methods[method].apply( this, Array.prototype.slice.call( arguments, 1 ));
+		} else if ( typeof method === 'object' || ! method ) {
+			return methods.init.apply( this, arguments );
+		} else {
+			$.error( 'Method ' +  method + ' does not exist on jQuery.flyweightCustomSelect' );
+		}
+
 	};
 	
 	/*!
