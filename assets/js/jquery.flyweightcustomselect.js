@@ -1,5 +1,3 @@
-var jQuery = window.jQuery || {};
-
 /*!
 * jQuery Custom Select Manager function
 * Copyright 2011, Ray Brooks
@@ -193,7 +191,7 @@ var jQuery = window.jQuery || {};
 				if (selectedAnchor.nodeName.toUpperCase() !== "A") {
 					return false;
 				}
-				setSelectToIndex(getIndexByAttr("index", parseInt(selectedAnchor.getAttribute("data-index"), 10)));
+				setSelectToIndex(getIndexByAttr("selectIndex", parseInt(selectedAnchor.getAttribute("data-index"), 10)));
 				menu.close();
 			};
 			
@@ -218,18 +216,20 @@ var jQuery = window.jQuery || {};
 				}
 			};
 			
+			var init = function() {
+				menuDiv = window.document.createElement('div');
+				menuDiv.className = settings.classes.menu.container.base;
+				
+				$('body').append(menuDiv);
+				
+				$(menuDiv).bind('click', onClick);
+				
+				return this;
+			};
+			
+			init();
+			
 			return {
-				init: function() {
-					menuDiv = window.document.createElement('div');
-					menuDiv.className = settings.classes.menu.container.base;
-					
-					$('body').append(menuDiv);
-					
-					$(menuDiv).bind('click', onClick);
-					
-					this.close();
-					return this;
-				},
 				open: function(triggeredPlaceHolder, triggeredSelectEl) {			
 					//set closure wide variable to remember which object triggered open
 					placeHolder = triggeredPlaceHolder;
@@ -300,7 +300,6 @@ var jQuery = window.jQuery || {};
 				// toggle the custom select menu if enabled
 				if (isEnabled) {
 					if (!menu.visible()) {
-						initialSelectedIndex = selectEl.selectedIndex;
 						menu.open(this, selectEl);
 					} else {
 						menu.close();
@@ -379,6 +378,8 @@ var jQuery = window.jQuery || {};
 			};
 			
 			var enable = function() {
+				$(selectEl).removeAttr("disabled");
+				$placeHolder.removeClass(settings.classes.placeholder.container.disabled);
 				$placeHolder.click(onClick);
 				$placeHolder.keydown(onKeydown);
 				$placeHolder.focus(onFocus);
@@ -387,6 +388,8 @@ var jQuery = window.jQuery || {};
 			};
 			
 			var disable = function() {
+				$(selectEl).attr("disabled", "disabled");
+				$placeHolder.addClass(settings.classes.placeholder.container.disabled);
 				$placeHolder.unbind("click");
 				$placeHolder.unbind("keydown");
 				$placeHolder.unbind("focus");
@@ -395,25 +398,28 @@ var jQuery = window.jQuery || {};
 				$placeHolder.unbind("mouseout");
 			};
 			
+			var init = function() {
+				//set initial text of placeholder
+				var selectedItem = $(settings.optionfilter, selectEl)[0];
+				
+				$placeHolder = $('<a href="#" aria-owns="' + selectEl.id + '" class="' + settings.classes.placeholder.container.base + '" role="button" href="#" tabindex="0" aria-haspopup="true" id="' + selectEl.id + '-button"><span class="' + settings.classes.placeholder.text.base + '">' + (selectedItem.label || selectedItem.text) + '</span><span class="' + settings.classes.placeholder.arrow.base + '"></span></a>');
+				
+				enable();
+				
+				$(selectEl).after($placeHolder);
+				$(selectEl).hide();
+				
+				return $placeHolder[0];
+			};
+			
+			init();
+			
 			return {
-				init: function() {
-					//set initial text of placeholder
-					var selectedItem = $(settings.optionfilter, selectEl)[0];
-					
-					$placeHolder = $('<a href="#" aria-owns="' + selectEl.id + '" class="' + settings.classes.placeholder.container.base + '" role="button" href="#" tabindex="0" aria-haspopup="true" id="' + selectEl.id + '-button"><span class="' + settings.classes.placeholder.text.base + '">' + (selectedItem.label || selectedItem.text) + '</span><span class="' + settings.classes.placeholder.arrow.base + '"></span></a>');
-					
-					enable();
-					
-					$(selectEl).after($placeHolder);
-					$(selectEl).hide();
-					
-					return $placeHolder[0];
-				},
 				enable:function() {
-					
+					enable();
 				},
 				disable:function() {
-					
+					disable();
 				}
 			};
 			
@@ -426,21 +432,28 @@ var jQuery = window.jQuery || {};
 				//instantiate single drop down menuDiv on first run
 				//store instance on prototype. menu is local var for better compression & performance!
 				if (menu === null) {
-					menu = $.fn.flyweightCustomSelect.menu = new FlyweightMenu().init();
+					menu = $.fn.flyweightCustomSelect.menu = new FlyweightMenu();
 				}
 				
+				menu.close();
+				
+				//keep a record of placeholder on select
 				return this.each(function() {
-					return new PlaceHolder(this).init();
+					$(this).data('placeHolder', new PlaceHolder(this));	
 				});
 			},
 			destroy:function() {
 				
 			},
 			enable:function() {
-				
+				return this.each(function() {
+					$(this).data('placeHolder').enable();	
+				});
 			},
 			disable:function() {
-				
+				return this.each(function() {
+					$(this).data('placeHolder').disable();	
+				});
 			}
 		};
 		

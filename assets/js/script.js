@@ -61,6 +61,7 @@ var render = function(e) {
 	time = new Date().getTime();
 	
 	$("select").flyweightCustomSelect();
+	//$("select").flyweightCustomSelect('disable');
 	
 	time = new Date().getTime() - time;
 	
