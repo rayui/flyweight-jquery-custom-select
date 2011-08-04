@@ -22,7 +22,7 @@
 				selectEl = null,
 				isOpen = false,
 				menuDiv = null,
-				initialSelectedIndex = -1,
+				initialSelectedIndex = 0,
 				searchString = '',
 				lookupHash = [],
 				timer = null;
@@ -223,8 +223,6 @@
 				$('body').append(menuDiv);
 				
 				$(menuDiv).bind('click', onClick);
-				
-				return this;
 			};
 			
 			init();
@@ -242,7 +240,7 @@
 					positionMenu();
 					fitScrollBar();
 					fitMenuOnScreen();
-					setMenuByAttr("index", initialSelectedIndex);
+					setMenuByAttr("selectIndex", initialSelectedIndex);
 					
 					$(menuDiv).addClass(settings.classes.menu.container.open);
 					$(placeHolder).addClass(settings.classes.placeholder.container.open);
@@ -259,6 +257,10 @@
 					
 					//set flag
 					isOpen = false;
+				},
+				destroy:function() {
+					$(menuDiv).unbind();
+					$(menuDiv).remove();
 				},
 				reset: function() {
 					setMenuByAttr("index", initialSelectedIndex);
@@ -420,6 +422,11 @@
 				},
 				disable:function() {
 					disable();
+				},
+				destroy:function() {
+					$placeHolder.unbind();
+					$placeHolder.remove();
+					$(selectEl).removeAttr("disabled").show();
 				}
 			};
 			
@@ -443,7 +450,11 @@
 				});
 			},
 			destroy:function() {
-				
+				menu.destroy();
+				menu = $.fn.flyweightCustomSelect.menu = null;
+				return this.each(function() {
+					$(this).data('placeHolder').destroy();
+				});
 			},
 			enable:function() {
 				return this.each(function() {
