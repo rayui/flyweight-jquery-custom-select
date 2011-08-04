@@ -29,8 +29,11 @@
 .jquery-flyweight-select-arrow {
 	margin:10px 5px 0 0;
 	padding:5px 10px 0 0;
+	width:0;
 	height:0;
 	border:0;
+	line-height:0;
+	font-size:0;
 	background:transparent url(/assets/img/flyweight-custom-select-ie-sprite.png) scroll no-repeat 0 0;
 }
 
