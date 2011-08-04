@@ -165,7 +165,7 @@
 				for (i = 0; i < lookupHash.length; i+=1) {
 					if(lookupHash[i].text) {
 						if (lookupHash[i].text.replace(/[\W]/ig,'').substring(0, typeAheadString.length).toString().toUpperCase() === typeAheadString) {
-							setMenuByAttr("value", lookupHash[i].value);
+							setMenuByAttr("text", lookupHash[i].text);
 							i = lookupHash.length;
 							found = true;
 						}
@@ -232,7 +232,6 @@
 					//set closure wide variable to remember which object triggered open
 					placeHolder = triggeredPlaceHolder;
 					selectEl = triggeredSelectEl;
-					initialSelectedIndex = selectEl.selectedIndex; 	
 					
 					//cache the values & text for performance
 					mapOptionsToHash();
@@ -240,7 +239,9 @@
 					positionMenu();
 					fitScrollBar();
 					fitMenuOnScreen();
-					setMenuByAttr("selectIndex", initialSelectedIndex);
+					
+					//now set intial state of menu
+					setMenuByAttr("selectIndex", selectEl.selectedIndex);
 					
 					$(menuDiv).addClass(settings.classes.menu.container.open);
 					$(placeHolder).addClass(settings.classes.placeholder.container.open);
@@ -263,7 +264,7 @@
 					$(menuDiv).remove();
 				},
 				reset: function() {
-					setMenuByAttr("index", initialSelectedIndex);
+					setMenuToIndex(initialSelectedIndex);
 					this.close();
 				},
 				visible: function() {
