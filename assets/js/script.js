@@ -25,12 +25,13 @@ function makeid()
 /* renderer */
 
 var render = function(e) {
-	var numSelects = parseInt($("#render-count").val(), 10),
+	var numSelects = parseInt($("#count").val(), 10),
 		$form = $("form"),
 		time,
 		i, j,
 		selectHTML,
-		randomString;
+		randomString,
+		options = {pleaseselect:false};
 	
 	e.stopPropagation();
 	e.preventDefault();
@@ -58,18 +59,36 @@ var render = function(e) {
 		$form.append(selectHTML + '</select>');
 	}
 	
+	if ($('#please-select').attr("checked")) {
+		options = {pleaseselect:true};	
+	}
+	
 	time = new Date().getTime();
 	
-	$("select").flyweightCustomSelect();
-	//$("select").flyweightCustomSelect('disable');
+	$("select").flyweightCustomSelect(options);
 	
 	time = new Date().getTime() - time;
 	
 	$("form").prepend("<div><span>Time to render " + numSelects + " custom selects: " + time + " ms</span><span>Average time per select: " + parseInt((time / numSelects), 10) + " ms</span></div>");
 };
 
+var destroy = function(e) {
+	$("select").flyweightCustomSelect('destroy');
+};
+
+var enable = function(e) {
+	$("select").flyweightCustomSelect('enable');
+};
+
+var disable = function(e) {
+	$("select").flyweightCustomSelect('disable');
+};
+
 /*Initialise custom select plugin test on document ready*/
 
 $().ready(function() {
-	$("#render-flyweight").bind("click", render);
+	$("#render").bind("click", render);
+	$("#destroy").bind("click", destroy);
+	$("#enable").bind("click", enable);
+	$("#disable").bind("click", disable);
 });
