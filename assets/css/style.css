@@ -5,32 +5,26 @@ body{
 }
 
 a {
-	color:#606060;
+	color:#ff0000;
 }
 
 .jquery-flyweight-select {
 	display:block;
 	float:left;
 	width:200px;
-	padding:5px;
+	padding:0;
 	margin:0 10px 10px 0;
-	background-color:#e0e0e0;
-	background-image: -webkit-gradient(
-	    linear,
-	    left bottom,
-	    left top,
-	    color-stop(0.33, rgb(235,235,235)),
-	    color-stop(0.66, rgb(255,255,255))
-	);
-	background-image: -moz-linear-gradient(
-	    center bottom,
-	    rgb(235,235,235) 33%,
-	    rgb(255,255,255) 66%
-	);
 	border:2px solid #c0c0c0;
 	border-radius: 5px;
 	-moz-border-radius: 5px;
 	-webkit-border-radius: 5px;
+	background:#e0e0e0;
+	background: -webkit-gradient(linear, 0 0, 0 bottom, from(#ffffff), to(#E0E0E0));
+	background: -webkit-linear-gradient(#ffffff, #E0E0E0);
+	background: -moz-linear-gradient(#ffffff, #E0E0E0);
+	background: -ms-linear-gradient(#ffffff, #E0E0E0);
+	background: -o-linear-gradient(#ffffff, #E0E0E0);
+	background: linear-gradient(#ffffff, #E0E0E0);
 	font-size:0.8em;
 	font-weight:bold;
 	text-decoration:none;
@@ -42,41 +36,62 @@ a {
 	-webkit-border-bottom-right-radius: 0;
 	-moz-border-radius-bottomleft: 0;
 	-moz-border-radius-bottomright: 0;
-	border-bottom-left-radius: 0;
-	border-bottom-right-radius: 0;
+	border-radius: 5px 5px 0 0;
 }
 
 .jquery-flyweight-select-focus,
 .jquery-flyweight-select-hover,
 .jquery-flyweight-select:hover {
 	outline:0;
-	color:#ffffff;
 	background-color:#FF8B17;
-	background-image: -webkit-gradient(
-	    linear,
-	    left bottom,
-	    left top,
-	    color-stop(0, rgb(255,181,102)),
-	    color-stop(0.15, rgb(255,139,23)),
-	    color-stop(0.85, rgb(255,139,23)),
-	    color-stop(1, rgb(255,218,133))
-	);
-	background-image: -moz-linear-gradient(
-	    center bottom,
-	    rgb(255,181,102) 0%,
-	    rgb(255,139,23) 15%,
-	    rgb(255,139,23) 85%,
-	    rgb(255,218,133) 100%
-	);
+	background: -webkit-gradient(linear, 0 0, 0 bottom, from(#FFB566), to(#FF8B17));
+	background: -webkit-linear-gradient(#FFB566, #FF8B17);
+	background: -moz-linear-gradient(#FFB566, #FF8B17);
+	background: -ms-linear-gradient(#FFB566, #FF8B17);
+	background: -o-linear-gradient(#FFB566, #FF8B17);
+	background: linear-gradient(#FFB566, #FF8B17);
+}
+
+.jquery-flyweight-select-disabled.jquery-flyweight-select-focus,
+.jquery-flyweight-select-disabled.jquery-flyweight-select-hover,
+.jquery-flyweight-select-disabled.jquery-flyweight-select:hover {
+	background-color:#e0e0e0;
+	background: -webkit-gradient(linear, 0 0, 0 bottom, from(#ffffff), to(#E0E0E0));
+	background: -webkit-linear-gradient(#ffffff, #E0E0E0);
+	background: -moz-linear-gradient(#ffffff, #E0E0E0);
+	background: -ms-linear-gradient(#ffffff, #E0E0E0);
+	background: -o-linear-gradient(#ffffff, #E0E0E0);
+	background: linear-gradient(#ffffff, #E0E0E0);
 }
 
 .jquery-flyweight-select-text {
-		
+	color:#606060;
+	display:block;
+	float:left;
+	padding:5px;
+}
+
+.jquery-flyweight-select-focus .jquery-flyweight-select-text,
+.jquery-flyweight-select-hover .jquery-flyweight-select-text,
+.jquery-flyweight-select:hover .jquery-flyweight-select-text {
+	color:#ffffff;
+}
+
+.jquery-flyweight-select-disabled .jquery-flyweight-select-text,
+.jquery-flyweight-select-disabled:hover .jquery-flyweight-select-text{
+	color:#606060;
+}
+
+.jquery-flyweight-select-disabled {
+	-moz-opacity: 0.50;
+	opacity: 0.50;
+	-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=50)";
 }
 
 .jquery-flyweight-select-arrow {
 	float:right;
-	margin-top:5px;
+	margin:10px 5px 0 0;
+	color:#606060;
 	border-color: #606060 transparent transparent transparent;
 	border-style:solid;
 	border-width:5px;
@@ -90,25 +105,26 @@ a {
 	border-color: #ffffff transparent transparent transparent;
 }
 
+.jquery-flyweight-select-disabled.jquery-flyweight-select-focus .jquery-flyweight-select-arrow,
+.jquery-flyweight-select-disabled.jquery-flyweight-select-hover .jquery-flyweight-select-arrow,
+.jquery-flyweight-select-disabled.jquery-flyweight-select:hover .jquery-flyweight-select-arrow {
+	border-color: #606060 transparent transparent transparent;
+}
+
+
 .jquery-flyweight-selectmenu {
-	visibility:hidden;
+	display:none;
 	position:absolute;
+	margin:0;
 	padding:0;
-	margin:11px 0 0 0;
-	min-width:210px;
+	min-width:200px;
 	background-color:#e0e0e0;
-	background-image: -webkit-gradient(
-	    linear,
-	    left bottom,
-	    left top,
-	    color-stop(0.33, rgb(255,255,255)),
-	    color-stop(0.66, rgb(235,235,235))
-	);
-	background-image: -moz-linear-gradient(
-	    center bottom,
-	    rgb(255,255,255) 33%,
-	    rgb(235,235,235) 66%
-	);
+	background: -webkit-gradient(linear, 0 0, 0 bottom, from(#ffffff), to(#E0E0E0));
+	background: -webkit-linear-gradient(#ffffff, #E0E0E0);
+	background: -moz-linear-gradient(#ffffff, #E0E0E0);
+	background: -ms-linear-gradient(#ffffff, #E0E0E0);
+	background: -o-linear-gradient(#ffffff, #E0E0E0);
+	background: linear-gradient(#ffffff, #E0E0E0);
 	border:2px solid #c0c0c0;
 	border-radius: 5px;
 	-moz-border-radius: 5px;
@@ -125,9 +141,8 @@ a {
 	-webkit-border-top-right-radius: 0;
 	-moz-border-radius-topleft: 0;
 	-moz-border-radius-topright: 0;
-	border-top-left-radius: 0;
-	border-top-right-radius: 0;
-	visibility:visible;	
+	border-radius:0 0 5px 5px;
+	display:block;	
 }
 
 .jquery-flyweight-selectmenu ul {
@@ -153,6 +168,7 @@ a {
 .jquery-flyweight-selectmenu ul li a.jquery-flyweight-selectmenu-listitem {
 	display:block;
 	padding:5px;
+	color:#606060;
 	text-decoration:none;
 }
 
@@ -165,20 +181,10 @@ a {
 	outline:0;
 	color:#ffffff;
 	background-color:#FF8B17;
-	background-image: -webkit-gradient(
-	    linear,
-	    left bottom,
-	    left top,
-	    color-stop(0, rgb(255,181,102)),
-	    color-stop(0.15, rgb(255,139,23)),
-	    color-stop(0.85, rgb(255,139,23)),
-	    color-stop(1, rgb(255,218,133))
-	);
-	background-image: -moz-linear-gradient(
-	    center bottom,
-	    rgb(255,181,102) 0%,
-	    rgb(255,139,23) 15%,
-	    rgb(255,139,23) 85%,
-	    rgb(255,218,133) 100%
-	);
+	background: -webkit-gradient(linear, 0 0, 0 bottom, from(#FFB566), to(#FF8B17));
+	background: -webkit-linear-gradient(#FFB566, #FF8B17);
+	background: -moz-linear-gradient(#FFB566, #FF8B17);
+	background: -ms-linear-gradient(#FFB566, #FF8B17);
+	background: -o-linear-gradient(#FFB566, #FF8B17);
+	background: linear-gradient(#FFB566, #FF8B17);
 }
