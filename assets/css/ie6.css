@@ -34,18 +34,18 @@
 	border:0;
 	line-height:0;
 	font-size:0;
-	background:transparent url(/assets/img/flyweight-custom-select-ie-sprite.png) scroll no-repeat 0 0;
+	background:transparent url(../img/flyweight-custom-select-ie-sprite.png) scroll no-repeat 0 0;
 }
 
 .jquery-flyweight-select-focus .jquery-flyweight-select-arrow,
 .jquery-flyweight-select-hover .jquery-flyweight-select-arrow,
 .jquery-flyweight-select:hover .jquery-flyweight-select-arrow {
-	background:transparent url(/assets/img/flyweight-custom-select-ie-sprite.png) scroll no-repeat 0 -50px;
+	background:transparent url(../img/flyweight-custom-select-ie-sprite.png) scroll no-repeat 0 -50px;
 }
 
 .jquery-flyweight-select-disabled .jquery-flyweight-select-arrow,
 .jquery-flyweight-select-disabled:hover .jquery-flyweight-select-arrow {
-	background:transparent url(/assets/img/flyweight-custom-select-ie-sprite.png) scroll no-repeat 0 -100px;
+	background:transparent url(../img/flyweight-custom-select-ie-sprite.png) scroll no-repeat 0 -100px;
 }
 
 .jquery-flyweight-selectmenu {
