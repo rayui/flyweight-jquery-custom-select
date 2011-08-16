@@ -2,7 +2,7 @@
 .jquery-flyweight-selectmenu,
 .jquery-flyweight-selectmenu ul li a.jquery-flyweight-selectmenu-listitem-focus,
 .jquery-flyweight-selectmenu ul li a.jquery-flyweight-selectmenu-listitem:hover {
-	behavior:url(/assets/css/PIE.htc);	
+	behavior:url(/flyweight-jquery-custom-select/assets/css/PIE.htc);	
 }
 
 .jquery-flyweight-select {
