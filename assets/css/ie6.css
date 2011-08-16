@@ -1,18 +1,18 @@
-.jquery-flyweight-select {
-	-pie-background: linear-gradient(#ffffff, #E0E0E0);
-	behavior:url(PIE.htc);
+.jquery-flyweight-select,
+.jquery-flyweight-selectmenu,
+.jquery-flyweight-selectmenu ul li a.jquery-flyweight-selectmenu-listitem-focus,
+.jquery-flyweight-selectmenu ul li a.jquery-flyweight-selectmenu-listitem:hover {
+	behavior:url(/assets/css/PIE.htc);	
 }
 
-.jquery-flyweight-select-open {
+.jquery-flyweight-select {
 	-pie-background: linear-gradient(#ffffff, #E0E0E0);
-	behavior:url(PIE.htc);
 }
 
 .jquery-flyweight-select-focus,
 .jquery-flyweight-select-hover,
 .jquery-flyweight-select:hover {
 	-pie-background: linear-gradient(#FFB566, #FF8B17);
-	behavior:url(PIE.htc);	
 }
 
 .jquery-flyweight-select-disabled,
@@ -50,11 +50,6 @@
 
 .jquery-flyweight-selectmenu {
 	-pie-background: linear-gradient(#FFFFFF, #E0E0E0);
-	behavior:url(PIE.htc);
-}
-
-.jquery-flyweight-selectmenu-open {
-	behavior:url(PIE.htc);
 }
 
 .jquery-flyweight-selectmenu ul li a.jquery-flyweight-selectmenu-listitem {
@@ -64,5 +59,5 @@
 .jquery-flyweight-selectmenu ul li a.jquery-flyweight-selectmenu-listitem-focus,
 .jquery-flyweight-selectmenu ul li a.jquery-flyweight-selectmenu-listitem:hover {
 	-pie-background: linear-gradient(#FFB566, #FF8B17);
-	behavior:url(PIE.htc);
+}l(PIE.htc);
 }
