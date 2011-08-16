@@ -2,6 +2,8 @@
 	padding:5px 10px 0 0;
 }
 
+/* we must disable PIE here because IE7 VML doesn't like it in this context */
+
 .jquery-flyweight-selectmenu ul li a.jquery-flyweight-selectmenu-listitem-focus,
 .jquery-flyweight-selectmenu ul li a.jquery-flyweight-selectmenu-listitem:hover {
 	background-color: #FF8B17;
