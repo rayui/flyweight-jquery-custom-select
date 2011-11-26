@@ -244,11 +244,11 @@
 					
 					$(menuDiv).addClass(settings.classes.menu.container.open);
 					$(placeHolder).addClass(settings.classes.placeholder.container.open);
+					$(placeHolder).focus();
 					
 					//set flags
 					isOpen = true;
 					window.clearTimeout(timer);
-
 				},
 				close: function() {
 					$(menuDiv).removeClass(settings.classes.menu.container.open);
