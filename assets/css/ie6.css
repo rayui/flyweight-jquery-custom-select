@@ -1,18 +1,18 @@
-.fwselect {
-	-pie-background: linear-gradient(#ffffff, #E0E0E0);
-	behavior:url(./PIE.htc);
+.fwselect,
+.fwselect-menu,
+.fwselect-menu ul li a.fwselect-menu-listitem-focus,
+.fwselect-menu ul li a.fwselect-menu-listitem:hover {
+	behavior:url(/assets/css/PIE.htc);	
 }
 
-.fwselect-open {
+.fwselect {
 	-pie-background: linear-gradient(#ffffff, #E0E0E0);
-	behavior:url(./PIE.htc);
 }
 
 .fwselect-focus,
 .fwselect-hover,
 .fwselect:hover {
 	-pie-background: linear-gradient(#FFB566, #FF8B17);
-	behavior:url(./PIE.htc);	
 }
 
 .fwselect-disabled,
@@ -50,11 +50,6 @@
 
 .fwselect-menu {
 	-pie-background: linear-gradient(#FFFFFF, #E0E0E0);
-	behavior:url(./PIE.htc);
-}
-
-.fwselect-menu-open {
-	behavior:url(./PIE.htc);
 }
 
 .fwselect-menu ul li a.fwselect-menu-listitem {
@@ -64,5 +59,4 @@
 .fwselect-menu ul li a.fwselect-menu-listitem-focus,
 .fwselect-menu ul li a.fwselect-menu-listitem:hover {
 	-pie-background: linear-gradient(#FFB566, #FF8B17);
-	behavior:url(./PIE.htc);
 }
