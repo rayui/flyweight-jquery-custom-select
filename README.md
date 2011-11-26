@@ -20,14 +20,13 @@ It borrows accessibility design patterns from the Filament Group's jQuery UI Sel
   * Binds to original select change event
   * Auto scroll
   * Javascript only 8KB compressed
-  * Works in all tested major browsers (FF 3.6/5.1, Chrome 11/12, IE 6/7/8)
+  * Works in all tested major browsers (FF 3.6/5.1, Chrome 11/12, IE 6/7/8/9)
 
 ## Todo
 
   * Lint code
   * Hide on lose focus
   * Label association
-  * Refactor to jQuery UI plugin model/remove minor dependencies
   * Infinite scroll
   * Rationalise WAI-ARIA roles
 

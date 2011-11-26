@@ -8,7 +8,7 @@ a {
 	color:#ff0000;
 }
 
-.jquery-flyweight-select {
+.fwselect {
 	display:block;
 	float:left;
 	width:200px;
@@ -30,7 +30,7 @@ a {
 	text-decoration:none;
 }
 
-.jquery-flyweight-select-open {
+.fwselect-open {
 	border-bottom:none;
 	-webkit-border-bottom-left-radius: 0;
 	-webkit-border-bottom-right-radius: 0;
@@ -39,9 +39,9 @@ a {
 	border-radius: 5px 5px 0 0;
 }
 
-.jquery-flyweight-select-focus,
-.jquery-flyweight-select-hover,
-.jquery-flyweight-select:hover {
+.fwselect-focus,
+.fwselect-hover,
+.fwselect:hover {
 	outline:0;
 	background-color:#FF8B17;
 	background: -webkit-gradient(linear, 0 0, 0 bottom, from(#FFB566), to(#FF8B17));
@@ -52,9 +52,9 @@ a {
 	background: linear-gradient(#FFB566, #FF8B17);
 }
 
-.jquery-flyweight-select-disabled.jquery-flyweight-select-focus,
-.jquery-flyweight-select-disabled.jquery-flyweight-select-hover,
-.jquery-flyweight-select-disabled.jquery-flyweight-select:hover {
+.fwselect-disabled.fwselect-focus,
+.fwselect-disabled.fwselect-hover,
+.fwselect-disabled.fwselect:hover {
 	background-color:#e0e0e0;
 	background: -webkit-gradient(linear, 0 0, 0 bottom, from(#ffffff), to(#E0E0E0));
 	background: -webkit-linear-gradient(#ffffff, #E0E0E0);
@@ -64,31 +64,31 @@ a {
 	background: linear-gradient(#ffffff, #E0E0E0);
 }
 
-.jquery-flyweight-select-text {
+.fwselect-text {
 	color:#606060;
 	display:block;
 	float:left;
 	padding:5px;
 }
 
-.jquery-flyweight-select-focus .jquery-flyweight-select-text,
-.jquery-flyweight-select-hover .jquery-flyweight-select-text,
-.jquery-flyweight-select:hover .jquery-flyweight-select-text {
+.fwselect-focus .fwselect-text,
+.fwselect-hover .fwselect-text,
+.fwselect:hover .fwselect-text {
 	color:#ffffff;
 }
 
-.jquery-flyweight-select-disabled .jquery-flyweight-select-text,
-.jquery-flyweight-select-disabled:hover .jquery-flyweight-select-text{
+.fwselect-disabled .fwselect-text,
+.fwselect-disabled:hover .fwselect-text{
 	color:#606060;
 }
 
-.jquery-flyweight-select-disabled {
+.fwselect-disabled {
 	-moz-opacity: 0.50;
 	opacity: 0.50;
 	-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=50)";
 }
 
-.jquery-flyweight-select-arrow {
+.fwselect-arrow {
 	float:right;
 	margin:10px 5px 0 0;
 	color:#606060;
@@ -99,20 +99,20 @@ a {
 	height:0;
 }
 
-.jquery-flyweight-select-focus .jquery-flyweight-select-arrow,
-.jquery-flyweight-select-hover .jquery-flyweight-select-arrow,
-.jquery-flyweight-select:hover .jquery-flyweight-select-arrow {
+.fwselect-focus .fwselect-arrow,
+.fwselect-hover .fwselect-arrow,
+.fwselect:hover .fwselect-arrow {
 	border-color: #ffffff transparent transparent transparent;
 }
 
-.jquery-flyweight-select-disabled.jquery-flyweight-select-focus .jquery-flyweight-select-arrow,
-.jquery-flyweight-select-disabled.jquery-flyweight-select-hover .jquery-flyweight-select-arrow,
-.jquery-flyweight-select-disabled.jquery-flyweight-select:hover .jquery-flyweight-select-arrow {
+.fwselect-disabled.fwselect-focus .fwselect-arrow,
+.fwselect-disabled.fwselect-hover .fwselect-arrow,
+.fwselect-disabled.fwselect:hover .fwselect-arrow {
 	border-color: #606060 transparent transparent transparent;
 }
 
 
-.jquery-flyweight-selectmenu {
+.fwselect-menu {
 	display:none;
 	position:absolute;
 	margin:0;
@@ -135,7 +135,7 @@ a {
 	
 }
 
-.jquery-flyweight-selectmenu-open {
+.fwselect-menu-open {
 	border-top:none;
 	-webkit-border-top-left-radius: 0;
 	-webkit-border-top-right-radius: 0;
@@ -145,39 +145,39 @@ a {
 	display:block;	
 }
 
-.jquery-flyweight-selectmenu ul {
+.fwselect-menu ul {
 	display:block;
 	margin:0;
 	padding:0;
 	list-style-type:none;
 }
 
-.jquery-flyweight-selectmenu ul li {
+.fwselect-menu ul li {
 	display:block;
 	margin:0;
 	padding:0;
 }
 
-.jquery-flyweight-selectmenu .jquery-flyweight-selectmenu-group span {
+.fwselect-menu .fwselect-menu-group span {
 	display:block;
 	background-color:#c0c0c0;
 	padding:5px;
 	color:#ffffff;
 }
 
-.jquery-flyweight-selectmenu ul li a.jquery-flyweight-selectmenu-listitem {
+.fwselect-menu ul li a.fwselect-menu-listitem {
 	display:block;
 	padding:5px;
 	color:#606060;
 	text-decoration:none;
 }
 
-.jquery-flyweight-selectmenu .jquery-flyweight-selectmenu-group a.jquery-flyweight-selectmenu-listitem {
+.fwselect-menu .fwselect-menu-group a.fwselect-menu-listitem {
 	padding:5px 5px 5px 10px;	
 }
 
-.jquery-flyweight-selectmenu ul li a.jquery-flyweight-selectmenu-listitem-focus,
-.jquery-flyweight-selectmenu ul li a.jquery-flyweight-selectmenu-listitem:hover {
+.fwselect-menu ul li a.fwselect-menu-listitem-focus,
+.fwselect-menu ul li a.fwselect-menu-listitem:hover {
 	outline:0;
 	color:#ffffff;
 	background-color:#FF8B17;

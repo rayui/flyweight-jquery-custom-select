@@ -47,17 +47,17 @@
 				}
 			};
 			
-			//builds markup for li and anchor of list item
-			var buildItem = function(dataIndex, text) {
-				return '<li><a  class="' + settings.classes.menu.listitem.base + '"data-index="' + dataIndex + '" href="#">' + text + '</a></li>';
-			};
-			
 			//builds menu markup
 			var buildMenu = function() {
 				//get data from select
 				//build markup of control
 				var i = 0,
 					customHTML = '<ul class="' + settings.classes.menu.list.base + '">';
+					
+				//builds markup for li and anchor of list item
+				var buildItem = function(dataIndex, text) {
+					return '<li><a  class="' + settings.classes.menu.listitem.base + '"data-index="' + dataIndex + '" href="#">' + text + '</a></li>';
+				};
 					
 				while (i < lookupHash.length) {
 					if (lookupHash[i].type === "OPTGROUP") {
@@ -511,48 +511,48 @@
 		classes:{
 			placeholder:{
 				container:{
-					base:"jquery-flyweight-select",
-					open:"jquery-flyweight-select-open",
-					hover:"jquery-flyweight-select-hover",
-					focus:"jquery-flyweight-select-focus",
-					disabled:"jquery-flyweight-select-disabled"
+					base:"fwselect",
+					open:"fwselect-open",
+					hover:"fwselect-hover",
+					focus:"fwselect-focus",
+					disabled:"fwselect-disabled"
 				},
 				text:{
-					base:"jquery-flyweight-select-text"
+					base:"fwselect-text"
 				},
 				arrow:{
-					base:"jquery-flyweight-select-arrow"
+					base:"fwselect-arrow"
 				}
 			},
 			menu:{
 				container:{
-					base:"jquery-flyweight-selectmenu",
-					open:"jquery-flyweight-selectmenu-open"
+					base:"fwselect-menu",
+					open:"fwselect-menu-open"
 				},
 				list:{
-					base:"jquery-flyweight-selectmenu-list"
+					base:"fwselect-menu-list"
 				},
 				listitem:{
-					base:"jquery-flyweight-selectmenu-listitem",
-					focus:"jquery-flyweight-selectmenu-listitem-focus",
-					hover:"jquery-flyweight-selectmenu-listitem-hover"
+					base:"fwselect-menu-listitem",
+					focus:"fwselect-menu-listitem-focus",
+					hover:"fwselect-menu-listitem-hover"
 				},
 				group:{
-					base:"jquery-flyweight-selectmenu-group"
+					base:"fwselect-menu-group"
 				}
 			}			
 		},
 		optionfilter:'option,optgroup',
 		pleaseselect:true,
 		keymap:{
-			left:$.ui.keyCode.LEFT,
-			right:$.ui.keyCode.RIGHT,
-			up:$.ui.keyCode.UP,
-			down:$.ui.keyCode.DOWN,
-			enter:$.ui.keyCode.ENTER,
-			space:$.ui.keyCode.SPACE,
-			tab:$.ui.keyCode.TAB,
-			escape:$.ui.keyCode.ESCAPE
+			left:37,
+			right:39,
+			up:38,
+			down:40,
+			enter:13,
+			space:32,
+			tab:9,
+			escape:27
 		}
 	};
 }(jQuery));

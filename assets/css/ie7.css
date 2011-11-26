@@ -1,9 +1,9 @@
-.jquery-flyweight-select-arrow {
+.fwselect-arrow {
 	padding:5px 10px 0 0;
 }
 
-.jquery-flyweight-selectmenu ul li a.jquery-flyweight-selectmenu-listitem-focus,
-.jquery-flyweight-selectmenu ul li a.jquery-flyweight-selectmenu-listitem:hover {
+.fwselect-menu ul li a.fwselect-menu-listitem-focus,
+.fwselect-menu ul li a.fwselect-menu-listitem:hover {
 	background-color: #FF8B17;
 	behavior:none;
 }
