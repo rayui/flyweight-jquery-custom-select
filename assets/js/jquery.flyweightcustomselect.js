@@ -484,8 +484,6 @@
 			return methods[method].apply( this, Array.prototype.slice.call( arguments, 1 ));
 		} else if ( typeof method === 'object' || ! method ) {
 			return methods.init.apply( this, arguments );
-			//$(':input:visible, :radio:visible, :checkbox:visible').each(function(i,e){ e.attr('tabindex',i) });
-
 		} else {
 			$.error( 'Method ' +  method + ' does not exist on jQuery.flyweightCustomSelect' );
 		}

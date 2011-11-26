@@ -17,16 +17,16 @@ It borrows accessibility design patterns from the Filament Group's jQuery UI Sel
   * Graceful destroy, original select maintains state
   * Supports PIE.htc
   * Toggle hide first option element (for Please Select, etc) [REMOVED]
-  * Togglable tabindex support
+  * Togglable tabindex support (on by default)
   * Binds to original select change event
-  * Auto scroll
+  * Auto page scroll
   * Javascript only 8KB compressed
   * Works in all tested major browsers (FF 3.6/5.1, Chrome 11/12, IE 6/7/8/9)
 
 ## Todo
 
   * Lint code
-  * Hide on lose focus
+  * Hide menu on lose focus
   * Label association
   * Rationalise WAI-ARIA roles
 
