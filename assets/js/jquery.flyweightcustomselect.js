@@ -65,6 +65,7 @@
 						}
 						customHTML += '</ul></li>';
 					} else {
+						customHTML += buildItem(lookupHash[i].selectIndex, lookupHash[i].text);
 						i+=1;
 					}
 				}
@@ -325,15 +326,17 @@
 					case (e.which === settings.keymap.up):
 						if (!menu.visible()) {
 							$(this).trigger("click");
+						} else {
+							menu.scrollUp();
 						}
-						menu.scrollUp();
 						break;
 					case (e.which === settings.keymap.right):
 					case (e.which === settings.keymap.down):
 						if (!menu.visible()) {
 							$(this).trigger("click");
+						} else {
+							menu.scrollDown();
 						}
-						menu.scrollDown();
 						break;
 					case (e.which === settings.keymap.enter):
 					case (e.which === settings.keymap.tab):
