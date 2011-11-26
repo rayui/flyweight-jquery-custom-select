@@ -37,8 +37,7 @@
 					if ($.browser.msie && el.nodeName.toUpperCase() === "OPTGROUP") {
 						selectIndex = null;
 					}
-					
-					return {type:el.nodeName.toUpperCase(), selectIndex:selectIndex, text:$el.text(), value:$el.attr("value"), group:$el.attr("label")};
+					return {type:el.nodeName.toUpperCase(), selectIndex:selectIndex, text:$el.text(), value:$el.attr("value"), group:$el.attr("label"), hidden:false};
 				});
 			};
 			
