@@ -16,7 +16,7 @@ It borrows accessibility design patterns from the Filament Group's jQuery UI Sel
   * Enable/disable
   * Graceful destroy, original select maintains state
   * Supports PIE.htc
-  * Toggle hide first option element (for Please Select, etc)
+  * Toggle hide first option element (for Please Select, etc) [REMOVED]
   * Binds to original select change event
   * Auto scroll
   * Javascript only 8KB compressed
@@ -27,7 +27,6 @@ It borrows accessibility design patterns from the Filament Group's jQuery UI Sel
   * Lint code
   * Hide on lose focus
   * Label association
-  * Infinite scroll
   * Rationalise WAI-ARIA roles
 
 ## Useful links

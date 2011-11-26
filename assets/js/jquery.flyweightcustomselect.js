@@ -39,12 +39,8 @@
 					if ($.browser.msie && el.nodeName.toUpperCase() === "OPTGROUP") {
 						selectIndex = null;
 					}
-					return {type:el.nodeName.toUpperCase(), selectIndex:selectIndex, text:$el.text(), value:$el.attr("value"), group:$el.attr("label"), hidden:false};
+					return {type:el.nodeName.toUpperCase(), selectIndex:selectIndex, text:$el.text(), value:$el.attr("value"), group:$el.attr("label")};
 				});
-				//flag first option as "please select"
-				if (lookupHash[0].type === "OPTION" && settings.pleaseselect) {
-					lookupHash[0].hidden = true; 	
-				}
 			};
 			
 			//builds menu markup
@@ -69,9 +65,6 @@
 						}
 						customHTML += '</ul></li>';
 					} else {
-						if (!lookupHash[i].hidden) {
-							customHTML += buildItem(lookupHash[i].selectIndex, lookupHash[i].text);
-						}
 						i+=1;
 					}
 				}
@@ -214,9 +207,7 @@
 				while (lookupIndex) {
 					lookupIndex -= 1;
 					if (lookupHash[lookupIndex].selectIndex === selectEl.selectedIndex + offset) {
-						if (!lookupHash[lookupIndex].hidden) {
-							setMenuToIndex(lookupIndex);
-						}
+						setMenuToIndex(lookupIndex);
 						lookupIndex = 0;
 					}
 				}
@@ -543,7 +534,6 @@
 			}			
 		},
 		optionfilter:'option,optgroup',
-		pleaseselect:true,
 		keymap:{
 			left:37,
 			right:39,
