@@ -37,7 +37,7 @@ var addselect = function(e) {
 	$form.empty();
 	
 	for(i = numSelects - 1; i >= 0; i--) {
-		selectHTML = '<select id="select" name="select' + i + '" class="select' + i + '"><option value="" selected="selected">Please select...</option>';
+		selectHTML = '<select id="select" name="select' + i + '" class="select' + i + '" tabindex="' + (numSelects - i) + '"><option value="" selected="selected">Please select...</option>';
 		selectHTML += '<optgroup label="' + makeid() + '">';
 		
 		for (j = 0; j <= 10; j++) {

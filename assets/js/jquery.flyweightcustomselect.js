@@ -383,20 +383,26 @@
 			
 			var enable = function() {
 				$(selectEl).removeAttr("disabled");
+				
+				!($(selectEl).attr('tabindex') && settings.tabindex) || $placeHolder.attr('tabindex', $(selectEl).attr('tabindex'));
+				
 				$placeHolder.removeClass(settings.classes.placeholder.container.disabled);
 				$placeHolder.click(onClick);
 				$placeHolder.keydown(onKeydown);
-				$placeHolder.focus(onFocus);
+				$placeHolder.unbind("focus").focus(onFocus);
 				$placeHolder.blur(onBlur);
 				$placeHolder.hover(onMouseOver, onMouseOut);
 			};
 			
 			var disable = function() {
 				$(selectEl).attr("disabled", "disabled");
+				
+				!settings.tabindex || $placeHolder.removeAttr("tabindex");
+				
 				$placeHolder.addClass(settings.classes.placeholder.container.disabled);
 				$placeHolder.unbind("click");
 				$placeHolder.unbind("keydown");
-				$placeHolder.unbind("focus");
+				$placeHolder.unbind("focus").focus(function() {this.blur();});
 				$placeHolder.unbind("blur");
 				$placeHolder.unbind("mouseover");
 				$placeHolder.unbind("mouseout");
@@ -406,7 +412,7 @@
 				//set initial text of placeholder
 				var selectedText = selectEl.options[selectEl.selectedIndex].text;
 				
-				$placeHolder = $('<a href="#" aria-owns="' + selectEl.id + '" class="' + settings.classes.placeholder.container.base + '" role="button" href="#" tabindex="0" aria-haspopup="true" id="' + selectEl.id + '-button"><span class="' + settings.classes.placeholder.text.base + '">' + selectedText + '</span><span class="' + settings.classes.placeholder.arrow.base + '"></span></a>');
+				$placeHolder = $('<a href="#" aria-owns="' + selectEl.id + '" class="' + settings.classes.placeholder.container.base + '" role="button" href="#" aria-haspopup="true" id="' + selectEl.id + '-button"><span class="' + settings.classes.placeholder.text.base + '">' + selectedText + '</span><span class="' + settings.classes.placeholder.arrow.base + '"></span></a>');
 				
 				enable();
 				
@@ -452,6 +458,7 @@
 						$(this).data('placeHolder', new PlaceHolder(this));
 					}
 				});
+				
 			},
 			destroy:function() {
 				menu.destroy();
@@ -477,6 +484,8 @@
 			return methods[method].apply( this, Array.prototype.slice.call( arguments, 1 ));
 		} else if ( typeof method === 'object' || ! method ) {
 			return methods.init.apply( this, arguments );
+			//$(':input:visible, :radio:visible, :checkbox:visible').each(function(i,e){ e.attr('tabindex',i) });
+
 		} else {
 			$.error( 'Method ' +  method + ' does not exist on jQuery.flyweightCustomSelect' );
 		}
@@ -537,6 +546,7 @@
 			}			
 		},
 		optionfilter:'option,optgroup',
+		tabindex:true,
 		keymap:{
 			left:37,
 			right:39,

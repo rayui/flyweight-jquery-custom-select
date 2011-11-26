@@ -17,6 +17,7 @@ It borrows accessibility design patterns from the Filament Group's jQuery UI Sel
   * Graceful destroy, original select maintains state
   * Supports PIE.htc
   * Toggle hide first option element (for Please Select, etc) [REMOVED]
+  * Togglable tabindex support
   * Binds to original select change event
   * Auto scroll
   * Javascript only 8KB compressed
