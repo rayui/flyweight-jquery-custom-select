@@ -21,7 +21,7 @@
 			var placeHolder = null,
 				selectEl = null,
 				isOpen = false,
-				menuDiv = null,
+				$menuDiv = null,
 				initialSelectedIndex = 0,
 				lookupHash = [];
 
@@ -69,7 +69,7 @@
 					}
 				}
 				
-				$(menuDiv).html(customHTML + '</ul>');
+				$menuDiv.html(customHTML + '</ul>');
 				
 			};
 			
@@ -79,18 +79,28 @@
 				var xy = $(placeHolder).offset();
 				xy.top += $(placeHolder).height();
 				
-				menuDiv.style.left = xy.left + 'px';
-				menuDiv.style.top = xy.top + 'px';
+				$menuDiv.css({
+					left: xy.left + 'px',
+					top: xy.top + 'px'
+				});
+			};
+			
+			var hasScrollBar = function(el) {
+			    //note: clientHeight= height of holder
+			    //scrollHeight= we have content till this height
+			    if ((el.clientHeight < el.scrollHeight) || (el.clientWidth < el.scrollWidth)) {
+				return true;
+			    }
+			    return false;
 			};
 			
 			var fitScrollBar = function() {
 				//make jQuery to get rendered width
-				var $menuDiv = $(menuDiv),
-					placeholderWidth = $(selectEl).width();
+				var placeholderWidth = $(selectEl).width();
 									
 				if (placeholderWidth > $menuDiv.width()) {
 					$menuDiv.find("ul").width(placeholderWidth);
-					if($menuDiv.find("ul").flyweightCustomSelect.hasScrollBar()) {
+					if (hasScrollBar($menuDiv.find("ul"))) {
 						$menuDiv.find("li").width(placeholderWidth - 17); //this needs calculating properly, somehow
 					} else {
 						$menuDiv.find("li").width(placeholderWidth);
@@ -100,10 +110,10 @@
 			
 			var fitMenuOnScreen = function() {
 				//ensure menu is always visible
-				var $menuDiv = $(menuDiv);
+
 				if($menuDiv.offset().top + $menuDiv.height() > $(window).height()) {
 					var scrollEl = $.browser.webkit ? window.document.body : "html"; 
-					$(scrollEl).animate({scrollTop: parseInt(menuDiv.style.top, 10) - 100}, 1000);
+					$(scrollEl).animate({scrollTop: parseInt($menuDiv.position().top, 10) - 100}, 1000);
 				}	
 			};
 
@@ -121,8 +131,7 @@
 
 			//update menu to show new select info
 			var setMenuToIndex = function(lookupIndex) {
-				var $menuDiv = $(menuDiv),
-					$selectedAnchor;
+				var $selectedAnchor;
 				
 				//first ensure select is kept in sync
 				//necessary for data integrity
@@ -154,26 +163,26 @@
 			var setMenuByAttr = function(attr, data) {
 				setMenuToIndex(getLookupIndexByAttr(attr, data));
 			};
+
+			//search for next element from specified start position in select
+			var find = function(search, i) {
+				while (i < selectEl.options.length) {
+					if (selectEl[i].text.toUpperCase().charCodeAt(0) === search) {
+						setMenuByAttr("selectIndex", i);
+						return true;
+					}
+					i+=1;
+				}
+				return false;
+			}
 			
 			//typeahead functionality
 			var typeAhead = function(search) {
 				//normalise search character
 				search = search.toUpperCase().charCodeAt(0);
 				
-				//search for next element from specified start position in select
-				var find = function(i) {
-					while (i < selectEl.options.length) {
-						if (selectEl[i].text.toUpperCase().charCodeAt(0) === search) {
-							setMenuByAttr("selectIndex", i);
-							return true;
-						}
-						i+=1;
-					}
-					return false;
-				}
-				
 				//if we don't find it after our current position, we search from the top
-				find(selectEl.selectedIndex + 1) || find(0);
+				find(search, selectEl.selectedIndex + 1) || find(search, 0);
 				
 			};
 			
@@ -211,17 +220,10 @@
 					}
 				}
 			};
-			
-			var init = function() {
-				menuDiv = window.document.createElement('div');
-				menuDiv.className = settings.classes.menu.container.base;
-				
-				$('body').append(menuDiv);
-				
-				$(menuDiv).bind('click', onClick);
-			};
-			
-			init();
+
+			//initialise on first run			
+			$menuDiv = $('<div class="' + settings.classes.menu.container.base + '" />').bind('click', onClick);
+			$('body').append($menuDiv);
 			
 			return {
 				initialise: function(triggeredPlaceHolder, triggeredSelectEl) {
@@ -242,9 +244,10 @@
 						initialSelectedIndex = getLookupIndexByAttr("selectIndex", selectEl.selectedIndex);
 						setMenuToIndex(initialSelectedIndex);
 						
-						$(menuDiv).addClass(settings.classes.menu.container.open);
-						$(placeHolder).addClass(settings.classes.placeholder.container.open);
-						$(placeHolder).focus();
+						$menuDiv.addClass(settings.classes.menu.container.open);
+						$(placeHolder)
+							.addClass(settings.classes.placeholder.container.open)
+							.focus();
 						
 						//set flags
 						isOpen = true;
@@ -253,15 +256,15 @@
 					return false;
 				},
 				close: function() {
-					$(menuDiv).removeClass(settings.classes.menu.container.open);
+					$menuDiv.removeClass(settings.classes.menu.container.open);
 					$(placeHolder).removeClass(settings.classes.placeholder.container.open);
 					
 					//set flag
 					isOpen = false;
 				},
 				destroy:function() {
-					$(menuDiv).unbind();
-					$(menuDiv).remove();
+					$menuDiv.unbind();
+					$menuDiv.remove();
 				},
 				reset: function() {
 					setMenuToIndex(initialSelectedIndex);
@@ -269,10 +272,6 @@
 				},
 				isOpen: function() {
 					return isOpen;
-				},
-				enabled: function() {
-					//stub
-					return true;	
 				},
 				scrollDown: function() {
 					this.open() || scrollBy(1);	
@@ -404,21 +403,13 @@
 				$placeHolder.unbind("mouseout");
 			};
 			
-			var init = function() {
-				//set initial text of placeholder
-				var selectedText = selectEl.options[selectEl.selectedIndex].text;
-				
-				$placeHolder = $('<a href="#" aria-owns="' + selectEl.id + '" class="' + settings.classes.placeholder.container.base + '" role="button" href="#" aria-haspopup="true" id="' + selectEl.id + '-button"><span class="' + settings.classes.placeholder.text.base + '">' + selectedText + '</span><span class="' + settings.classes.placeholder.arrow.base + '"></span></a>');
-				
-				enable();
-				
-				$(selectEl).after($placeHolder);
-				$(selectEl).hide();
-				
-				return $placeHolder[0];
-			};
+			//generate placeholder and enable
+			$placeHolder = $('<a href="#" aria-owns="' + selectEl.id + '" class="' + settings.classes.placeholder.container.base + '" role="button" href="#" aria-haspopup="true" id="' + selectEl.id + '-button"><span class="' + settings.classes.placeholder.text.base + '">' + selectEl.options[selectEl.selectedIndex].text + '</span><span class="' + settings.classes.placeholder.arrow.base + '"></span></a>');
+			enable();
 			
-			init();
+			//inesrt and hide bound control
+			$(selectEl).after($placeHolder);
+			$(selectEl).hide();
 			
 			return {
 				enable:function() {
@@ -485,24 +476,6 @@
 			$.error( 'Method ' +  method + ' does not exist on jQuery.flyweightCustomSelect' );
 		}
 
-	};
-	
-	/*!
-	 * hasScrollBar function
-	 * Adapted from code
-	 * Copyright 2011, Pravee Prasad
-	 * See http://stackoverflow.com/users/183200/praveen-prasad http://stackoverflow.com/questions/2059743/detect-elements-overflow-using-jquery/2060003#2060003 
-	 */
-	
-	$.fn.flyweightCustomSelect.hasScrollBar = function() {
-	    //note: clientHeight= height of holder
-	    //scrollHeight= we have content till this height
-	    var elm = this;
-	    var hasScrollBar = false;
-	    if ((elm.clientHeight < elm.scrollHeight) || (elm.clientWidth < elm.scrollWidth)) {
-		hasScrollBar = true;
-	    }
-	    return hasScrollBar;
 	};
 	
 	$.fn.flyweightCustomSelect.settings = {
