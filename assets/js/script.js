@@ -63,10 +63,6 @@ var apply = function(e) {
 		$form = $("form"),
 		time,
 		options = null;
-
-	if (!$('#please-select').attr("checked")) {
-		options = {pleaseselect:false};	
-	}
 	
 	time = new Date().getTime();
 	
