@@ -23,8 +23,7 @@
 				isOpen = false,
 				menuDiv = null,
 				initialSelectedIndex = 0,
-				lookupHash = [],
-				timer = null;
+				lookupHash = [];
 
 			// this utility function gets a hash of text and value of each filtered element out of the select,
 			// then gets their values and returns them in an array
@@ -248,7 +247,6 @@
 					
 					//set flags
 					isOpen = true;
-					window.clearTimeout(timer);
 				},
 				close: function() {
 					$(menuDiv).removeClass(settings.classes.menu.container.open);
@@ -277,6 +275,12 @@
 				},
 				scrollUp: function() {
 					scrollBy(-1);	
+				},
+				pageDown: function() {
+					scrollBy(10);	
+				},
+				pageUp: function() {
+					scrollBy(-10);	
 				},
 				search: function(search) {
 					typeAhead(search);
@@ -334,6 +338,20 @@
 							$(this).trigger("click");
 						} else {
 							menu.scrollDown();
+						}
+						break;
+					case (e.which === settings.keymap.pgup):
+						if (!menu.visible()) {
+							$(this).trigger("click");
+						} else {
+							menu.pageUp();
+						}
+						break;
+					case (e.which === settings.keymap.pgdn):
+						if (!menu.visible()) {
+							$(this).trigger("click");
+						} else {
+							menu.pageDown();
 						}
 						break;
 					case (e.which === settings.keymap.enter):
@@ -558,6 +576,8 @@
 			enter:13,
 			space:32,
 			tab:9,
+			pgup:33,
+			pgdn:34,
 			escape:27
 		}
 	};
