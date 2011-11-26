@@ -33,13 +33,13 @@
 				//get all filtered elements and cache them
 				lookupHash = $.map($(settings.optionfilter, selectEl), function(el, index) {
 					var $el = $(el),
-						selectIndex = $el.attr("index");
+						selectIndex = $el[0].index;
 					
 					//hack because IE returns index 0 for optgroup when it should be undefined
 					if ($.browser.msie && el.nodeName.toUpperCase() === "OPTGROUP") {
 						selectIndex = null;
 					}
-					return {type:el.nodeName.toUpperCase(), selectIndex:selectIndex, text:$el.attr("text"), value:$el.attr("value"), group:$el.attr("label"), hidden:false};
+					return {type:el.nodeName.toUpperCase(), selectIndex:selectIndex, text:$el.text(), value:$el.attr("value"), group:$el.attr("label"), hidden:false};
 				});
 				//flag first option as "please select"
 				if (lookupHash[0].type === "OPTION" && settings.pleaseselect) {
