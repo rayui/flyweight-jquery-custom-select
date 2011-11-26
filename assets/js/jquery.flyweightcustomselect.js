@@ -448,6 +448,9 @@
 				//store instance on prototype. menu is local var for better compression & performance!
 				if (menu === null) {
 					menu = $.fn.flyweightCustomSelect.menu = new FlyweightMenu();
+					$(document).click(function() {
+						if (menu.visible()) {menu.reset()};
+					})
 				}
 				
 				menu.close();
@@ -544,7 +547,7 @@
 			}			
 		},
 		optionfilter:'option,optgroup',
-		tabindex:true,
+		tabindex:false,
 		keymap:{
 			left:37,
 			right:39,
