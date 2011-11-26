@@ -23,7 +23,6 @@
 				isOpen = false,
 				menuDiv = null,
 				initialSelectedIndex = 0,
-				searchString = '',
 				lookupHash = [],
 				timer = null;
 
@@ -157,24 +156,25 @@
 			};
 			
 			//typeahead functionality
-			var typeAhead = function() {
-				var typeAheadString = searchString.replace(/[\W]/ig,'').toUpperCase(),
-					found = false,
-					i = 0;
-
-				for (i = 0; i < lookupHash.length; i+=1) {
-					if(lookupHash[i].text) {
-						if (lookupHash[i].text.replace(/[\W]/ig,'').substring(0, typeAheadString.length).toString().toUpperCase() === typeAheadString) {
-							setMenuByAttr("text", lookupHash[i].text);
-							i = lookupHash.length;
-							found = true;
+			var typeAhead = function(search) {
+				//normalise search character
+				search = search.toUpperCase().charCodeAt(0);
+				
+				//search for next element from specified start position in select
+				var find = function(i) {
+					while (i < selectEl.options.length) {
+						if (selectEl[i].text.toUpperCase().charCodeAt(0) === search) {
+							setMenuByAttr("selectIndex", i);
+							return true;
 						}
+						i+=1;
 					}
+					return false;
 				}
 				
-				window.clearTimeout(timer);
-				timer = window.setTimeout(function() {searchString = '';}, 1000);
-
+				//if we don't find it after our current position, we search from the top
+				find(selectEl.selectedIndex + 1) || find(0);
+				
 			};
 			
 			var onClick = function(e) {
@@ -247,7 +247,6 @@
 					
 					//set flags
 					isOpen = true;
-					searchString = '';
 					window.clearTimeout(timer);
 
 				},
@@ -279,9 +278,8 @@
 				scrollUp: function() {
 					scrollBy(-1);	
 				},
-				search: function(charCode) {
-					searchString += charCode;
-					typeAhead();
+				search: function(search) {
+					typeAhead(search);
 				},
 				getSelect: function() {
 					return selectEl;
@@ -384,6 +382,7 @@
 			var enable = function() {
 				$(selectEl).removeAttr("disabled");
 				
+				//copy tabindex of select to placeholder according to settings
 				!($(selectEl).attr('tabindex') && settings.tabindex) || $placeHolder.attr('tabindex', $(selectEl).attr('tabindex'));
 				
 				$placeHolder.removeClass(settings.classes.placeholder.container.disabled);
@@ -397,11 +396,13 @@
 			var disable = function() {
 				$(selectEl).attr("disabled", "disabled");
 				
+				//remove tabindex according to settings
 				!settings.tabindex || $placeHolder.removeAttr("tabindex");
 				
 				$placeHolder.addClass(settings.classes.placeholder.container.disabled);
 				$placeHolder.unbind("click");
 				$placeHolder.unbind("keydown");
+				//remove placeholder from document focus flow
 				$placeHolder.unbind("focus").focus(function() {this.blur();});
 				$placeHolder.unbind("blur");
 				$placeHolder.unbind("mouseover");
