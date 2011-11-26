@@ -400,10 +400,11 @@
 				!settings.tabindex || $placeHolder.removeAttr("tabindex");
 				
 				$placeHolder.addClass(settings.classes.placeholder.container.disabled);
-				$placeHolder.unbind("click");
+				//prevent default click
+				$placeHolder.unbind("click").click(function() {return false;});
 				$placeHolder.unbind("keydown");
 				//remove placeholder from document focus flow
-				$placeHolder.unbind("focus").focus(function() {this.blur();});
+				$placeHolder.unbind("focus").focus(function() {this.blur();return false;});
 				$placeHolder.unbind("blur");
 				$placeHolder.unbind("mouseover");
 				$placeHolder.unbind("mouseout");
