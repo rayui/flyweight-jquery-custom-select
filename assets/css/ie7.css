@@ -2,10 +2,9 @@
 	padding:5px 10px 0 0;
 }
 
-/* we must disable PIE here because IE7 VML doesn't like it in this context */
-
 .fwselect-menu ul li a.fwselect-menu-listitem-focus,
 .fwselect-menu ul li a.fwselect-menu-listitem:hover {
+	/* we must disable PIE here because IE7 VML doesn't like it in this context */
 	background-color: #FF8B17;
 	behavior:none;
 }

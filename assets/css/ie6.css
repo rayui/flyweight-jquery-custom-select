@@ -3,7 +3,7 @@
 .fwselect-menu ul li a.fwselect-menu-listitem-focus,
 .fwselect-menu ul li a.fwselect-menu-listitem:hover,
 .fwselect-menu-open {
-	behavior:url(/flyweight-jquery-custom-select/assets/css/PIE.htc);	
+	behavior:url(../css/PIE.htc);	
 	-pie-background: linear-gradient(#ffffff, #E0E0E0);
 }
 
@@ -32,18 +32,18 @@
 	border:0;
 	line-height:0;
 	font-size:0;
-	background:transparent url(/flyweight-jquery-custom-select/assets/img/flyweight-custom-select-ie-sprite.png) scroll no-repeat 0 0;
+	background:transparent url(../img/flyweight-custom-select-ie-sprite.png) scroll no-repeat 0 0;
 }
 
 .fwselect-focus .fwselect-arrow,
 .fwselect-hover .fwselect-arrow,
 .fwselect:hover .fwselect-arrow {
-	background:transparent url(/flyweight-jquery-custom-select/assets/img/flyweight-custom-select-ie-sprite.png) scroll no-repeat 0 -50px;
+	background:transparent url(../img/flyweight-custom-select-ie-sprite.png) scroll no-repeat 0 -50px;
 }
 
 .fwselect-disabled .fwselect-arrow,
 .fwselect-disabled:hover .fwselect-arrow {
-	background:transparent url(/flyweight-jquery-custom-select/assets/img/flyweight-custom-select-ie-sprite.png) scroll no-repeat 0 -100px;
+	background:transparent url(../img/flyweight-custom-select-ie-sprite.png) scroll no-repeat 0 -100px;
 }
 
 .fwselect-menu ul li a.fwselect-menu-listitem {
