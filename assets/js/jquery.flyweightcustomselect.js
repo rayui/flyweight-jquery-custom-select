@@ -9,11 +9,6 @@
 	$.fn.flyweightCustomSelect = function(method) {
 		var settings = {},
 			menu = $.fn.flyweightCustomSelect.menu || null;
-		
-		//produce modulo correctly		
-		var mod = function(n, m) {
-			return ((m%n)+n)%n;
-		};
 
 		//dropdown menuDiv constructor
 		var FlyweightMenu = function() {
@@ -174,7 +169,7 @@
 					i+=1;
 				}
 				return false;
-			}
+			};
 			
 			//typeahead functionality
 			var typeAhead = function(search) {
@@ -187,12 +182,12 @@
 			};
 			
 			var onClick = function(e) {
+				e.preventDefault();
+				e.stopPropagation();
+				
 				var selectedAnchor = e.target,
 					value,
 					index;
-					
-				e.preventDefault();
-				e.stopPropagation();
 				
 				//we only set target for keyboard nav as events will be triggered on wrapper div, not anchor (as is when clicked)
 				//we need to check this because the person could theoretically click on the div which the elements are bound to, as opposed to the anchor 
@@ -221,78 +216,80 @@
 				}
 			};
 
-			//initialise on first run			
-			$menuDiv = $('<div class="' + settings.classes.menu.container.base + '" />').bind('click', onClick);
-			$('body').append($menuDiv);
-			
-			return {
-				initialise: function(triggeredPlaceHolder, triggeredSelectEl) {
-					//set closure wide variable to remember which object triggered open
-					placeHolder = triggeredPlaceHolder;
-					selectEl = triggeredSelectEl;					
-				},
-				open: function() {
-					if (!isOpen) {
-						//cache the values & text for performance
-						mapOptionsToHash();
-						buildMenu();
-						positionMenu();
-						fitScrollBar();
-						fitMenuOnScreen();
+			//initialise on first run
+			return function() {
+				$menuDiv = $('<div class="' + settings.classes.menu.container.base + '" />').bind('click', onClick);
+				$('body').append($menuDiv);
+				
+				return {
+					initialise: function(triggeredPlaceHolder, triggeredSelectEl) {
+						//set closure wide variable to remember which object triggered open
+						placeHolder = triggeredPlaceHolder;
+						selectEl = triggeredSelectEl;					
+					},
+					open: function() {
+						if (!isOpen) {
+							//cache the values & text for performance
+							mapOptionsToHash();
+							buildMenu();
+							positionMenu();
+							fitScrollBar();
+							fitMenuOnScreen();
+							
+							//now set intial state of menu
+							initialSelectedIndex = getLookupIndexByAttr("selectIndex", selectEl.selectedIndex);
+							setMenuToIndex(initialSelectedIndex);
+							
+							$menuDiv.addClass(settings.classes.menu.container.open);
+							$(placeHolder)
+								.addClass(settings.classes.placeholder.container.open)
+								.focus();
+							
+							//set flags
+							isOpen = true;
+							return true;
+						}
+						return false;
+					},
+					close: function() {
+						$menuDiv.removeClass(settings.classes.menu.container.open);
+						$(placeHolder).removeClass(settings.classes.placeholder.container.open);
 						
-						//now set intial state of menu
-						initialSelectedIndex = getLookupIndexByAttr("selectIndex", selectEl.selectedIndex);
+						//set flag
+						isOpen = false;
+					},
+					destroy:function() {
+						$menuDiv.unbind();
+						$menuDiv.remove();
+					},
+					reset: function() {
 						setMenuToIndex(initialSelectedIndex);
-						
-						$menuDiv.addClass(settings.classes.menu.container.open);
-						$(placeHolder)
-							.addClass(settings.classes.placeholder.container.open)
-							.focus();
-						
-						//set flags
-						isOpen = true;
-						return true;
+						this.close();
+					},
+					isOpen: function() {
+						return isOpen;
+					},
+					scrollDown: function() {
+						this.open() || scrollBy(1);	
+					},
+					scrollUp: function() {
+						this.open() || scrollBy(-1);
+					},
+					pageDown: function() {
+						this.open() || scrollBy(10);	
+					},
+					pageUp: function() {
+						this.open() || scrollBy(-10);	
+					},
+					search: function(character) {
+						this.open();
+						typeAhead(character);
+					},
+					getSelect: function() {
+						return selectEl;
 					}
-					return false;
-				},
-				close: function() {
-					$menuDiv.removeClass(settings.classes.menu.container.open);
-					$(placeHolder).removeClass(settings.classes.placeholder.container.open);
-					
-					//set flag
-					isOpen = false;
-				},
-				destroy:function() {
-					$menuDiv.unbind();
-					$menuDiv.remove();
-				},
-				reset: function() {
-					setMenuToIndex(initialSelectedIndex);
-					this.close();
-				},
-				isOpen: function() {
-					return isOpen;
-				},
-				scrollDown: function() {
-					this.open() || scrollBy(1);	
-				},
-				scrollUp: function() {
-					this.open() || scrollBy(-1);
-				},
-				pageDown: function() {
-					this.open() || scrollBy(10);	
-				},
-				pageUp: function() {
-					this.open() || scrollBy(-10);	
-				},
-				search: function(search) {
-					this.open();
-					typeAhead(search);
-				},
-				getSelect: function() {
-					return selectEl;
-				}
-			};
+				};
+			}();
 		};
 		
 		var PlaceHolder = function(selectEl) {
@@ -314,8 +311,8 @@
 			};
 			
 			//keydown behaviour
-			var onKeydown = function(e) {		
-				if (e.which === settings.keymap.left || e.keyCode === settings.keymap.right || e.keyCode === settings.keymap.up || e.keyCode === settings.keymap.down || e.keyCode === settings.keymap.enter || e.keyCode === settings.keymap.space) {
+			var onKeyDown = function(e) {			
+				if (e.keyCode === settings.keymap.left || e.keyCode === settings.keymap.right || e.keyCode === settings.keymap.up || e.keyCode === settings.keymap.down || e.keyCode === settings.keymap.enter || e.keyCode === settings.keymap.space) {
 					e.stopPropagation();
 					e.preventDefault();
 				}
@@ -323,34 +320,34 @@
 				//switch(true) to enable use of expanded conditional statements
 				//crockford doesn't like this but what the hell
 				switch (true) {
-					case (e.which === settings.keymap.left):
-					case (e.which === settings.keymap.up):
+					case (e.keyCode === settings.keymap.left):
+					case (e.keyCode === settings.keymap.up):
 						menu.scrollUp();
 						break;
-					case (e.which === settings.keymap.right):
-					case (e.which === settings.keymap.down):
+					case (e.keyCode === settings.keymap.right):
+					case (e.keyCode === settings.keymap.down):
 						menu.scrollDown();
 						break;
-					case (e.which === settings.keymap.pgup):
+					case (e.keyCode === settings.keymap.pgup):
 						menu.pageUp();
 						break;
-					case (e.which === settings.keymap.pgdn):
+					case (e.keyCode === settings.keymap.pgdn):
 						menu.pageDown();
 						break;
-					case (e.which === settings.keymap.enter):
-					case (e.which === settings.keymap.space):
+					case (e.keyCode === settings.keymap.enter):
+					case (e.keyCode === settings.keymap.space):
 						$(this).trigger("click");
 						break;
-					case (e.which === settings.keymap.tab):
+					case (e.keyCode === settings.keymap.tab):
 						menu.close();
 						break;
-					case (e.which === settings.keymap.escape):
+					case (e.keyCode === settings.keymap.escape):
 						menu.reset();
 						break;
-					case (e.which >= 48 && e.which <= 59):
-					case (e.which >= 65 && e.which <= 90):
-					case (e.which >= 97 && e.which <= 122):
-						menu.search(String.fromCharCode(e.which));
+					case (e.keyCode >= 48 && e.keyCode <= 59):
+					case (e.keyCode >= 65 && e.keyCode <= 90):
+					case (e.keyCode >= 97 && e.keyCode <= 122):
+						menu.search(String.fromCharCode(e.keyCode));
 						break;
 				}
 			};
@@ -361,6 +358,7 @@
 			};
 			
 			var onBlur = function(e) {
+				menu.close();
 				$(this).removeClass(settings.classes.placeholder.container.focus);
 			};
 			
@@ -380,9 +378,10 @@
 				
 				$placeHolder.removeClass(settings.classes.placeholder.container.disabled);
 				$placeHolder.click(onClick);
-				$placeHolder.keydown(onKeydown);
-				$placeHolder.unbind("focus").focus(onFocus);
-				$placeHolder.blur(onBlur);
+				$placeHolder.unbind('focusin').bind('focusin', onFocus);
+				$placeHolder.focusout(onBlur);
+
+				$placeHolder.keydown(onKeyDown);
 				$placeHolder.hover(onMouseOver, onMouseOut);
 			};
 			
@@ -394,36 +393,38 @@
 				
 				$placeHolder.addClass(settings.classes.placeholder.container.disabled);
 				//prevent default click
-				$placeHolder.unbind("click").click(function() {return false;});
-				$placeHolder.unbind("keydown");
+				$placeHolder.unbind('click').click(function() {return false;});
+				$placeHolder.unbind('keydown');
 				//remove placeholder from document focus flow
-				$placeHolder.unbind("focus").focus(function() {this.blur();return false;});
-				$placeHolder.unbind("blur");
-				$placeHolder.unbind("mouseover");
-				$placeHolder.unbind("mouseout");
+				$placeHolder.unbind('focusin').bind('focusin', function() {this.blur();return false;});
+				$placeHolder.unbind('focusout');
+				$placeHolder.unbind('mouseover');
+				$placeHolder.unbind('mouseout');
 			};
 			
 			//generate placeholder and enable
-			$placeHolder = $('<a href="#" aria-owns="' + selectEl.id + '" class="' + settings.classes.placeholder.container.base + '" role="button" href="#" aria-haspopup="true" id="' + selectEl.id + '-button"><span class="' + settings.classes.placeholder.text.base + '">' + selectEl.options[selectEl.selectedIndex].text + '</span><span class="' + settings.classes.placeholder.arrow.base + '"></span></a>');
-			enable();
-			
-			//inesrt and hide bound control
-			$(selectEl).after($placeHolder);
-			$(selectEl).hide();
-			
-			return {
-				enable:function() {
-					enable();
-				},
-				disable:function() {
-					disable();
-				},
-				destroy:function() {
-					$placeHolder.unbind();
-					$placeHolder.remove();
-					$(selectEl).removeAttr("disabled").show();
-				}
-			};
+			return function() {
+				$placeHolder = buildPlaceHolder(selectEl);
+				enable();
+				
+				//inesrt and hide bound control
+				$(selectEl).after($placeHolder);
+				$(selectEl).hide();
+				
+				return {
+					enable:function() {
+						enable();
+					},
+					disable:function() {
+						disable();
+					},
+					destroy:function() {
+						$placeHolder.unbind();
+						$placeHolder.remove();
+						$(selectEl).removeAttr("disabled").show();
+					}
+				};
+			}();
 			
 		};
 		
@@ -467,6 +468,21 @@
 				});
 			}
 		};
+		
+		//curry function to build placeHolder
+		//we do this here for performance so it is run only once.
+		var buildPlaceHolder = (function() {
+			//vml in IE6 won't focus on hyperlinks with PIE so, we have to wrap our markup in another div :(
+			if ($.browser.msie && parseInt($.browser.version, 10) < 7) {
+				return function(selectEl) {
+					return $('<div class="' + settings.classes.placeholder.container.base + '"><a href="#" aria-owns="' + selectEl.id + '" role="button" href="#" aria-haspopup="true" id="' + selectEl.id + '-button"><span class="' + settings.classes.placeholder.text.base + '">' + selectEl.options[selectEl.selectedIndex].text + '</span><span class="' + settings.classes.placeholder.arrow.base + '"></span></a></div>');
+				};
+			} else {
+				return function(selectEl) {
+					return $('<a href="#" aria-owns="' + selectEl.id + '" class="' + settings.classes.placeholder.container.base + '" role="button" href="#" aria-haspopup="true" id="' + selectEl.id + '-button"><span class="' + settings.classes.placeholder.text.base + '">' + selectEl.options[selectEl.selectedIndex].text + '</span><span class="' + settings.classes.placeholder.arrow.base + '"></span></a>');
+				};
+			}
+		})();
 		
 		if ( methods[method] ) {
 			return methods[method].apply( this, Array.prototype.slice.call( arguments, 1 ));

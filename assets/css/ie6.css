@@ -1,24 +1,32 @@
 .fwselect,
 .fwselect-menu,
-.fwselect-menu ul li a.fwselect-menu-listitem-focus,
-.fwselect-menu ul li a.fwselect-menu-listitem:hover {
-	behavior:url(/assets/css/PIE.htc);	
+.fwselect-menu a.fwselect-menu-listitem,
+.fwselect-menu a.fwselect-menu-listitem-focus,
+.fwselect-menu a.fwselect-menu-listitem:hover,
+.fwselect-menu-open {
+	behavior:url(/assets/css/PIE.htc);
 }
 
 .fwselect {
+	position:relative;
+	display:block;
+	height:1%;
+	zoom:1;
 	-pie-background: linear-gradient(#ffffff, #E0E0E0);
 }
 
 .fwselect-focus,
 .fwselect-hover,
-.fwselect:hover {
+.fwselect:hover,
+.fwselect-menu a.fwselect-menu-listitem-focus,
+.fwselect-menu a.fwselect-menu-listitem:hover {
 	-pie-background: linear-gradient(#FFB566, #FF8B17);
 }
 
 .fwselect-disabled,
 .fwselect-disabled:hover {
+	-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=50)";
 	border:2px solid #E0E0E0;
-	-pie-background: linear-gradient(#ffffff, #F0F0F0);	
 }
 
 .fwselect-disabled .fwselect-text,
@@ -46,17 +54,8 @@
 .fwselect-disabled .fwselect-arrow,
 .fwselect-disabled:hover .fwselect-arrow {
 	background:transparent url(../img/flyweight-custom-select-ie-sprite.png) scroll no-repeat 0 -100px;
-}
+}	
 
-.fwselect-menu {
-	-pie-background: linear-gradient(#FFFFFF, #E0E0E0);
-}
-
-.fwselect-menu ul li a.fwselect-menu-listitem {
+.fwselect-menu a.fwselect-menu-listitem {
 	width:185px;
-}
-
-.fwselect-menu ul li a.fwselect-menu-listitem-focus,
-.fwselect-menu ul li a.fwselect-menu-listitem:hover {
-	-pie-background: linear-gradient(#FFB566, #FF8B17);
 }
