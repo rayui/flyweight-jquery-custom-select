@@ -218,8 +218,9 @@
 
 			//initialise on first run
 			return function() {
-				$menuDiv = $('<div class="' + settings.classes.menu.container.base + '" />').bind('click', onClick);
+				$menuDiv = $('<div class="' + settings.classes.menu.container.base + '" />');
 				$('body').append($menuDiv);
+				$menuDiv.bind('click', onClick);
 				
 				return {
 					initialise: function(triggeredPlaceHolder, triggeredSelectEl) {
@@ -358,7 +359,6 @@
 			};
 			
 			var onBlur = function(e) {
-				menu.close();
 				$(this).removeClass(settings.classes.placeholder.container.focus);
 			};
 			
@@ -438,7 +438,7 @@
 					menu = $.fn.flyweightCustomSelect.menu = new FlyweightMenu();
 					$(document).click(function() {
 						if (menu.isOpen()) {menu.reset()};
-					})
+					});
 				}
 				
 				//keep a record of placeholder on select
