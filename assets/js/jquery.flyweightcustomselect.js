@@ -218,12 +218,11 @@
 
 			//initialise on first run
 			return function() {
-				$menuDiv = $('<div class="' + settings.classes.menu.container.base + '" />');
+				$menuDiv = $('<div class="' + settings.classes.menu.container.base + '" />').bind('click', onClick);
 				$('body').append($menuDiv);
-				$menuDiv.bind('click', onClick);
 				
 				return {
-					initialise: function(triggeredPlaceHolder, triggeredSelectEl) {
+					bondToSelect: function(triggeredPlaceHolder, triggeredSelectEl) {
 						//set closure wide variable to remember which object triggered open
 						placeHolder = triggeredPlaceHolder;
 						selectEl = triggeredSelectEl;					
@@ -304,7 +303,7 @@
 				//close existing any menu and re-initialise for current select 
 				if (menu.getSelect() !== selectEl) {
 					menu.close();
-					menu.initialise(this, selectEl);
+					menu.bondToSelect(this, selectEl);
 				}
 				
 				// toggle the custom select menu if enabled
@@ -354,7 +353,7 @@
 			};
 			
 			var onFocus = function(e) {
-				menu.initialise($(this), selectEl);
+				menu.bondToSelect($(this), selectEl);
 				$(this).addClass(settings.classes.placeholder.container.focus);
 			};
 			
