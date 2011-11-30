@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 .jquery-flyweight-select,
 .jquery-flyweight-selectmenu,
 .jquery-flyweight-selectmenu ul li a.jquery-flyweight-selectmenu-listitem-focus,
@@ -12,21 +13,45 @@
 .jquery-flyweight-select-focus,
 .jquery-flyweight-select-hover,
 .jquery-flyweight-select:hover {
+=======
+.fwselect,
+.fwselect-menu,
+.fwselect-menu a.fwselect-menu-listitem,
+.fwselect-menu a.fwselect-menu-listitem-focus,
+.fwselect-menu a.fwselect-menu-listitem:hover,
+.fwselect-menu-open {
+	behavior:url(/assets/css/PIE.htc);
+}
+
+.fwselect {
+	position:relative;
+	display:block;
+	height:1%;
+	zoom:1;
+	-pie-background: linear-gradient(#ffffff, #E0E0E0);
+}
+
+.fwselect-focus,
+.fwselect-hover,
+.fwselect:hover,
+.fwselect-menu a.fwselect-menu-listitem-focus,
+.fwselect-menu a.fwselect-menu-listitem:hover {
+>>>>>>> master
 	-pie-background: linear-gradient(#FFB566, #FF8B17);
 }
 
-.jquery-flyweight-select-disabled,
-.jquery-flyweight-select-disabled:hover {
+.fwselect-disabled,
+.fwselect-disabled:hover {
+	-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=50)";
 	border:2px solid #E0E0E0;
-	-pie-background: linear-gradient(#ffffff, #F0F0F0);	
 }
 
-.jquery-flyweight-select-disabled .jquery-flyweight-select-text,
-.jquery-flyweight-select-disabled:hover .jquery-flyweight-select-text {
+.fwselect-disabled .fwselect-text,
+.fwselect-disabled:hover .fwselect-text {
 	color:#a0a0a0;
 }
 
-.jquery-flyweight-select-arrow {
+.fwselect-arrow {
 	margin:10px 5px 0 0;
 	padding:3px 10px 0 0;
 	width:0;
@@ -37,6 +62,7 @@
 	background:transparent url(/flyweight-jquery-custom-select/assets/img/flyweight-custom-select-ie-sprite.png) scroll no-repeat 0 0;
 }
 
+<<<<<<< HEAD
 .jquery-flyweight-select-focus .jquery-flyweight-select-arrow,
 .jquery-flyweight-select-hover .jquery-flyweight-select-arrow,
 .jquery-flyweight-select:hover .jquery-flyweight-select-arrow {
@@ -61,3 +87,19 @@
 	-pie-background: linear-gradient(#FFB566, #FF8B17);
 }l(PIE.htc);
 }
+=======
+.fwselect-focus .fwselect-arrow,
+.fwselect-hover .fwselect-arrow,
+.fwselect:hover .fwselect-arrow {
+	background:transparent url(../img/flyweight-custom-select-ie-sprite.png) scroll no-repeat 0 -50px;
+}
+
+.fwselect-disabled .fwselect-arrow,
+.fwselect-disabled:hover .fwselect-arrow {
+	background:transparent url(../img/flyweight-custom-select-ie-sprite.png) scroll no-repeat 0 -100px;
+}	
+
+.fwselect-menu a.fwselect-menu-listitem {
+	width:185px;
+}
+>>>>>>> master
