@@ -42,7 +42,7 @@
 	border:0;
 	line-height:0;
 	font-size:0;
-	background:transparent url(/flyweight-jquery-custom-select/assets/img/flyweight-custom-select-ie-sprite.png) scroll no-repeat 0 0;
+	background:transparent url(../img/flyweight-custom-select-ie-sprite.png) scroll no-repeat 0 0;
 }
 
 .fwselect-focus .fwselect-arrow,

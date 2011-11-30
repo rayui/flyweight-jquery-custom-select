@@ -31,7 +31,8 @@
 					//hack because IE returns index 0 for optgroup when it should be undefined
 					if ($.browser.msie && el.nodeName.toUpperCase() === "OPTGROUP") {
 						selectIndex = null;
-					}				
+					}
+					
 					return {type:el.nodeName.toUpperCase(), selectIndex:selectIndex, text:$el.text(), value:$el.attr("value"), group:$el.attr("label")};
 				});
 			};
