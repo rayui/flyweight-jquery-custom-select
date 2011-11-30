@@ -80,6 +80,11 @@
 				});
 			};
 			
+			var sizeMenu = function() {
+				var width = $(placeHolder).width();
+				$menuDiv.width(width);
+			};
+			
 			var hasScrollBar = function(el) {
 			    //note: clientHeight= height of holder
 			    //scrollHeight= we have content till this height
@@ -233,6 +238,7 @@
 							mapOptionsToHash();
 							buildMenu();
 							positionMenu();
+							sizeMenu();
 							fitScrollBar();
 							fitMenuOnScreen();
 							
