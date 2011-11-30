@@ -1,19 +1,3 @@
-<<<<<<< HEAD
-.jquery-flyweight-select,
-.jquery-flyweight-selectmenu,
-.jquery-flyweight-selectmenu ul li a.jquery-flyweight-selectmenu-listitem-focus,
-.jquery-flyweight-selectmenu ul li a.jquery-flyweight-selectmenu-listitem:hover {
-	behavior:url(/flyweight-jquery-custom-select/assets/css/PIE.htc);	
-}
-
-.jquery-flyweight-select {
-	-pie-background: linear-gradient(#ffffff, #E0E0E0);
-}
-
-.jquery-flyweight-select-focus,
-.jquery-flyweight-select-hover,
-.jquery-flyweight-select:hover {
-=======
 .fwselect,
 .fwselect-menu,
 .fwselect-menu a.fwselect-menu-listitem,
@@ -36,7 +20,6 @@
 .fwselect:hover,
 .fwselect-menu a.fwselect-menu-listitem-focus,
 .fwselect-menu a.fwselect-menu-listitem:hover {
->>>>>>> master
 	-pie-background: linear-gradient(#FFB566, #FF8B17);
 }
 
@@ -62,32 +45,6 @@
 	background:transparent url(/flyweight-jquery-custom-select/assets/img/flyweight-custom-select-ie-sprite.png) scroll no-repeat 0 0;
 }
 
-<<<<<<< HEAD
-.jquery-flyweight-select-focus .jquery-flyweight-select-arrow,
-.jquery-flyweight-select-hover .jquery-flyweight-select-arrow,
-.jquery-flyweight-select:hover .jquery-flyweight-select-arrow {
-	background:transparent url(/flyweight-jquery-custom-select/assets/img/flyweight-custom-select-ie-sprite.png) scroll no-repeat 0 -50px;
-}
-
-.jquery-flyweight-select-disabled .jquery-flyweight-select-arrow,
-.jquery-flyweight-select-disabled:hover .jquery-flyweight-select-arrow {
-	background:transparent url(/flyweight-jquery-custom-select/assets/img/flyweight-custom-select-ie-sprite.png) scroll no-repeat 0 -100px;
-}
-
-.jquery-flyweight-selectmenu {
-	-pie-background: linear-gradient(#FFFFFF, #E0E0E0);
-}
-
-.jquery-flyweight-selectmenu ul li a.jquery-flyweight-selectmenu-listitem {
-	width:185px;
-}
-
-.jquery-flyweight-selectmenu ul li a.jquery-flyweight-selectmenu-listitem-focus,
-.jquery-flyweight-selectmenu ul li a.jquery-flyweight-selectmenu-listitem:hover {
-	-pie-background: linear-gradient(#FFB566, #FF8B17);
-}l(PIE.htc);
-}
-=======
 .fwselect-focus .fwselect-arrow,
 .fwselect-hover .fwselect-arrow,
 .fwselect:hover .fwselect-arrow {
@@ -102,4 +59,3 @@
 .fwselect-menu a.fwselect-menu-listitem {
 	width:185px;
 }
->>>>>>> master
