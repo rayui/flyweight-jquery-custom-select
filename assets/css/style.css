@@ -28,6 +28,14 @@ a {
 	font-size:0.8em;
 	font-weight:bold;
 	text-decoration:none;
+	
+	-webkit-highlight-tap-color:rgba(0,0,0,0);
+	
+	user-select:none;
+	-webkit-user-select:none;
+	-moz-user-select:none;
+	-o-user-select:none;
+	-ms-user-select:none;
 }
 
 .fwselect-open {
@@ -200,6 +208,7 @@ a {
 	padding:5px;
 	color:#606060;
 	text-decoration:none;
+	-webkit-highlight-tap-color:rgba(0,0,0,0);
 }
 
 .fwselect-menu .fwselect-menu-group a.fwselect-menu-listitem {

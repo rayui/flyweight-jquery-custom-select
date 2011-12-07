@@ -6,6 +6,8 @@
 */
 
 (function($){
+	var clickEvent = ('touchstart' in document.documentElement) ? 'touchstart' : 'click'
+	
 	$.fn.flyweightCustomSelect = function(method) {
 		var settings = {},
 			menu = $.fn.flyweightCustomSelect.menu || null;
@@ -104,15 +106,6 @@
 				return isDropDown;
 				
 			};
-			
-			var hasScrollBar = function(el) {
-			    //note: clientHeight= height of holder
-			    //scrollHeight= we have content till this height
-			    if ((el.clientHeight < el.scrollHeight) || (el.clientWidth < el.scrollWidth)) {
-				return true;
-			    }
-			    return false;
-			};
 
 			//update selecEl value to new index			
 			var setSelectToIndex = function(lookupIndex) {
@@ -155,17 +148,12 @@
 				
 				return i;
 			};
-			
-			//update menu to to match psecific attribute in lookupHash 
-			var setMenuByAttr = function(attr, data) {
-				setMenuToIndex(getLookupIndexByAttr(attr, data));
-			};
 
 			//search for next element from specified start position in select
 			var find = function(search, i) {
 				while (i < selectEl.options.length) {
 					if (selectEl[i].text.toUpperCase().charCodeAt(0) === search) {
-						setMenuByAttr("selectIndex", i);
+						setMenuToIndex(getLookupIndexByAttr("selectIndex", i));
 						return true;
 					}
 					i+=1;
@@ -220,7 +208,7 @@
 
 			//initialise on first run
 			return function() {
-				menuDiv = $('<div class="' + settings.classes.menu.container.base + '" />').bind('click', onClick);
+				menuDiv = $('<div class="' + settings.classes.menu.container.base + '" />').bind(clickEvent, onClick);
 				$('body').append(menuDiv);
 				
 				return {
@@ -326,7 +314,6 @@
 			//keydown behaviour
 			var onKeyDown = function(e) {			
 				if (e.keyCode === settings.keymap.left || e.keyCode === settings.keymap.right || e.keyCode === settings.keymap.up || e.keyCode === settings.keymap.down || e.keyCode === settings.keymap.enter || e.keyCode === settings.keymap.space) {
-					e.stopPropagation();
 					e.preventDefault();
 				}
 				
@@ -349,7 +336,7 @@
 						break;
 					case (e.keyCode === settings.keymap.enter):
 					case (e.keyCode === settings.keymap.space):
-						$(this).trigger("click");
+						$(this).trigger(clickEvent);
 						break;
 					case (e.keyCode === settings.keymap.tab):
 						menu.close();
@@ -366,15 +353,11 @@
 			};
 			
 			var onFocus = function(e) {
-				e.stopPropagation();
-				e.preventDefault();
 				menu.bondToSelect(placeHolder, selectEl);
 				$(this).addClass(settings.classes.placeholder.container.focus);
 			};
 			
 			var onBlur = function(e) {
-				e.stopPropagation();
-				e.preventDefault();
 				$(this).removeClass(settings.classes.placeholder.container.focus);
 			};
 			
@@ -388,12 +371,15 @@
 			
 			var enable = function() {
 				$(selectEl).removeAttr("disabled");
-				
-				//copy tabindex of select to placeholder according to settings
-				!($(selectEl).attr('tabindex') && settings.tabindex) || placeHolder.attr('tabindex', $(selectEl).attr('tabindex'));
+								
+				if ($(selectEl).attr('tabindex') && settings.tabindex) {
+					placeHolder.attr('tabindex', $(selectEl).attr('tabindex'));
+				} else {
+					placeHolder.attr('tabindex', 0);
+				}
 				
 				placeHolder.removeClass(settings.classes.placeholder.container.disabled);
-				placeHolder.click(onClick);
+				placeHolder.bind(clickEvent, onClick);
 				placeHolder.unbind('focusin').bind('focusin', onFocus);
 				placeHolder.focusout(onBlur);
 
@@ -409,7 +395,7 @@
 				
 				placeHolder.addClass(settings.classes.placeholder.container.disabled);
 				//prevent default click
-				placeHolder.unbind('click').click(function() {return false;});
+				placeHolder.unbind(clickEvent).bind(clickEvent, function() {return false;});
 				placeHolder.unbind('keydown');
 				//remove placeholder from document focus flow
 				placeHolder.unbind('focusin').bind('focusin', function() {this.blur();return false;});
@@ -452,7 +438,7 @@
 				//store instance on prototype. menu is local var for better compression & performance!
 				if (menu === null) {
 					menu = $.fn.flyweightCustomSelect.menu = new FlyweightMenu();
-					$(document).click(function() {
+					$(document).bind(clickEvent, function() {
 						if (menu.isOpen()) {menu.reset()};
 					});
 				}
@@ -534,7 +520,7 @@
 					base:"fwselect-menu",
 					open:"fwselect-menu-open",
 					dropdown:"fwselect-menu-drop-down",
-					dropup:"fwselect-menu-drop-up",
+					dropup:"fwselect-menu-drop-up"
 				},
 				list:{
 					base:"fwselect-menu-list"
