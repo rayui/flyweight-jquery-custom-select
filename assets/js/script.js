@@ -27,7 +27,7 @@ function makeid()
 var addselect = function(e) {
 	var numSelects = parseInt($("#count").val(), 10),
 		$form = $("form"),
-		i, j,
+		i, j, numItems,
 		selectHTML,
 		randomString;
 	
@@ -40,14 +40,18 @@ var addselect = function(e) {
 		selectHTML = '<select id="select" name="select' + i + '" class="select' + i + '" tabindex="' + (numSelects - i) + '"><option value="" selected="selected">Please select...</option>';
 		selectHTML += '<optgroup label="' + makeid() + '">';
 		
-		for (j = 0; j <= 10; j++) {
+		numItems = parseInt(Math.random() * 10, 10);
+		
+		for (j = 0; j <= numItems; j++) {
 			randomString = makeid();
 			selectHTML += '<option value="' + randomString.toUpperCase() + '">' + randomString + '</option>';
 		}
 		
 		selectHTML += '</optgroup><optgroup label="' + makeid() + '">';
 		
-		for (j = 0; j <= 10; j++) {
+		numItems = parseInt(Math.random() * 10, 10);
+		
+		for (j = 0; j <= numItems; j++) {
 			randomString = makeid();
 			selectHTML += '<option value="' + randomString.toUpperCase() + '">' + randomString + '</option>';
 		}
