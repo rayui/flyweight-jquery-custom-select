@@ -300,14 +300,7 @@
 			var onClick = function(e) {
 				e.stopPropagation();
 				e.preventDefault();
-				
-				//close existing any menu and re-initialise for current select
-				
-				if (menu.getSelect() !== selectEl) {
-					menu.close();
-					menu.bondToSelect(placeHolder, selectEl);
-				}
-				
+
 				// toggle the custom select menu if enabled
 				menu.open() || menu.close();
 				
@@ -358,21 +351,13 @@
 			
 			var onFocus = function(e) {
 				e.stopPropagation();
+				placeHolder.addClass(settings.classes.placeholder.container.focus);
 				menu.bondToSelect(placeHolder, selectEl);
-				$(this).addClass(settings.classes.placeholder.container.focus);
 			};
 			
 			var onBlur = function(e) {
 				e.stopPropagation();
-				$(this).removeClass(settings.classes.placeholder.container.focus + ' ' + settings.classes.placeholder.container.open + ' ' + settings.classes.placeholder.container.dropdown + ' ' + settings.classes.placeholder.container.dropup);
-			};
-			
-			var onMouseOver = function(e) {
-				$(this).addClass(settings.classes.placeholder.container.hover);
-			};
-			
-			var onMouseOut = function(e) {
-				$(this).removeClass(settings.classes.placeholder.container.hover);
+				this.className = settings.classes.placeholder.container.base;
 			};
 			
 			var enable = function() {
@@ -390,7 +375,6 @@
 				placeHolder.unbind('blur').bind('blur', onBlur);
 
 				placeHolder.keydown(onKeyDown);
-				placeHolder.hover(onMouseOver, onMouseOut);
 			};
 			
 			var disable = function() {
@@ -406,8 +390,6 @@
 				//remove placeholder from document focus flow
 				placeHolder.unbind('focus').bind('focus', function() {this.blur();return false;});
 				placeHolder.unbind('blur');
-				placeHolder.unbind('mouseover');
-				placeHolder.unbind('mouseout');
 			};
 			
 			//generate placeholder and enable
@@ -510,7 +492,6 @@
 					open:"fwselect-open",
 					dropdown:"fwselect-drop-down",
 					dropup:"fwselect-drop-up",
-					hover:"fwselect-hover",
 					focus:"fwselect-focus",
 					disabled:"fwselect-disabled"
 				},
@@ -534,7 +515,6 @@
 				listitem:{
 					base:"fwselect-menu-listitem",
 					focus:"fwselect-menu-listitem-focus",
-					hover:"fwselect-menu-listitem-hover"
 				},
 				group:{
 					base:"fwselect-menu-group"
