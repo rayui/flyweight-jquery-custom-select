@@ -43,7 +43,6 @@ a {
 }
 
 .fwselect-drop-down {
-	border-bottom:none;
 	-webkit-border-bottom-left-radius: 0;
 	-webkit-border-bottom-right-radius: 0;
 	-moz-border-radius-bottomleft: 0;
@@ -52,8 +51,6 @@ a {
 }
 
 .fwselect-drop-up {
-	border-top:none;
-	padding-top:2px;
 	-webkit-border-top-left-radius: 0;
 	-webkit-border-top-right-radius: 0;
 	-moz-border-radius-topleft: 0;
@@ -62,7 +59,6 @@ a {
 }
 
 .fwselect-focus,
-.fwselect-hover,
 .fwselect:hover {
 	outline:0;
 	background-color:#FF8B17;
@@ -75,7 +71,6 @@ a {
 }
 
 .fwselect-disabled.fwselect-focus,
-.fwselect-disabled.fwselect-hover,
 .fwselect-disabled.fwselect:hover {
 	background-color:#e0e0e0;
 	background: -webkit-gradient(linear, 0 0, 0 bottom, from(#ffffff), to(#E0E0E0));
@@ -94,7 +89,6 @@ a {
 }
 
 .fwselect-focus .fwselect-text,
-.fwselect-hover .fwselect-text,
 .fwselect:hover .fwselect-text {
 	color:#ffffff;
 }
