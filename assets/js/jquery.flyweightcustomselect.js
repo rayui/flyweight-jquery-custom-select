@@ -81,7 +81,7 @@
 				var menuHeight = menuDiv.outerHeight(),
 					placeHolderTop = placeHolder.offset().top,
 					placeHolderHeight = placeHolder.height(),
-					windowHeight = $(window).height(),
+					windowHeight = document.documentElement.clientHeight, /*$(window).height(),*/
 					menuTop = 0,
 					isDropDown = true;
 					
