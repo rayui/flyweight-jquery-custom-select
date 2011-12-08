@@ -264,6 +264,7 @@
 					},
 					reset: function() {
 						setMenuToIndex(initialSelectedIndex);
+						placeHolder.blur();
 						this.close();
 					},
 					isOpen: function() {
@@ -313,7 +314,9 @@
 			};
 			
 			//keydown behaviour
-			var onKeyDown = function(e) {			
+			var onKeyDown = function(e) {
+				e.stopPropagation();
+				
 				if (e.keyCode === settings.keymap.left || e.keyCode === settings.keymap.right || e.keyCode === settings.keymap.up || e.keyCode === settings.keymap.down || e.keyCode === settings.keymap.enter || e.keyCode === settings.keymap.space) {
 					e.preventDefault();
 				}
@@ -354,11 +357,13 @@
 			};
 			
 			var onFocus = function(e) {
+				e.stopPropagation();
 				menu.bondToSelect(placeHolder, selectEl);
 				$(this).addClass(settings.classes.placeholder.container.focus);
 			};
 			
 			var onBlur = function(e) {
+				e.stopPropagation();
 				$(this).removeClass(settings.classes.placeholder.container.focus + ' ' + settings.classes.placeholder.container.open + ' ' + settings.classes.placeholder.container.dropdown + ' ' + settings.classes.placeholder.container.dropup);
 			};
 			
@@ -381,8 +386,8 @@
 				
 				placeHolder.removeClass(settings.classes.placeholder.container.disabled);
 				placeHolder.bind(clickEvent, onClick);
-				placeHolder.unbind('focusin').bind('focusin', onFocus);
-				placeHolder.focusout(onBlur);
+				placeHolder.unbind('focus').bind('focus', onFocus);
+				placeHolder.unbind('blur').bind('blur', onBlur);
 
 				placeHolder.keydown(onKeyDown);
 				placeHolder.hover(onMouseOver, onMouseOut);
@@ -399,8 +404,8 @@
 				placeHolder.unbind(clickEvent).bind(clickEvent, function() {return false;});
 				placeHolder.unbind('keydown');
 				//remove placeholder from document focus flow
-				placeHolder.unbind('focusin').bind('focusin', function() {this.blur();return false;});
-				placeHolder.unbind('focusout');
+				placeHolder.unbind('focus').bind('focus', function() {this.blur();return false;});
+				placeHolder.unbind('blur');
 				placeHolder.unbind('mouseover');
 				placeHolder.unbind('mouseout');
 			};
