@@ -81,14 +81,14 @@
 				var menuHeight = menuDiv.outerHeight(),
 					placeHolderTop = placeHolder.offset().top,
 					placeHolderHeight = placeHolder.height(),
-					windowHeight = document.documentElement.clientHeight, /*$(window).height(),*/
+					windowHeight = document.documentElement.clientHeight,
 					menuTop = 0,
 					isDropDown = true;
 					
 				if (placeHolderTop + placeHolderHeight + menuHeight < windowHeight) {
 					//drop down
 					menuTop = placeHolderTop + placeHolderHeight;
-				} else if (placeHolderTop - menuHeight > 0) {
+				} else if (placeHolderTop - menuHeight > $(window).scrollTop()) {
 					//drop up
 					menuTop = placeHolderTop - menuHeight;
 					isDropDown = false;
@@ -264,7 +264,6 @@
 					},
 					reset: function() {
 						setMenuToIndex(initialSelectedIndex);
-						placeHolder.blur();
 						this.close();
 					},
 					isOpen: function() {
@@ -300,7 +299,7 @@
 			var onClick = function(e) {
 				e.stopPropagation();
 				e.preventDefault();
-
+				
 				// toggle the custom select menu if enabled
 				menu.open() || menu.close();
 				
@@ -351,13 +350,13 @@
 			
 			var onFocus = function(e) {
 				e.stopPropagation();
-				placeHolder.addClass(settings.classes.placeholder.container.focus);
 				menu.bondToSelect(placeHolder, selectEl);
+				placeHolder.addClass(settings.classes.placeholder.container.focus);
 			};
 			
 			var onBlur = function(e) {
 				e.stopPropagation();
-				this.className = settings.classes.placeholder.container.base;
+				placeHolder[0].className = settings.classes.placeholder.container.base;
 			};
 			
 			var enable = function() {
