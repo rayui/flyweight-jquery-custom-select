@@ -2,7 +2,7 @@
 Dual licensed under the MIT or GPL Version 2 licenses.
 
 This plugin implements a flyweight design pattern for jQuery custom select controls. It aims to mimic standard operating system behaviour whilst remaining consistent across platofrm and browser. By only holding one visible control element in memory at one time, it aims to reduce the number of DOM accesses and event binding operations. This can result in significantly reduced page render times on larger forms. 
-It borrows accessibility design patterns from the Filament Group's jQuery UI Selectmenu keyboard navigable ARIA plugin, currently included with JQuery-UI. It requires jQuery 1.4+ to run.
+It borrows accessibility design patterns from the Filament Group's jQuery UI Selectmenu keyboard navigable ARIA plugin, currently included with jQuery-UI. It requires jQuery 1.4+ to run and this is the only requirement.
 
 ## Features
 
@@ -32,7 +32,6 @@ It borrows accessibility design patterns from the Filament Group's jQuery UI Sel
 
   * http://www.filamentgroup.com/lab/jquery_ui_selectmenu_an_aria_accessible_plugin_for_styling_a_html_select/
   * http://jquery.com/
-  * http://jqueryui.com/
   * A live demonstration may be found at http://rayui.github.com/flyweight-jquery-custom-select/
   
 ## Disclaimer
