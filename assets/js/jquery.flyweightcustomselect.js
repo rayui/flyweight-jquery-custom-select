@@ -6,7 +6,7 @@
 */
 
 (function($){
-	var clickEvent = ('touchstart' in document.documentElement) ? 'touchstart' : 'click'
+	var clickEvent = ('ontouchstart' in document.documentElement) ? 'touchend' : 'click'
 	
 	$.fn.flyweightCustomSelect = function(method) {
 		var settings = {},
@@ -172,6 +172,8 @@
 			};
 			
 			var onClick = function(e) {
+				if (menu.touchMoved) {return false;}
+
 				e.preventDefault();
 				e.stopPropagation();
 				
@@ -184,11 +186,21 @@
 				if (selectedAnchor.nodeName.toUpperCase() !== "A") {
 					return false;
 				}
+				
 				setSelectToIndex(getLookupIndexByAttr("selectIndex", parseInt(selectedAnchor.getAttribute("data-index"), 10)));
 				menu.close();
 				
 				//return focus to placeholder
 				placeHolder.focus();
+			};
+			
+			var onTouchStart = function(e) {
+				placeHolder.addClass(settings.classes.placeholder.container.focus);
+				menu.touchMoved = false;
+			};
+			
+			var onTouchMove = function(e) {
+				menu.touchMoved = true;
 			};
 			
 			//selects the item by offset from currently selected item in original select element
@@ -205,10 +217,15 @@
 					}
 				}
 			};
-
+			
 			//initialise on first run
 			return function() {
-				menuDiv = $('<div class="' + settings.classes.menu.container.base + '" />').bind(clickEvent, onClick);
+			
+				menuDiv = $('<div class="' + settings.classes.menu.container.base + '" />');
+				menuDiv.bind(clickEvent, onClick);
+				menuDiv.bind('touchstart', onTouchStart);
+				menuDiv.bind('touchmove', onTouchMove);
+				
 				$('body').append(menuDiv);
 				
 				return {
@@ -253,6 +270,9 @@
 
 						if (placeHolder) {
 							placeHolder.removeClass(settings.classes.placeholder.container.open + ' ' + settings.classes.placeholder.container.dropdown + ' ' + settings.classes.placeholder.container.dropup);
+							if (clickEvent === 'touchend') {
+								placeHolder[0].className = settings.classes.placeholder.container.base;
+							}
 						}
 						
 						//set flag
@@ -287,23 +307,44 @@
 					},
 					getSelect: function() {
 						return selectEl;
-					}
+					},
+					getCurrentPlaceHolder: function() {
+						return placeHolder;
+					},
+					touchMoved: false
 				};
 			}();
 		};
 		
 		var PlaceHolder = function(selectEl) {
 			var placeHolder;
-			
-			//click behaviour
-			var onClick = function(e) {
-				e.stopPropagation();
-				e.preventDefault();
-				
-				// toggle the custom select menu if enabled
-				menu.open() || menu.close();
-				
-			};
+
+			var onClick = (function(e) {
+				var disableDefault = function(e) {
+					e.stopPropagation();
+					e.preventDefault();
+				},
+				toggleMenu = function() {
+					menu.open() || menu.close();
+				};
+				if (clickEvent !== 'touchend') {
+					return function(e) {
+						// toggle the custom select menu if enabled
+						disableDefault(e);
+						toggleMenu();
+					}
+				} else {
+					return function(e) {
+						disableDefault(e);
+						var currentPlaceHolder = menu.getCurrentPlaceHolder();
+						if (currentPlaceHolder) {
+							currentPlaceHolder[0].className = settings.classes.placeholder.container.base;
+						}
+						menu.bondToSelect(placeHolder, selectEl);
+						toggleMenu();
+					}
+				}
+			})();
 			
 			//keydown behaviour
 			var onKeyDown = function(e) {
@@ -359,37 +400,57 @@
 				placeHolder[0].className = settings.classes.placeholder.container.base;
 			};
 			
-			var enable = function() {
-				$(selectEl).removeAttr("disabled");
-								
-				if ($(selectEl).attr('tabindex') && settings.tabindex) {
-					placeHolder.attr('tabindex', $(selectEl).attr('tabindex'));
-				} else {
-					placeHolder.attr('tabindex', 0);
+			var enable = (function() {
+				var _enable = function() {
+					$(selectEl).removeAttr("disabled");
+									
+					if ($(selectEl).attr('tabindex') && settings.tabindex) {
+						placeHolder.attr('tabindex', $(selectEl).attr('tabindex'));
+					} else {
+						placeHolder.attr('tabindex', 0);
+					}
+					
+					placeHolder.removeClass(settings.classes.placeholder.container.disabled);
+					placeHolder.bind(clickEvent, onClick);
 				}
-				
-				placeHolder.removeClass(settings.classes.placeholder.container.disabled);
-				placeHolder.bind(clickEvent, onClick);
-				placeHolder.unbind('focus').bind('focus', onFocus);
-				placeHolder.unbind('blur').bind('blur', onBlur);
-
-				placeHolder.keydown(onKeyDown);
-			};
+				if (clickEvent !== 'touchend') {
+					return function() {
+						_enable();
+						placeHolder.unbind('focus').bind('focus', onFocus);
+						placeHolder.unbind('blur').bind('blur', onBlur);
+						placeHolder.keydown(onKeyDown);
+					}
+				} else {
+					return function() {
+						_enable();
+					}
+				}
+			})();
 			
-			var disable = function() {
-				$(selectEl).attr("disabled", "disabled");
-				
-				//remove tabindex according to settings
-				!settings.tabindex || placeHolder.removeAttr("tabindex");
-				
-				placeHolder.addClass(settings.classes.placeholder.container.disabled);
-				//prevent default click
-				placeHolder.unbind(clickEvent).bind(clickEvent, function() {return false;});
-				placeHolder.unbind('keydown');
-				//remove placeholder from document focus flow
-				placeHolder.unbind('focus').bind('focus', function() {this.blur();return false;});
-				placeHolder.unbind('blur');
-			};
+			var disable = (function() {
+				var _disable = function() {
+					$(selectEl).attr("disabled", "disabled");
+					
+					//remove tabindex according to settings
+					!settings.tabindex || placeHolder.removeAttr("tabindex");
+					
+					placeHolder.addClass(settings.classes.placeholder.container.disabled);
+					//prevent default click
+					placeHolder.unbind(clickEvent).bind(clickEvent, function() {return false;});
+				}
+				if (clickEvent !== 'touchend') {
+					return function() {
+						_disable();
+						placeHolder.unbind('focus').bind('focus', function() {this.blur();return false;});
+						placeHolder.unbind('blur');
+						placeHolder.unbind('keydown');
+					}
+				} else {
+					return function() {
+						_disable();
+					}
+				}
+			})();
 			
 			//generate placeholder and enable
 			return function() {
@@ -513,7 +574,7 @@
 				},
 				listitem:{
 					base:"fwselect-menu-listitem",
-					focus:"fwselect-menu-listitem-focus",
+					focus:"fwselect-menu-listitem-focus"
 				},
 				group:{
 					base:"fwselect-menu-group"
