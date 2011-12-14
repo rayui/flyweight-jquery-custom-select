@@ -33,7 +33,3 @@ It borrows accessibility design patterns from the Filament Group's jQuery UI Sel
   * http://www.filamentgroup.com/lab/jquery_ui_selectmenu_an_aria_accessible_plugin_for_styling_a_html_select/
   * http://jquery.com/
   * A live demonstration may be found at http://rayui.github.com/flyweight-jquery-custom-select/
-  
-## Disclaimer
-
-This code is currently only a functional prototype and should not be considered production ready code. Please see the unstable branch for the latest commits
