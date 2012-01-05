@@ -19,7 +19,7 @@ It borrows accessibility design patterns from the Filament Group's jQuery UI Sel
   * Toggle hide first option element (for Please Select, etc) [REMOVED in favour of mimicking OS behaviour]
   * Togglable tabindex support (on by default)
   * Binds to original select change event
-  * Javascript only 8KB compressed
+  * Javascript only 8KB compressed (2.5KB GZipped)
   * Works in all tested major browsers (FF 3.6/5.1, Chrome 11/12/15, IE 6/7/8/9)
   * Provides Mobile Webkit and Safari experience consistent with desktop
 
