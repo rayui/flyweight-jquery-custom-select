@@ -81,7 +81,7 @@
 				var menuHeight = menuDiv.outerHeight(),
 					placeHolderTop = placeHolder.offset().top,
 					placeHolderHeight = placeHolder.height(),
-					windowHeight = document.documentElement.clientHeight,
+					windowHeight = window.innerHeight ? window.innerHeight : $(window).height(), //document.documentElement.clientHeight,
 					menuTop = 0,
 					isDropDown = true;
 					
@@ -94,8 +94,10 @@
 					isDropDown = false;
 				} else {
 					//drop down with scroll
-					menuTop = placeHolderTop + placeHolderHeight;
-					menuDiv.find('ul.' + settings.classes.menu.list.base).height(windowHeight - menuTop);
+					var menuTop = placeHolderTop + placeHolderHeight,
+						maxDropDownHeight = windowHeight - (menuTop - $(window).scrollTop());
+						
+					menuDiv.find('ul.' + settings.classes.menu.list.base).height(maxDropDownHeight > menuHeight ? menuHeight : maxDropDownHeight);
 				}
 				
 				menuDiv.css({
