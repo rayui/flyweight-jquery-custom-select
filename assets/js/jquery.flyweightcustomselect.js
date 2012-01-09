@@ -81,7 +81,7 @@
 				var menuHeight = menuDiv.outerHeight(),
 					placeHolderTop = placeHolder.offset().top,
 					placeHolderHeight = placeHolder.height(),
-					windowHeight = document.documentElement.clientHeight,
+					windowHeight = window.innerHeight ? window.innerHeight : $(window).height(), //document.documentElement.clientHeight,
 					menuTop = 0,
 					isDropDown = true;
 					
@@ -94,8 +94,14 @@
 					isDropDown = false;
 				} else {
 					//drop down with scroll
-					menuTop = placeHolderTop + placeHolderHeight;
-					menuDiv.find('ul.' + settings.classes.menu.list.base).height(windowHeight - menuTop);
+					var menuTop = placeHolderTop + placeHolderHeight,
+						newMenuHeight = Math.min(menuHeight, windowHeight - (menuTop - $(window).scrollTop()));
+						
+					menuDiv.find('ul.' + settings.classes.menu.list.base).height(newMenuHeight);
+					
+					if (clickEvent === 'touchend') {
+						addTouchScrollIndicator(menuHeight, newMenuHeight);
+					}
 				}
 				
 				menuDiv.css({
@@ -105,6 +111,14 @@
 				
 				return isDropDown;
 				
+			};
+			
+			//add a scroll indicator for touch devices
+			var addTouchScrollIndicator = function(originalMenuHeight, newMenuHeight) {
+				var touchScrollIndicator = $('<span class="' + settings.classes.menu.scroll.base + '"></span>');
+					
+				touchScrollIndicator.height(parseInt(Math.pow(newMenuHeight, 2) / originalMenuHeight, 10) - 10);
+				menuDiv.append(touchScrollIndicator);
 			};
 
 			//update selecEl value to new index			
@@ -172,9 +186,6 @@
 			};
 			
 			var onClick = function(e) {
-				if (menu.touchMoved) {return false;}
-
-				e.preventDefault();
 				e.stopPropagation();
 				
 				var selectedAnchor = e.target,
@@ -187,20 +198,38 @@
 					return false;
 				}
 				
-				setSelectToIndex(getLookupIndexByAttr("selectIndex", parseInt(selectedAnchor.getAttribute("data-index"), 10)));
-				menu.close();
+				if (!menu.touchMoved) {
+					setSelectToIndex(getLookupIndexByAttr("selectIndex", parseInt(selectedAnchor.getAttribute("data-index"), 10)));
+					menu.close();
+					//return focus to placeholder
+					placeHolder.focus();
+				}
 				
-				//return focus to placeholder
-				placeHolder.focus();
+				return false;
 			};
 			
 			var onTouchStart = function(e) {
+				e.stopPropagation();
 				placeHolder.addClass(settings.classes.placeholder.container.focus);
 				menu.touchMoved = false;
+				menu.lastTouch = e.originalEvent.touches[0].pageY;
+				return false;
 			};
 			
 			var onTouchMove = function(e) {
 				menu.touchMoved = true;
+
+				var menuList = menuDiv.find('ul.' + settings.classes.menu.list.base),
+					menuScrollIndicator = menuDiv.find('span.' + settings.classes.menu.scroll.base),
+					menuScrollTop = menuList.attr('scrollTop') + menu.lastTouch - e.originalEvent.touches[0].pageY,
+					menuScrollIndicatorTop = 5 + menuScrollTop * menuScrollIndicator.height() / menuList.height();
+					
+				menuScrollIndicatorTop = Math.max(5, menuScrollIndicatorTop);
+				menuScrollIndicatorTop = Math.min(menuList.height() - menuScrollIndicator.height() - 10, menuScrollIndicatorTop);
+					
+				menuList.scrollTop(menuScrollTop);
+				menuScrollIndicator.css('top', menuScrollIndicatorTop);
+				menu.lastTouch = e.originalEvent.touches[0].pageY;
 			};
 			
 			//selects the item by offset from currently selected item in original select element
@@ -260,8 +289,7 @@
 							setMenuToIndex(initialSelectedIndex);
 							
 							//set flags
-							isOpen = true;
-							return true;
+							return (isOpen = true);
 						}
 						return false;
 					},
@@ -311,7 +339,8 @@
 					getCurrentPlaceHolder: function() {
 						return placeHolder;
 					},
-					touchMoved: false
+					touchMoved: false,
+					lastTouch: 0
 				};
 			}();
 		};
@@ -346,45 +375,51 @@
 				}
 			})();
 			
+			var onTouchStart = function(e) {
+				e.stopPropagation();
+				return false;
+			};
+			
 			//keydown behaviour
 			var onKeyDown = function(e) {
 				e.stopPropagation();
+				var keyCode = e.keyCode;
 				
-				if (e.keyCode === settings.keymap.left || e.keyCode === settings.keymap.right || e.keyCode === settings.keymap.up || e.keyCode === settings.keymap.down || e.keyCode === settings.keymap.enter || e.keyCode === settings.keymap.space) {
+				if (keyCode === settings.keymap.left || keyCode === settings.keymap.right || keyCode === settings.keymap.up || keyCode === settings.keymap.down || keyCode === settings.keymap.enter || keyCode === settings.keymap.space) {
 					e.preventDefault();
 				}
 				
 				//switch(true) to enable use of expanded conditional statements
 				//crockford doesn't like this but what the hell
 				switch (true) {
-					case (e.keyCode === settings.keymap.left):
-					case (e.keyCode === settings.keymap.up):
+					case (keyCode === settings.keymap.left):
+					case (keyCode === settings.keymap.up):
 						menu.scrollUp();
 						break;
-					case (e.keyCode === settings.keymap.right):
-					case (e.keyCode === settings.keymap.down):
+					case (keyCode === settings.keymap.right):
+					case (keyCode === settings.keymap.down):
 						menu.scrollDown();
 						break;
-					case (e.keyCode === settings.keymap.pgup):
+					case (keyCode === settings.keymap.pgup):
 						menu.pageUp();
 						break;
-					case (e.keyCode === settings.keymap.pgdn):
+					case (keyCode === settings.keymap.pgdn):
 						menu.pageDown();
 						break;
-					case (e.keyCode === settings.keymap.enter):
-					case (e.keyCode === settings.keymap.space):
+					case (keyCode === settings.keymap.enter):
+					case (keyCode === settings.keymap.space):
 						$(this).trigger(clickEvent);
 						break;
-					case (e.keyCode === settings.keymap.tab):
+					case (keyCode === settings.keymap.tab):
 						menu.close();
 						break;
-					case (e.keyCode === settings.keymap.escape):
+					case (keyCode === settings.keymap.escape):
 						menu.reset();
 						break;
-					case (e.keyCode >= 48 && e.keyCode <= 59):
-					case (e.keyCode >= 65 && e.keyCode <= 90):
-					case (e.keyCode >= 97 && e.keyCode <= 122):
-						menu.search(String.fromCharCode(e.keyCode));
+					case (keyCode >= 48 && keyCode <= 59):
+					case (keyCode >= 65 && keyCode <= 90):
+					case (keyCode >= 97 && keyCode <= 122):
+						menu.search(String.fromCharCode(keyCode));
 						break;
 				}
 			};
@@ -423,6 +458,7 @@
 				} else {
 					return function() {
 						_enable();
+						placeHolder.unbind('touchstart').bind('touchstart', onTouchStart);
 					}
 				}
 			})();
@@ -448,6 +484,7 @@
 				} else {
 					return function() {
 						_disable();
+						placeHolder.unbind('touchstart');
 					}
 				}
 			})();
@@ -480,15 +517,35 @@
 		
 		var methods = {
 			init:function(options) {
+				var cancelMenu = (function() {
+					if (clickEvent !== 'touchend') {
+						return function() {
+							if (menu.isOpen()) {menu.reset()};
+						}
+					} else {
+						var touchMoved;
+
+						$(document).bind('touchstart', function(e) {
+							touchMoved = false;
+						});
+						
+						$(document).bind('touchmove', function(e) {
+							touchMoved = true;
+						});
+						
+						return function() {
+							if (menu.isOpen() && touchMoved === false) {menu.reset()};
+						}
+					}
+				}());
+				
 				settings = $.extend({}, $.fn.flyweightCustomSelect.settings, options);
 				
 				//instantiate single drop down menuDiv on first run
 				//store instance on prototype. menu is local var for better compression & performance!
 				if (menu === null) {
 					menu = $.fn.flyweightCustomSelect.menu = new FlyweightMenu();
-					$(document).bind(clickEvent, function() {
-						if (menu.isOpen()) {menu.reset()};
-					});
+					$(document).bind(clickEvent, cancelMenu);
 				}
 				
 				//keep a record of placeholder on select
@@ -497,11 +554,15 @@
 						$(this).data('placeHolder', new PlaceHolder(this));
 					}
 				});
-				
 			},
 			destroy:function() {
 				menu.destroy();
 				menu = $.fn.flyweightCustomSelect.menu = null;
+				
+				$(document).unbind(clickEvent);
+				$(document).unbind('touchmove');
+				$(document).unbind('touchstart');
+				
 				return this.each(function() {
 					$(this).data('placeHolder').destroy();
 					$(this).data('placeHolder', null);
@@ -525,11 +586,11 @@
 			//vml in IE6 won't focus on hyperlinks with PIE so, we have to wrap our markup in another div :(
 			if ($.browser.msie && parseInt($.browser.version, 10) < 7) {
 				return function(selectEl) {
-					return $('<div class="' + settings.classes.placeholder.container.base + '"><a href="#" aria-owns="' + selectEl.id + '" role="button" href="#" aria-haspopup="true" id="' + selectEl.id + '-button"><span class="' + settings.classes.placeholder.text.base + '">' + selectEl.options[selectEl.selectedIndex].text + '</span><span class="' + settings.classes.placeholder.arrow.base + '"></span></a></div>');
+					return $('<div class="' + settings.classes.placeholder.container.base + ' ' + selectEl.className + '"><a href="#" aria-owns="' + selectEl.id + '" role="button" href="#" aria-haspopup="true" id="' + selectEl.id + '-button"><span class="' + settings.classes.placeholder.text.base + '">' + selectEl.options[selectEl.selectedIndex].text + '</span><span class="' + settings.classes.placeholder.arrow.base + '"></span></a></div>');
 				};
 			} else {
 				return function(selectEl) {
-					return $('<a href="#" aria-owns="' + selectEl.id + '" class="' + settings.classes.placeholder.container.base + '" role="button" href="#" aria-haspopup="true" id="' + selectEl.id + '-button"><span class="' + settings.classes.placeholder.text.base + '">' + selectEl.options[selectEl.selectedIndex].text + '</span><span class="' + settings.classes.placeholder.arrow.base + '"></span></a>');
+					return $('<a href="#" aria-owns="' + selectEl.id + '" class="' + settings.classes.placeholder.container.base + ' ' + selectEl.className + '" role="button" href="#" aria-haspopup="true" id="' + selectEl.id + '-button"><span class="' + settings.classes.placeholder.text.base + '">' + selectEl.options[selectEl.selectedIndex].text + '</span><span class="' + settings.classes.placeholder.arrow.base + '"></span></a>');
 				};
 			}
 		})();
@@ -578,6 +639,9 @@
 				},
 				group:{
 					base:"fwselect-menu-group"
+				},
+				scroll:{
+					base:"fwselect-menu-scroll"
 				}
 			}			
 		},
