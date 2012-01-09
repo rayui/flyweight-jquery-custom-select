@@ -95,9 +95,13 @@
 				} else {
 					//drop down with scroll
 					var menuTop = placeHolderTop + placeHolderHeight,
-						maxDropDownHeight = windowHeight - (menuTop - $(window).scrollTop());
+						newMenuHeight = Math.min(menuHeight, windowHeight - (menuTop - $(window).scrollTop()));
 						
-					menuDiv.find('ul.' + settings.classes.menu.list.base).height(maxDropDownHeight > menuHeight ? menuHeight : maxDropDownHeight);
+					menuDiv.find('ul.' + settings.classes.menu.list.base).height(newMenuHeight);
+					
+					if (clickEvent === 'touchend') {
+						addTouchScrollIndicator(menuHeight, newMenuHeight);
+					}
 				}
 				
 				menuDiv.css({
@@ -107,6 +111,14 @@
 				
 				return isDropDown;
 				
+			};
+			
+			//add a scroll indicator for touch devices
+			var addTouchScrollIndicator = function(originalMenuHeight, newMenuHeight) {
+				var touchScrollIndicator = $('<span class="' + settings.classes.menu.scroll.base + '"></span>');
+					
+				touchScrollIndicator.height(parseInt(Math.pow(newMenuHeight, 2) / originalMenuHeight, 10) - 10);
+				menuDiv.append(touchScrollIndicator);
 			};
 
 			//update selecEl value to new index			
@@ -206,7 +218,17 @@
 			
 			var onTouchMove = function(e) {
 				menu.touchMoved = true;
-				menuDiv.find("ul").scrollTop(menuDiv.find("ul").attr('scrollTop') + menu.lastTouch - e.originalEvent.touches[0].pageY);
+
+				var menuList = menuDiv.find('ul.' + settings.classes.menu.list.base),
+					menuScrollIndicator = menuDiv.find('span.' + settings.classes.menu.scroll.base),
+					menuScrollTop = menuList.attr('scrollTop') + menu.lastTouch - e.originalEvent.touches[0].pageY,
+					menuScrollIndicatorTop = 5 + menuScrollTop * menuScrollIndicator.height() / menuList.height();
+					
+				menuScrollIndicatorTop = Math.max(5, menuScrollIndicatorTop);
+				menuScrollIndicatorTop = Math.min(menuList.height() - menuScrollIndicator.height() - 10, menuScrollIndicatorTop);
+					
+				menuList.scrollTop(menuScrollTop);
+				menuScrollIndicator.css('top', menuScrollIndicatorTop);
 				menu.lastTouch = e.originalEvent.touches[0].pageY;
 			};
 			
@@ -267,8 +289,7 @@
 							setMenuToIndex(initialSelectedIndex);
 							
 							//set flags
-							isOpen = true;
-							return true;
+							return (isOpen = true);
 						}
 						return false;
 					},
@@ -565,11 +586,11 @@
 			//vml in IE6 won't focus on hyperlinks with PIE so, we have to wrap our markup in another div :(
 			if ($.browser.msie && parseInt($.browser.version, 10) < 7) {
 				return function(selectEl) {
-					return $('<div class="' + settings.classes.placeholder.container.base + '"><a href="#" aria-owns="' + selectEl.id + '" role="button" href="#" aria-haspopup="true" id="' + selectEl.id + '-button"><span class="' + settings.classes.placeholder.text.base + '">' + selectEl.options[selectEl.selectedIndex].text + '</span><span class="' + settings.classes.placeholder.arrow.base + '"></span></a></div>');
+					return $('<div class="' + settings.classes.placeholder.container.base + ' ' + selectEl.className + '"><a href="#" aria-owns="' + selectEl.id + '" role="button" href="#" aria-haspopup="true" id="' + selectEl.id + '-button"><span class="' + settings.classes.placeholder.text.base + '">' + selectEl.options[selectEl.selectedIndex].text + '</span><span class="' + settings.classes.placeholder.arrow.base + '"></span></a></div>');
 				};
 			} else {
 				return function(selectEl) {
-					return $('<a href="#" aria-owns="' + selectEl.id + '" class="' + settings.classes.placeholder.container.base + '" role="button" href="#" aria-haspopup="true" id="' + selectEl.id + '-button"><span class="' + settings.classes.placeholder.text.base + '">' + selectEl.options[selectEl.selectedIndex].text + '</span><span class="' + settings.classes.placeholder.arrow.base + '"></span></a>');
+					return $('<a href="#" aria-owns="' + selectEl.id + '" class="' + settings.classes.placeholder.container.base + ' ' + selectEl.className + '" role="button" href="#" aria-haspopup="true" id="' + selectEl.id + '-button"><span class="' + settings.classes.placeholder.text.base + '">' + selectEl.options[selectEl.selectedIndex].text + '</span><span class="' + settings.classes.placeholder.arrow.base + '"></span></a>');
 				};
 			}
 		})();
@@ -618,6 +639,9 @@
 				},
 				group:{
 					base:"fwselect-menu-group"
+				},
+				scroll:{
+					base:"fwselect-menu-scroll"
 				}
 			}			
 		},

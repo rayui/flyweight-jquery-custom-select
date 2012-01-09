@@ -221,3 +221,17 @@ a {
 	background: -o-linear-gradient(#FFB566, #FF8B17);
 	background: linear-gradient(#FFB566, #FF8B17);
 }
+
+.fwselect-menu-scroll {
+	position:absolute;
+	top:5px;
+	right:5px;
+	width:0;
+	height:50px;
+	border:2px solid #303030;
+	-moz-opacity: 0.50;
+	opacity: 0.50;
+	border-radius: 2px;
+	-moz-border-radius: 2px;
+	-webkit-border-radius: 2px;
+}
