@@ -35,7 +35,13 @@
 						selectIndex = null;
 					}
 					
-					return {type:el.nodeName.toUpperCase(), selectIndex:selectIndex, text:$el.text(), value:$el.attr("value"), group:$el.attr("label")};
+					return {
+						type:el.nodeName.toUpperCase(), 
+						selectIndex:selectIndex, 
+						text: settings.htmlGenerator ? settings.itemHtmlGenerator.apply($el): $el.text(), 
+						value:$el.attr("value"), 
+						group:$el.attr("label")
+					};
 				});
 			};
 			
@@ -127,7 +133,7 @@
 				selectEl.selectedIndex = lookupHash[lookupIndex].selectIndex;
 				
 				//update value of anchor
-				placeHolder.find("span." + settings.classes.placeholder.text.base).text(lookupHash[lookupIndex].text);
+				placeHolder.find("span." + settings.classes.placeholder.text.base).html(lookupHash[lookupIndex].text);
 				
 				//trigger any change events bound to select element
 				$(selectEl).trigger("change");
