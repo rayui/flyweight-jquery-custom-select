@@ -130,14 +130,16 @@
 
 			//update selecEl value to new index			
 			var setSelectToIndex = function(lookupIndex) {
-				selectEl.value = lookupHash[lookupIndex].value;
-				selectEl.selectedIndex = lookupHash[lookupIndex].selectIndex;
-				
-				//update value of anchor
-				placeHolder.find("span." + settings.classes.placeholder.text.base).html(lookupHash[lookupIndex].text);
-				
-				//trigger any change events bound to select element
-				$(selectEl).trigger("change");
+			  if (selectEl.value !== lookupHash[lookupIndex].value) {
+          selectEl.value = lookupHash[lookupIndex].value;
+          selectEl.selectedIndex = lookupHash[lookupIndex].selectIndex;
+          
+          //update value of anchor
+          placeHolder.find("span." + settings.classes.placeholder.text.base).html(lookupHash[lookupIndex].text);
+          
+          //trigger any change events bound to select element
+          $(selectEl).trigger("change");
+        }
 			};
 
 			//update menu to show new select info
