@@ -127,15 +127,14 @@
 				touchScrollIndicator.height(parseInt(Math.pow(newMenuHeight, 2) / originalMenuHeight, 10) - 10);
 				menuDiv.append(touchScrollIndicator);
 			};
-
+			
 			//update selecEl value to new index			
 			var setSelectToIndex = function(lookupIndex) {
 			  if (selectEl.value !== lookupHash[lookupIndex].value) {
           selectEl.value = lookupHash[lookupIndex].value;
           selectEl.selectedIndex = lookupHash[lookupIndex].selectIndex;
           
-          //update value of anchor
-          placeHolder.find("span." + settings.classes.placeholder.text.base).html(lookupHash[lookupIndex].text);
+          //placeHolder.find("span." + settings.classes.placeholder.text.base).html(lookupHash[lookupIndex].text);
           
           //trigger any change events bound to select element
           $(selectEl).trigger("change");
@@ -445,6 +444,10 @@
 				placeHolder[0].className = settings.classes.placeholder.container.base;
 			};
 			
+			var onSelectChange = function(e) {
+			  placeHolder.find("span." + settings.classes.placeholder.text.base).html(e.target.selectedOptions[0].text);
+			};
+			
 			var enable = (function() {
 				var _enable = function() {
 					$(selectEl).removeAttr("disabled");
@@ -507,6 +510,9 @@
 				//inesrt and hide bound control
 				$(selectEl).after(placeHolder);
 				$(selectEl).hide();
+				
+				//bind change event of select to update placeholder
+				$(selectEl).bind('change', onSelectChange);
 				
 				return {
 					enable:function() {
