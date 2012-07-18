@@ -443,7 +443,7 @@
 			};
 			
 			var onSelectChange = function(e) {
-			  if (e.target.selectedOptions) {
+			  if (e.target.selectedOptions && placeHolder) {
 			    placeHolder.find("span." + settings.classes.placeholder.text.base).html(e.target.selectedOptions[0].text);
 			  }
 			};
