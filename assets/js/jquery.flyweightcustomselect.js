@@ -357,9 +357,11 @@
 			var placeHolder;
 
 			var onClick = (function(e) {
-				var disableDefault = function(e) {
+				var clickCommon = function(e) {
 					e.stopPropagation();
 					e.preventDefault();
+          menu.bondToSelect(placeHolder, selectEl);
+          toggleMenu();
 				},
 				toggleMenu = function() {
 					return (menu.open() || menu.close());
@@ -367,18 +369,15 @@
 				if (clickEvent !== 'touchend') {
 					return function(e) {
 						// toggle the custom select menu if enabled
-						disableDefault(e);
-						toggleMenu();
+						clickCommon(e);
 					};
 				} else {
 					return function(e) {
-						disableDefault(e);
 						var currentPlaceHolder = menu.getCurrentPlaceHolder();
 						if (currentPlaceHolder) {
 							currentPlaceHolder[0].className = settings.classes.placeholder.container.base;
 						}
-						menu.bondToSelect(placeHolder, selectEl);
-						toggleMenu();
+						clickCommon(e);
 					};
 				}
 			})();
