@@ -6,7 +6,7 @@
 */
 
 (function($){
-	var clickEvent = ('ontouchstart' in document.documentElement) ? 'touchend' : 'click'
+	var clickEvent = ('ontouchstart' in document.documentElement) ? 'touchend' : 'click';
 	
 	$.fn.flyweightCustomSelect = function(method) {
 		var settings = {},
@@ -99,9 +99,10 @@
 					menuTop = placeHolderTop - menuHeight;
 					isDropDown = false;
 				} else {
+					var newMenuHeight;
 					//drop down with scroll
-					var menuTop = placeHolderTop + placeHolderHeight,
-						newMenuHeight = Math.min(menuHeight, windowHeight - (menuTop - $(window).scrollTop()));
+					menuTop = placeHolderTop + placeHolderHeight;
+					newMenuHeight = Math.min(menuHeight, windowHeight - (menuTop - $(window).scrollTop()));
 						
 					menuDiv.find('ul.' + settings.classes.menu.list.base).height(newMenuHeight);
 					
@@ -187,7 +188,7 @@
 				search = search.toUpperCase().charCodeAt(0);
 				
 				//if we don't find it after our current position, we search from the top
-				find(search, selectEl.selectedIndex + 1) || find(search, 0);
+				return find(search, selectEl.selectedIndex + 1) || find(search, 0);
 				
 			};
 			
@@ -346,7 +347,8 @@
 						return placeHolder;
 					},
 					touchMoved: false,
-					lastTouch: 0
+					lastTouch: 0,
+					reposition: positionMenu
 				};
 			}();
 		};
@@ -360,14 +362,14 @@
 					e.preventDefault();
 				},
 				toggleMenu = function() {
-					menu.open() || menu.close();
+					return (menu.open() || menu.close());
 				};
 				if (clickEvent !== 'touchend') {
 					return function(e) {
 						// toggle the custom select menu if enabled
 						disableDefault(e);
 						toggleMenu();
-					}
+					};
 				} else {
 					return function(e) {
 						disableDefault(e);
@@ -377,7 +379,7 @@
 						}
 						menu.bondToSelect(placeHolder, selectEl);
 						toggleMenu();
-					}
+					};
 				}
 			})();
 			
@@ -453,19 +455,19 @@
 					
 					placeHolder.removeClass(settings.classes.placeholder.container.disabled);
 					placeHolder.bind(clickEvent, onClick);
-				}
+				};
 				if (clickEvent !== 'touchend') {
 					return function() {
 						_enable();
 						placeHolder.unbind('focus').bind('focus', onFocus);
 						placeHolder.unbind('blur').bind('blur', onBlur);
 						placeHolder.keydown(onKeyDown);
-					}
+					};
 				} else {
 					return function() {
 						_enable();
 						placeHolder.unbind('touchstart').bind('touchstart', onTouchStart);
-					}
+					};
 				}
 			})();
 			
@@ -479,19 +481,19 @@
 					placeHolder.addClass(settings.classes.placeholder.container.disabled);
 					//prevent default click
 					placeHolder.unbind(clickEvent).bind(clickEvent, function() {return false;});
-				}
+				};
 				if (clickEvent !== 'touchend') {
 					return function() {
 						_disable();
 						placeHolder.unbind('focus').bind('focus', function() {this.blur();return false;});
 						placeHolder.unbind('blur');
 						placeHolder.unbind('keydown');
-					}
+					};
 				} else {
 					return function() {
 						_disable();
 						placeHolder.unbind('touchstart');
-					}
+					};
 				}
 			})();
 			
@@ -526,8 +528,10 @@
 				var cancelMenu = (function() {
 					if (clickEvent !== 'touchend') {
 						return function() {
-							if (menu.isOpen()) {menu.reset()};
-						}
+							if (menu.isOpen()) {
+								menu.reset();
+							}
+						};
 					} else {
 						var touchMoved;
 
@@ -540,8 +544,10 @@
 						});
 						
 						return function() {
-							if (menu.isOpen() && touchMoved === false) {menu.reset()};
-						}
+							if (menu.isOpen() && touchMoved === false) {
+								menu.reset();
+							}
+						};
 					}
 				}());
 				
@@ -551,6 +557,7 @@
 				//store instance on prototype. menu is local var for better compression & performance!
 				if (menu === null) {
 					menu = $.fn.flyweightCustomSelect.menu = new FlyweightMenu();
+					$(window).bind('resize', menu.reposition);
 					$(document).bind(clickEvent, cancelMenu);
 				}
 				
@@ -601,11 +608,14 @@
 			}
 		})();
 		
+		//see if we have the method public method. if so, call it with remaining arguments
 		if ( methods[method] ) {
 			return methods[method].apply( this, Array.prototype.slice.call( arguments, 1 ));
 		} else if ( typeof method === 'object' || ! method ) {
+		  //else if the argument is of type object (i.e. we assume it is config and extend it into default settings) or nothing, we call init
 			return methods.init.apply( this, arguments );
 		} else {
+		  //fail with error message to jQuery
 			$.error( 'Method ' +  method + ' does not exist on jQuery.flyweightCustomSelect' );
 		}
 
