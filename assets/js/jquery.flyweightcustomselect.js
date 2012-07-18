@@ -134,9 +134,8 @@
           selectEl.value = lookupHash[lookupIndex].value;
           selectEl.selectedIndex = lookupHash[lookupIndex].selectIndex;
           
-          //placeHolder.find("span." + settings.classes.placeholder.text.base).html(lookupHash[lookupIndex].text);
-          
           //trigger any change events bound to select element
+          //this will include the one this plugin creates to update the value of the placeholder
           $(selectEl).trigger("change");
         }
 			};
@@ -445,7 +444,9 @@
 			};
 			
 			var onSelectChange = function(e) {
-			  placeHolder.find("span." + settings.classes.placeholder.text.base).html(e.target.selectedOptions[0].text);
+			  if (e.target.selectedOptions) {
+			    placeHolder.find("span." + settings.classes.placeholder.text.base).html(e.target.selectedOptions[0].text);
+			  }
 			};
 			
 			var enable = (function() {
@@ -511,7 +512,8 @@
 				$(selectEl).after(placeHolder);
 				$(selectEl).hide();
 				
-				//bind change event of select to update placeholder
+				//bind change event of select to update placeholder when select is updated
+				//if this is unbound then the placeholder will stop representing the value of the select
 				$(selectEl).bind('change', onSelectChange);
 				
 				return {
