@@ -361,10 +361,7 @@
 					e.stopPropagation();
 					e.preventDefault();
           menu.bondToSelect(placeHolder, selectEl);
-          toggleMenu();
-				},
-				toggleMenu = function() {
-					return (menu.open() || menu.close());
+          return (menu.open() || menu.close());
 				};
 				if (clickEvent !== 'touchend') {
 					return function(e) {
