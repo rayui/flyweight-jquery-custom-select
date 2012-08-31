@@ -440,8 +440,8 @@
 			};
 			
 			var onSelectChange = function(e) {
-			  if (e.target.selectedOptions && placeHolder) {
-			    placeHolder.find("span." + settings.classes.placeholder.text.base).html(e.target.selectedOptions[0].text);
+			  if (e.target.options && placeHolder) {
+			    placeHolder.find("span." + settings.classes.placeholder.text.base).html(e.target.options[e.target.selectedIndex].text);
 			  }
 			};
 			
