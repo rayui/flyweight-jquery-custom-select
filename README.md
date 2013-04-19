@@ -36,7 +36,7 @@ Takes a string of the selector for a jQuery object. The left offset of the drop 
 on the parent's object left offset. The width is increased by the difference between the parent's left offset
 and the placeholder's original left offset.
 
-  $(select).flyweightCustomSelect({'alignTo': '.parent'});
+  `$(select).flyweightCustomSelect({'alignTo': '.parent'});`
 
 ## Useful links
 
