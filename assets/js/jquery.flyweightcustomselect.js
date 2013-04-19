@@ -7,10 +7,11 @@
 
 (function($){
 	var clickEvent = ('ontouchstart' in document.documentElement) ? 'touchend' : 'click';
-	
+
 	$.fn.flyweightCustomSelect = function(method) {
 		var settings = {},
-			menu = $.fn.flyweightCustomSelect.menu || null;
+			menu = $.fn.flyweightCustomSelect.menu || null,
+			align = method && method.alignTo ? method.alignTo : null;
 
 		//dropdown menuDiv constructor
 		var FlyweightMenu = function() {
@@ -29,34 +30,34 @@
 				lookupHash = $.map($(settings.optionfilter, selectEl), function(el, index) {
 					var $el = $(el),
 						selectIndex = $el[0].index;
-					
+
 					//hack because IE returns index 0 for optgroup when it should be undefined
 					if ($.browser.msie && el.nodeName.toUpperCase() === "OPTGROUP") {
 						selectIndex = null;
 					}
-					
+
 					return {
-						type:el.nodeName.toUpperCase(), 
-						selectIndex:selectIndex, 
-						text: settings.htmlGenerator ? settings.itemHtmlGenerator.apply($el): $el.text(), 
-						value:$el.attr("value"), 
+						type:el.nodeName.toUpperCase(),
+						selectIndex:selectIndex,
+						text: settings.htmlGenerator ? settings.itemHtmlGenerator.apply($el): $el.text(),
+						value:$el.attr("value"),
 						group:$el.attr("label")
 					};
 				});
 			};
-			
+
 			//builds menu markup
 			var buildMenu = function() {
 				//get data from select
 				//build markup of control
 				var i = 0,
 					customHTML = '<ul class="' + settings.classes.menu.list.base + '">';
-					
+
 				//builds markup for li and anchor of list item
 				var buildItem = function(dataIndex, text) {
 					return '<li><a  class="' + settings.classes.menu.listitem.base + '"data-index="' + dataIndex + '" href="#">' + text + '</a></li>';
 				};
-					
+
 				while (i < lookupHash.length) {
 					if (lookupHash[i].type === "OPTGROUP") {
 						customHTML += '<li class="' + settings.classes.menu.group.base + '"><span>' + lookupHash[i].group + '</span><ul>';
@@ -71,26 +72,30 @@
 						i+=1;
 					}
 				}
-				
+
 				menuDiv.html(customHTML + '</ul>');
-				
+
 			};
-			
+
 			var sizeMenu = function() {
 				var width = placeHolder.width();
 				menuDiv.width(width);
 			};
-			
+
 			var positionMenu = function() {
 				//position menu
-				
 				var menuHeight = menuDiv.outerHeight(),
 					placeHolderTop = placeHolder.offset().top,
 					placeHolderHeight = placeHolder.height(),
 					windowHeight = window.innerHeight ? window.innerHeight : $(window).height(), //document.documentElement.clientHeight,
 					menuTop = 0,
+					alignEl = settings.alignTo && placeHolder.parents(settings.alignTo).first() || null,
+					offsetLeft = alignEl ? alignEl : placeHolder,
+					offsetMax = alignEl ? Math.max(alignEl.width(), placeHolder.width()) : 0,
+					offsetMin = alignEl ? Math.min(alignEl.width(), placeHolder.width()) : 0,
+					deltaWidth = alignEl ? offsetMax - offsetMin : 0,
 					isDropDown = true;
-					
+
 				if (placeHolderTop + placeHolderHeight + menuHeight < windowHeight) {
 					//drop down
 					menuTop = placeHolderTop + placeHolderHeight;
@@ -103,54 +108,55 @@
 					//drop down with scroll
 					menuTop = placeHolderTop + placeHolderHeight;
 					newMenuHeight = Math.min(menuHeight, windowHeight - (menuTop - $(window).scrollTop()));
-						
+
 					menuDiv.find('ul.' + settings.classes.menu.list.base).height(newMenuHeight);
-					
+
 					if (clickEvent === 'touchend') {
 						addTouchScrollIndicator(menuHeight, newMenuHeight);
 					}
 				}
-				
+
 				menuDiv.css({
-					left: placeHolder.offset().left + 'px',
-					top: menuTop + 'px'
+					left: offsetLeft.offset().left + 'px',
+					top: menuTop + 'px',
+					width: placeHolder.width() + deltaWidth
 				});
-				
+
 				return isDropDown;
-				
+
 			};
-			
+
 			//add a scroll indicator for touch devices
 			var addTouchScrollIndicator = function(originalMenuHeight, newMenuHeight) {
 				var touchScrollIndicator = $('<span class="' + settings.classes.menu.scroll.base + '"></span>');
-					
+
 				touchScrollIndicator.height(parseInt(Math.pow(newMenuHeight, 2) / originalMenuHeight, 10) - 10);
 				menuDiv.append(touchScrollIndicator);
 			};
-			
-			//update selecEl value to new index			
+
+			//update selecEl value to new index
 			var setSelectToIndex = function(lookupIndex) {
-			  if (selectEl.value !== lookupHash[lookupIndex].value) {
-          selectEl.value = lookupHash[lookupIndex].value;
-          selectEl.selectedIndex = lookupHash[lookupIndex].selectIndex;
-          
-          //trigger any change events bound to select element
-          //this will include the one this plugin creates to update the value of the placeholder
-          $(selectEl).trigger("change");
-        }
+				if (selectEl.value !== lookupHash[lookupIndex].value) {
+					selectEl.value = lookupHash[lookupIndex].value;
+					selectEl.selectedIndex = lookupHash[lookupIndex].selectIndex;
+
+					//trigger any change events bound to select element
+					//this will include the one this plugin creates to update the value of the placeholder
+					$(selectEl).trigger("change");
+				}
 			};
 
 			//update menu to show new select info
 			var setMenuToIndex = function(lookupIndex) {
 				var $selectedAnchor;
-				
+
 				//first ensure select is kept in sync
 				//necessary for data integrity
 				setSelectToIndex(lookupIndex);
-				
+
 				//scroll to selected LI in list
 				$selectedAnchor = menuDiv.find('a[data-index="' + lookupHash[lookupIndex].selectIndex + '"]');
-				
+
 				menuDiv.find("ul").scrollTop(0);
 				menuDiv.find("a").removeClass(settings.classes.menu.listitem.focus);
 				if ($selectedAnchor.length > 0) {
@@ -158,15 +164,15 @@
 					menuDiv.find("ul").scrollTop($selectedAnchor.position().top);
 				}
 			};
-			
-			//get index of attribute 
+
+			//get index of attribute
 			var getLookupIndexByAttr = function(attr, data) {
 				var i = lookupHash.length - 1;
-				
+
 				while(i > 0 && lookupHash[i][attr] !== data) {
 					i-=1;
 				}
-				
+
 				return i;
 			};
 
@@ -181,40 +187,40 @@
 				}
 				return false;
 			};
-			
+
 			//typeahead functionality
 			var typeAhead = function(search) {
 				//normalise search character
 				search = search.toUpperCase().charCodeAt(0);
-				
+
 				//if we don't find it after our current position, we search from the top
 				return find(search, selectEl.selectedIndex + 1) || find(search, 0);
-				
+
 			};
-			
+
 			var onClick = function(e) {
 				e.stopPropagation();
-				
+
 				var selectedAnchor = e.target,
 					value,
 					index;
-				
+
 				//we only set target for keyboard nav as events will be triggered on wrapper div, not anchor (as is when clicked)
-				//we need to check this because the person could theoretically click on the div which the elements are bound to, as opposed to the anchor 
+				//we need to check this because the person could theoretically click on the div which the elements are bound to, as opposed to the anchor
 				if (selectedAnchor.nodeName.toUpperCase() !== "A") {
 					return false;
 				}
-				
+
 				if (!menu.touchMoved) {
 					setSelectToIndex(getLookupIndexByAttr("selectIndex", parseInt(selectedAnchor.getAttribute("data-index"), 10)));
 					menu.close();
 					//return focus to placeholder
 					placeHolder.focus();
 				}
-				
+
 				return false;
 			};
-			
+
 			var onTouchStart = function(e) {
 				e.stopPropagation();
 				placeHolder.addClass(settings.classes.placeholder.container.focus);
@@ -222,7 +228,7 @@
 				menu.lastTouch = e.originalEvent.touches[0].pageY;
 				return false;
 			};
-			
+
 			var onTouchMove = function(e) {
 				menu.touchMoved = true;
 
@@ -230,15 +236,15 @@
 					menuScrollIndicator = menuDiv.find('span.' + settings.classes.menu.scroll.base),
 					menuScrollTop = menuList.attr('scrollTop') + menu.lastTouch - e.originalEvent.touches[0].pageY,
 					menuScrollIndicatorTop = 5 + menuScrollTop * menuScrollIndicator.height() / menuList.height();
-					
+
 				menuScrollIndicatorTop = Math.max(5, menuScrollIndicatorTop);
 				menuScrollIndicatorTop = Math.min(menuList.height() - menuScrollIndicator.height() - 10, menuScrollIndicatorTop);
-					
+
 				menuList.scrollTop(menuScrollTop);
 				menuScrollIndicator.css('top', menuScrollIndicatorTop);
 				menu.lastTouch = e.originalEvent.touches[0].pageY;
 			};
-			
+
 			//selects the item by offset from currently selected item in original select element
 			var scrollBy = function(offset) {
 				// step to next while option's value is not empty and is not an optgroup or label
@@ -253,30 +259,29 @@
 					}
 				}
 			};
-			
+
 			//initialise on first run
 			return function() {
-			
 				menuDiv = $('<div class="' + settings.classes.menu.container.base + '" />');
 				menuDiv.bind(clickEvent, onClick);
 				menuDiv.bind('touchstart', onTouchStart);
 				menuDiv.bind('touchmove', onTouchMove);
-				
+
 				$('body').append(menuDiv);
-				
+
 				return {
 					bondToSelect: function(triggeredPlaceHolder, triggeredSelectEl) {
 						//set closure wide variable to remember which object triggered open
 						placeHolder = triggeredPlaceHolder;
 						selectEl = triggeredSelectEl;
 					},
-					open: function() {					
+					open: function() {
 						if (!isOpen) {
 							//cache the values & text for performance
 							mapOptionsToHash();
 							buildMenu();
 							sizeMenu();
-							
+
 							//positionMenu returns true if it is drop down, false if it is dropping up
 							if (positionMenu()) {
 								menuDiv.addClass(settings.classes.menu.container.dropdown);
@@ -285,16 +290,16 @@
 								menuDiv.addClass(settings.classes.menu.container.dropup);
 								placeHolder.addClass(settings.classes.placeholder.container.dropup);
 							}
-							
+
 							menuDiv.addClass(settings.classes.menu.container.open);
 							placeHolder
 								.addClass(settings.classes.placeholder.container.open)
 								.focus();
-							
+
 							//now set intial state of menu
 							initialSelectedIndex = getLookupIndexByAttr("selectIndex", selectEl.selectedIndex);
 							setMenuToIndex(initialSelectedIndex);
-							
+
 							//set flags
 							return (isOpen = true);
 						}
@@ -309,7 +314,7 @@
 								placeHolder[0].className = settings.classes.placeholder.container.base;
 							}
 						}
-						
+
 						//set flag
 						isOpen = false;
 					},
@@ -325,16 +330,16 @@
 						return isOpen;
 					},
 					scrollDown: function() {
-						this.open() || scrollBy(1);	
+						this.open() || scrollBy(1);
 					},
 					scrollUp: function() {
 						this.open() || scrollBy(-1);
 					},
 					pageDown: function() {
-						this.open() || scrollBy(10);	
+						this.open() || scrollBy(10);
 					},
 					pageUp: function() {
-						this.open() || scrollBy(-10);	
+						this.open() || scrollBy(-10);
 					},
 					search: function(character) {
 						this.open();
@@ -352,7 +357,7 @@
 				};
 			}();
 		};
-		
+
 		var PlaceHolder = function(selectEl) {
 			var placeHolder;
 
@@ -360,8 +365,8 @@
 				var clickCommon = function(e) {
 					e.stopPropagation();
 					e.preventDefault();
-          menu.bondToSelect(placeHolder, selectEl);
-          return (menu.open() || menu.close());
+					menu.bondToSelect(placeHolder, selectEl);
+					return (menu.open() || menu.close());
 				};
 				if (clickEvent !== 'touchend') {
 					return function(e) {
@@ -378,21 +383,21 @@
 					};
 				}
 			})();
-			
+
 			var onTouchStart = function(e) {
 				e.stopPropagation();
 				return false;
 			};
-			
+
 			//keydown behaviour
 			var onKeyDown = function(e) {
 				e.stopPropagation();
 				var keyCode = e.keyCode;
-				
+
 				if (keyCode === settings.keymap.left || keyCode === settings.keymap.right || keyCode === settings.keymap.up || keyCode === settings.keymap.down || keyCode === settings.keymap.enter || keyCode === settings.keymap.space) {
 					e.preventDefault();
 				}
-				
+
 				//switch(true) to enable use of expanded conditional statements
 				//crockford doesn't like this but what the hell
 				switch (true) {
@@ -427,34 +432,34 @@
 						break;
 				}
 			};
-			
+
 			var onFocus = function(e) {
 				e.stopPropagation();
 				menu.bondToSelect(placeHolder, selectEl);
 				placeHolder.addClass(settings.classes.placeholder.container.focus);
 			};
-			
+
 			var onBlur = function(e) {
 				e.stopPropagation();
 				placeHolder[0].className = settings.classes.placeholder.container.base;
 			};
-			
+
 			var onSelectChange = function(e) {
-			  if (e.target.selectedOptions && placeHolder) {
-			    placeHolder.find("span." + settings.classes.placeholder.text.base).html(e.target.selectedOptions[0].text);
+			  if (e.target.options && placeHolder) {
+			    placeHolder.find("span." + settings.classes.placeholder.text.base).html(e.target.options[e.target.selectedIndex].text);
 			  }
 			};
-			
+
 			var enable = (function() {
 				var _enable = function() {
 					$(selectEl).removeAttr("disabled");
-									
+
 					if ($(selectEl).attr('tabindex') && settings.tabindex) {
 						placeHolder.attr('tabindex', $(selectEl).attr('tabindex'));
 					} else {
 						placeHolder.attr('tabindex', 0);
 					}
-					
+
 					placeHolder.removeClass(settings.classes.placeholder.container.disabled);
 					placeHolder.bind(clickEvent, onClick);
 				};
@@ -472,14 +477,14 @@
 					};
 				}
 			})();
-			
+
 			var disable = (function() {
 				var _disable = function() {
 					$(selectEl).attr("disabled", "disabled");
-					
+
 					//remove tabindex according to settings
 					!settings.tabindex || placeHolder.removeAttr("tabindex");
-					
+
 					placeHolder.addClass(settings.classes.placeholder.container.disabled);
 					//prevent default click
 					placeHolder.unbind(clickEvent).bind(clickEvent, function() {return false;});
@@ -498,20 +503,20 @@
 					};
 				}
 			})();
-			
+
 			//generate placeholder and enable
 			return function() {
 				placeHolder = buildPlaceHolder(selectEl);
 				enable();
-				
+
 				//inesrt and hide bound control
 				$(selectEl).after(placeHolder);
 				$(selectEl).hide();
-				
+
 				//bind change event of select to update placeholder when select is updated
 				//if this is unbound then the placeholder will stop representing the value of the select
 				$(selectEl).bind('change', onSelectChange);
-				
+
 				return {
 					enable:function() {
 						enable();
@@ -526,9 +531,9 @@
 					}
 				};
 			}();
-			
+
 		};
-		
+
 		var methods = {
 			init:function(options) {
 				var cancelMenu = (function() {
@@ -544,11 +549,11 @@
 						$(document).bind('touchstart', function(e) {
 							touchMoved = false;
 						});
-						
+
 						$(document).bind('touchmove', function(e) {
 							touchMoved = true;
 						});
-						
+
 						return function() {
 							if (menu.isOpen() && touchMoved === false) {
 								menu.reset();
@@ -556,9 +561,8 @@
 						};
 					}
 				}());
-				
+
 				settings = $.extend({}, $.fn.flyweightCustomSelect.settings, options);
-				
 				//instantiate single drop down menuDiv on first run
 				//store instance on prototype. menu is local var for better compression & performance!
 				if (menu === null) {
@@ -566,7 +570,7 @@
 					$(window).bind('resize', menu.reposition);
 					$(document).bind(clickEvent, cancelMenu);
 				}
-				
+
 				//keep a record of placeholder on select
 				return this.each(function() {
 					if (!$(this).data('placeHolder')) {
@@ -577,11 +581,11 @@
 			destroy:function() {
 				menu.destroy();
 				menu = $.fn.flyweightCustomSelect.menu = null;
-				
+
 				$(document).unbind(clickEvent);
 				$(document).unbind('touchmove');
 				$(document).unbind('touchstart');
-				
+
 				return this.each(function() {
 					$(this).data('placeHolder').destroy();
 					$(this).data('placeHolder', null);
@@ -589,16 +593,16 @@
 			},
 			enable:function() {
 				return this.each(function() {
-					$(this).data('placeHolder').enable();	
+					$(this).data('placeHolder').enable();
 				});
 			},
 			disable:function() {
 				return this.each(function() {
-					$(this).data('placeHolder').disable();	
+					$(this).data('placeHolder').disable();
 				});
 			}
 		};
-		
+
 		//curry function to build placeHolder
 		//we do this here for performance so it is run only once.
 		var buildPlaceHolder = (function() {
@@ -613,7 +617,7 @@
 				};
 			}
 		})();
-		
+
 		//see if we have the method public method. if so, call it with remaining arguments
 		if ( methods[method] ) {
 			return methods[method].apply( this, Array.prototype.slice.call( arguments, 1 ));
@@ -626,8 +630,9 @@
 		}
 
 	};
-	
+
 	$.fn.flyweightCustomSelect.settings = {
+		alignTo: null,
 		classes:{
 			placeholder:{
 				container:{
@@ -665,7 +670,7 @@
 				scroll:{
 					base:"fwselect-menu-scroll"
 				}
-			}			
+			}
 		},
 		optionfilter:'option,optgroup',
 		tabindex:false,
